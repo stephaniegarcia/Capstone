@@ -125,7 +125,7 @@ router.delete('/user/:userId', (req,res) => {
     else {
         res.status(404).send('User not found.');
     }
-    //res.status(404).send("User not found.");
+    
 });
 
 // Validates email address of course.
