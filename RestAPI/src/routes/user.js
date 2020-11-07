@@ -2,7 +2,7 @@
 const { Router } = require('express');
 const { nodemailer } = require('nodemailer');
 const { _ } = require('underscore');
-const users = require('../sample.json');
+const users = require('../users.json');
 const router = Router();
 
 
@@ -77,6 +77,7 @@ router.get('/user/:userId', (req,res) => {
 router.put('/user/:userId', (req, res) => {
     
     const {firstname, lastname, business_status, phone_number} = req.body;
+    let founded = false;
     
     if (firstname && lastname && business_status ){
       
@@ -85,17 +86,19 @@ router.put('/user/:userId', (req, res) => {
             if(validName(firstname) && validName(lastname) && validPhone(phone_number)){
                 
                 _.each(users, (user, i) => {
+                    console.log(user.id);
                     
                     if(user.id == req.params.userId){
+                        founded = true;
                         user.firstname = firstname;
                         user.lastname = lastname;
                         user.business_status = business_status;
                         user.phone_number = phone_number;
-
+                        console.log("Update user: " + req.params.userId);
+                        res.status(200).json(users);
                     }
                 });
-                console.log("Update user: " + req.params.userId);
-                res.status(200).json(users);
+                
             }
             else{
                 res.status(400).send("Error");
@@ -105,6 +108,10 @@ router.put('/user/:userId', (req, res) => {
     }
     else{
         res.status(400).send("Error");
+    }
+
+    if(!founded){
+        res.status(404).send("User not found");
     }
 });
 

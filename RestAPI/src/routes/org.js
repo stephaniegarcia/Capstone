@@ -1,32 +1,43 @@
 const { Router } = require('express');
 const router = Router();
+const { _ } = require('underscore');
+const organizations = require('../organizations.json');
+
 
 router.get('/organizations', (req, res) => {
-    const data = [
-        {
-            "name" : "example",
-            "email" : "examenple@test.com",
-            "phone" : "999-999-9999",
-            "stage": ["startup"],
-            "type" : ["microempresa", "empresa basada en innovacion"],
-            "link" : "example.com"
-        },
-        {
-            "name" : "example",
-            "email" : "examenple@test.com",
-            "phone" : "999-999-9999",
-            "stage": ["startup"],
-            "type" : ["microempresa", "empresa basada en innovacion"],
-            "link" : "example.com"
-        }
-    ]
-    if (data){
-        res.status(200).json(data);
+    
+    if (organizations){
+        res.status(200).json(organizations);
     }
     else{
-        res.status(400).send("Data not found");
+        res.status(400).send("Organizations not found");
     }
     
+});
+
+router.get('/organization/stars/:Id', (req, res) => {
+
+    let founded = false;
+    let average_stars;
+  
+    _.each(organizations, (organization, i) => {
+        console.log(organization.id);
+        if(organization.id == req.params.Id){
+            founded = true;
+            average_stars = organization.average_stars;
+        }
+    });
+
+    if(founded){
+        res.status(200).send(average_stars);
+    }
+    else{
+        res.status(404).send("Organization not found");
+    }
+});
+
+router.get('organizations/top', (req,res) =>{
+
 });
 
 
@@ -46,11 +57,46 @@ router.post('/organization', (req, res) => {
 
 });
 
-router.put('organization/:id', (req, res) => {
+router.put('/organization/:id', (req, res) => {
 
     const {organizations_name, email, phone, stage, type, link} = req.body;
+    let founded = false;
+    console.log(1);
+
+    if (organizations_name && email && phone && stage && type && link){
+        if(validEmail(email) && validPhone(phone)){
+            console.log(1);
+            _.each(organizations, (organization, i) => {
+                if(organization.id == req.params.id){
+                    founded = true;
+                    console.log(1);
+                    organization.organizations_name = organizations_name;
+                    organization.email = email;
+                    organization.phone = phone;
+                    organization.stage = stage;
+                    organization.type = type;
+                    organization.link = link;
+                    organization.average_stars = organization.average_stars;
+                    console.log(founded);
+                    res.status(200).json(organizations);
+                }
+            });
+        }
+        else{
+            res.status(400).send("Error1");
+        }
+    }
+    else{
+        res.status(400).send("Error2");
+    }
+
+    if(!founded){
+        res.status(404).send("Organization not found");
+    }
 
 });
+
+
 
 // Validates email address of course.
 function validEmail(email) {
