@@ -119,8 +119,12 @@ router.put('/user/:userId', (req, res) => {
 
 router.delete('/user/:userId', (req,res) => {
     let isDeleted = false;
-    _.each(users, (user, i) => {            
+    //console.log(users);
+    
+    _.each(users, (user, i) => {  
+        console.log(user);          
         if(user.id == req.params.userId){
+            
             users.splice(i,1);
             isDeleted = true;
         }

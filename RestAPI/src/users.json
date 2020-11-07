@@ -20,5 +20,16 @@
         "business_type": "empresa basada en inovacion",
         "business_stage": "crecimiento",
         "password" : "0000"
+    },
+    {
+        "id": "3",
+        "firstname": "john",
+        "lastname": "doe",
+        "email" : "test1@test.com",
+        "business_status": "desactivo",
+        "phone_number": "123-456-9979",
+        "business_type": "empresa basada en inovacion",
+        "business_stage": "crecimiento",
+        "password" : "0000"
     }
 ]

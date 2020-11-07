@@ -57,44 +57,48 @@ router.post('/organization', (req, res) => {
 
 });
 
-router.put('/organization/:id', (req, res) => {
-
-    const {organizations_name, email, phone, stage, type, link} = req.body;
-    let founded = false;
-    console.log(1);
-
-    if (organizations_name && email && phone && stage && type && link){
-        if(validEmail(email) && validPhone(phone)){
-            console.log(1);
-            _.each(organizations, (organization, i) => {
-                if(organization.id == req.params.id){
-                    founded = true;
-                    console.log(1);
-                    organization.organizations_name = organizations_name;
-                    organization.email = email;
-                    organization.phone = phone;
-                    organization.stage = stage;
-                    organization.type = type;
-                    organization.link = link;
-                    organization.average_stars = organization.average_stars;
-                    console.log(founded);
-                    res.status(200).json(organizations);
-                }
-            });
-        }
-        else{
-            res.status(400).send("Error1");
-        }
+router.get("/organizationsByType", (req, res) => {
+    const { type } = req.body;
+  
+    if (type) {
+      res.status(200).send(type);
+    } else {
+      res.status(404).send("Types not found");
     }
-    else{
-        res.status(400).send("Error2");
-    }
-
-    if(!founded){
-        res.status(404).send("Organization not found");
-    }
-
 });
+
+router.get("/organizationsByStage", (req, res) => {
+    const { stage } = req.body;
+  
+    if (stage) {
+      res.status(200).send(stage);
+    } else {
+      res.status(404).send("Stage not found");
+    }
+});
+
+router.get("/organization/comments/:Id", (req, res) => {
+    let founded = false;
+    let i = 0;
+    let comments;
+  
+    organizations.forEach((organization) => {
+      if (organization.id == req.params.Id) {
+        founded = true;
+        comments = organization.comments;
+      }
+  
+      i++;
+    });
+  
+    if (founded) {
+      res.status(200).send(comments);
+    } else {
+      res.status(404).send("Comments not found");
+    }
+  });
+
+
 
 
 
