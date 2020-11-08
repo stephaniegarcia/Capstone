@@ -22,7 +22,10 @@ function Glossary() {
           
             return (
                 <div >
-                   <h2>Tipos de Empresas</h2>
+                  <br/>
+                  <br/>
+                  <br/>
+                   <h2>Glosario</h2>
                 <Accordion expanded={expanded === 'panel1'} onChange={handleChange('panel1')}>
                   <AccordionSummary
                     expandIcon={<ExpandMoreIcon />}

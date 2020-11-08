@@ -88,7 +88,7 @@ class Login extends Component {
                 <TextField inputRef={ref => { loginProps.email = ref; }} required id="email-field" label="Correo Electrónico" />
                 <br />
                 <TextField inputRef={ref => { loginProps.password = ref; }} type="password" required id="password-field" label="Contraseña" />
-                    <h4>Hi</h4>
+                <Button href="/passwordReset" color="inherit" >Reset Password</Button>
                
                 <br />
 

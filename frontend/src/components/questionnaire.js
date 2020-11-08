@@ -11,23 +11,23 @@ class Questionnaire extends Component {
         {
           question: "¿Comenzaste un negocio en tu área de expertise o talento como por ejemplo, consultoría, diseño o jardinería?",
           options: ["Si", "No"],
-          answer: "1"
+          answer: null
         },{
           question: "¿Comenzaste un negocio para tener un ingreso personal adicional?",
           options: ["Si", "No"],
-          answer: "1"
+          answer: null
         },{
           question: "¿Trabajas por tu cuenta, por servicios profesionales o tienes una tienda online?",
           options: ["Si", "No"],
-          answer: "1"
+          answer: null
         },{
           question: "¿Tienes un local físico? ¿Como por ejemplo una tienda, restaurante, colmado, cafetería o boutique?",
           options: ["Si", "No"],
-          answer: "1"
+          answer: null
         },{
           question: "¿Cuentas con empleados que te ayudan a operar el negocio?",
           options: ["Si", "No"],
-          answer: "1"
+          answer: null
         },
       ]
     };

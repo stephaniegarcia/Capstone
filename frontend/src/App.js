@@ -8,7 +8,7 @@ import Organizations from './components/organizations';
 import Glossary from './components/glossary';
 import Questionnaire from './components/questionnaire';
 import UserProfile from './components/userProfile';
-
+import Outcome from './components/outcome';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
@@ -16,6 +16,7 @@ import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 import apiService from "./components/mockApiService";
+import PasswordReset from './components/passwordReset';
 
 
 function App() {
@@ -85,7 +86,9 @@ function App() {
         <Switch>
           <Route exact path='/' component={Home} />
           <Route path='/login' component={Login} />
+          <Route path='/passwordReset' component={PasswordReset} />
           <Route path='/tce' component={Questionnaire} />
+          <Route path='/outcome' component={Outcome} />
           <Route path='/organizaciones' component={Organizations} />
           <Route path='/glosario' component={Glossary} />
           <Route path='/colmena66' component={About} />

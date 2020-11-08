@@ -6,6 +6,7 @@ import Typography from '@material-ui/core/Typography';
 import LiveHelp from '@material-ui/icons/LiveHelp';
 import Button from '@material-ui/core/Button';
 import Radio from '@material-ui/core/Radio';
+import apiService from "./mockApiService";
 
 const styles = theme => ({
   root: theme.mixins.gutters({
@@ -33,15 +34,13 @@ class Questionnaire extends Component {
 //function Questionnaire(props) {
 
 constructor(props){
-super(props);
-this.state = {
-  current: 0,
-  quiz: props.quiz,
-  selectedValue: '0',
-  revealed: false,
- 
-
-}
+  super(props);
+  this.state = {
+    current: 0,
+    quiz: props.quiz,
+    selectedValue: null,
+    revealed: false,
+  }
 }
 // const [current, setCurrent] = useState(0);
 // const [quiz, setQuiz] = useState(props.quiz);
@@ -50,48 +49,33 @@ this.state = {
 
 
 handleChange = event => {
+    this.state.quiz[this.state.current].answer = event.target.value;
     this.setState({ selectedValue: event.target.value });
+    var canSubmit = true;
+    for(var i = 0; i < this.state.quiz.length; i++) {
+      canSubmit = canSubmit && this.state.quiz[i].answer != null;
+    }
+    this.setState({ canSubmit: canSubmit });
+    apiService.saveQuiz(this.state.quiz);
   };
 
-moveNext = () => {
-  this.clearBacks();
+
+moveNextClick = () => {
+  this.setState({ selectedValue: this.state.quiz[this.state.current+1].answer });
   this.setState({current: this.state.current+1})
 }
 
-movePrevious = () => {
- this.clearBacks();
+movePreviousClick = () => {
+  this.setState({ selectedValue: this.state.quiz[this.state.current-1].answer });
   this.setState({current: this.state.current-1})
-  
-
 }
 
-clearBacks = () =>{
-  var question = this.state.quiz[this.state.current]
-  for(var i = 0; i < question.options.length; i++){
-      this.refs[i.toString()].style.background = "white";
-  }
-}
-
-// revealCorrect = () => {
-// //clear backgrounds
-
-// var question = this.state.quiz[this.state.current]
-//   var answer = question.answer;
-//   this.clearBacks()
-//   if(this.state.selectedValue === answer){
-//   this.refs[answer].style.background = "lightgreen";
-//   }else{
-// this.refs[answer].style.background = "lightgreen";
-// this.refs[this.state.selectedValue].style.background = "lightcoral";
-//   }
-//   this.setState({revealed: true})
-// }
  render(){
     var question = this.state.quiz[this.state.current];
     var curQuestion = this.state.current + 1;
     var size = this.state.quiz.length;
     var moveRight = this.state.current+1 < this.state.quiz.length;
-    var moveLeft = this.state.current == 0;
+    var moveLeft = this.state.current-1 >= 0;
 
   return (
     <div>
@@ -114,7 +98,7 @@ clearBacks = () =>{
         {question.options.map((opt, index)=>(
           <div key={index} style={{marginTop: "5px"}}   ref={index.toString()}>
           <Radio
-
+          // checked={this.state.quiz[this.state.current].answer}
           checked={this.state.selectedValue === index.toString()}
           onChange={this.handleChange}
           value={index.toString()}
@@ -124,24 +108,11 @@ clearBacks = () =>{
         {opt}
         </div>
         ))}
-<div className={this.props.classes.footer}>
-         <Button onClick={this.revealCorrect} variant="raised" color="secondary">
-        Submit
-      </Button>
-      {(moveRight)? (<Button onClick={this.moveNext} variant="raised" color="primary" style={{float: "right"}}>
-        Next
-      </Button>): (<Button onClick={this.moveNext} disabled variant="raised" color="primary" style={{float: "right"}}>
-        Next
-      </Button>)}
-
-      {(moveLeft)? ( <Button onClick={this.movePrevious} disabled variant="raised" color="primary" style={{float: "right", marginRight: "50px"}}>
-        Previous
-      </Button>): ( <Button onClick={this.movePrevious} variant="raised" color="primary" style={{float: "right", marginRight: "50px"}}>
-        Previous
-      </Button>)}
-
-     
-</div>
+        <div className={this.props.classes.footer}>
+          <Button href="/outcome" disabled={!this.state.canSubmit} variant="raised" color="secondary">Submit</Button>
+          <Button disabled={!moveRight} onClick={this.moveNextClick} variant="raised" color="primary" style={{float: "right"}}>Next</Button>
+          <Button disabled={!moveLeft} onClick={this.movePreviousClick} variant="raised" color="primary" style={{float: "right", marginRight: "50px"}}>Previous</Button>
+        </div>
       </Paper>
     </div>
   );

@@ -26,17 +26,12 @@ import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
-
-import { DataGrid } from '@material-ui/data-grid';
-
-
-
+import Button from '@material-ui/core/Button';
+import { useHistory } from 'react-router-dom';
+import apiService from "./mockApiService";
 
 
-
-
-
-
+// import { DataGrid } from '@material-ui/data-grid';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -51,81 +46,28 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function UserProfile() {
-
-
-  // const columns = [
-  //   { field: 'id', headerName: 'ID', width: 70 },
-  //   { field: 'firstName', headerName: 'First name', width: 130 },
-  //   { field: 'lastName', headerName: 'Last name', width: 130 },
-  //   {
-  //     field: 'age',
-  //     headerName: 'Age',
-  //     type: 'number',
-  //     width: 90,
-  //   },
-  //   {
-  //     field: 'fullName',
-  //     headerName: 'Full name',
-  //     description: 'This column has a value getter and is not sortable.',
-  //     sortable: false,
-  //     width: 160,
-  //     valueGetter: (params) =>
-  //       `${params.getValue('firstName') || ''} ${params.getValue('lastName') || ''}`,
-  //   },
-  // ];
-  
-  // const rows = [
-  //   { id: 1, lastName: 'Snow', firstName: 'Jon', age: 35 },
-  //   { id: 2, lastName: 'Lannister', firstName: 'Cersei', age: 42 },
-  //   { id: 3, lastName: 'Lannister', firstName: 'Jaime', age: 45 },
-  //   { id: 4, lastName: 'Stark', firstName: 'Arya', age: 16 },
-  //   { id: 5, lastName: 'Targaryen', firstName: 'Daenerys', age: null },
-  //   { id: 6, lastName: 'Melisandre', firstName: null, age: 150 },
-  //   { id: 7, lastName: 'Clifford', firstName: 'Ferrara', age: 44 },
-  //   { id: 8, lastName: 'Frances', firstName: 'Rossini', age: 36 },
-  //   { id: 9, lastName: 'Roxie', firstName: 'Harvey', age: 65 },
-  // ];
-
-
-
-
-
-
-
-
-
-
-
+function Outcome() {
+    const history = useHistory();
     const [spacing, setSpacing] = React.useState(1);
     const [name, setName] = React.useState('Composed TextField');
     const classes = useStyles();
+    const [quizResult, setQuizResult] = React.useState({organizations:[]});
 
-  const handleChange = (event) => {
-    setName(event.target.value);
-  };
+    function submitQuiz() {
+      apiService.postRequest("quiz/submit", apiService.getQuiz()).then((response)=>{
+        setQuizResult(response);
+      });
+    }
 
-  //Organizations Logic
-  let rows = [
-    createData('Organización 1', "787 987 6656", "asdf@goog.com", "Lanzamiento", "Microempresa"),
-    createData('Organización 2', "787 987 6656", "asdf@goog.com", "Lanzamiento", "Microempresa"),
-    createData('Organización 3', "787 987 6656", "asdf@goog.com", "Lanzamiento", "Microempresa"),
-    createData('Organización 4', "787 987 6656", "asdf@goog.com", "Lanzamiento", "Microempresa"),
-    createData('Organización 5', "787 987 6656", "asdf@goog.com", "Lanzamiento", "Microempresa"),
-    createData('Organización 6', "787 987 6656", "asdf@goog.com", "Lanzamiento", "Microempresa"),
-  ];
+    function saveData() {
+      apiService.postRequest("quiz/save", apiService.getQuiz()).then((response)=>{
+        history.push("/userprofile");
+      });
+    }
 
- 
-
- // this.searchOrganizations();
-
-  // const renderTableBody = () => {
-  //   console.log("what");
-  //   return rows && rows.map((row) => (
-  //     <Row key={row.name} row={row} />
-  //   ))
-  // }
-  
+    React.useEffect(()=> {
+      submitQuiz();
+    }, [name]);
 
     /*Table logic */
     const useRowStyles = makeStyles({
@@ -136,20 +78,6 @@ function UserProfile() {
         },
       });
     
-      function createData(name, phone, email, bussinessStage, bussinessType) {
-        return {
-          name,
-          phone,
-          email,
-          bussinessStage,
-          bussinessType,
-          moreInfo: [
-            { description: 'Proveen financiamiento alternativo a empresas medianas en Puerto Rico y Mexico. Proporcionan soluciones financieras para potenciar el crecimiento de tu negocio. Trabajan transacciones de $500K USD a $5 millones USD, pero son flexibles. ',
-                },
-          ],
-        };
-      }
-      
       function Row(props) {
         const { row } = props;
         const [open, setOpen] = React.useState(false);
@@ -170,8 +98,8 @@ function UserProfile() {
               </TableCell>
               <TableCell align="right">{row.phone}</TableCell>
               <TableCell align="right">{row.email}</TableCell>
-              <TableCell align="right">{row.bussinessStage}</TableCell>
-              <TableCell align="right">{row.bussinessType}</TableCell>
+              <TableCell align="right">{row.businessStage}</TableCell>
+              <TableCell align="right">{row.businessType}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
@@ -213,7 +141,7 @@ function UserProfile() {
         row: PropTypes.shape({
             phone: PropTypes.number.isRequired,
           email: PropTypes.number.isRequired,
-          bussinessStage: PropTypes.number.isRequired,
+          businessStage: PropTypes.number.isRequired,
           moreInfo: PropTypes.arrayOf(
             PropTypes.shape({
               amount: PropTypes.number.isRequired,
@@ -223,7 +151,7 @@ function UserProfile() {
           ).isRequired,
           name: PropTypes.string.isRequired,
           price: PropTypes.number.isRequired,
-          bussinessType: PropTypes.number.isRequired,
+          businessType: PropTypes.number.isRequired,
         }).isRequired,
       };
     
@@ -234,88 +162,40 @@ function UserProfile() {
         <Grid container justify="center" spacing={spacing}>
           {(
             <Grid  item>
+                <div style={{'padding-top': '50px'}}></div>
               <Paper className={classes.paper} >
               <div>
-                  <h1>Hola</h1>
-                  <form className={classes.root} noValidate autoComplete="off">
+                  <h1>Segun tus respuestas tu tipo de negocio es:</h1>
+                  <h1> {quizResult.businessType}</h1>
+                  <h3>¡Sigue el camino rojo! Si empezaste tu negocio porque es lo que te apasiona, 
+                    con el propósito de generar ingreso personal adicional o porque quieres tener
+                     flexibilidad con tu tiempo, tienes una microempresa.</h3>
                 <div>
-                 <TextField
-                  id="standard-read-only-input"
-                 label="Nombre del Usuario:"
-                  defaultValue="Agatha Christie"
-                  InputProps={{
-                    readOnly: true,
-                  }}
-                />
-                </div>
-                <br/>
-               <br/>
-                <div>
-                <TextField
-                  id="standard-read-only-input"
-                 label="Correo Electrónico:"
-                  defaultValue="demo@demo.com"
-                  InputProps={{
-                    readOnly: true,
-                  }}
-                />
-                </div>
-                <br/>
-               <br/>
-                <div>
-                <TextField
-                  id="standard-read-only-input"
-                 label="Teléfono:"
-                  defaultValue="939 460 2020"
-                  InputProps={{
-                    readOnly: true,
-                  }}
-                />
-                </div>
-                <br/>
-                <br/>
-                <div>
-                <TextField
-                  id="standard-read-only-input"
-                 label="Etapa de Negocio"
-                  defaultValue="Lanzamiento"
-                  InputProps={{
-                    readOnly: true,
-                  }}
-                />
+               
                  </div>
                   <br/>
                 <br/>
               
-                <div>
-                   <TextField
-                  id="standard-read-only-input"
-                 label="Tipo de Negocio"
-                  defaultValue="Microempresa"
-                  InputProps={{
-                    readOnly: true,
-                  }}
-                />
-               
-                </div>
-                  </form>
+ 
+                  
               </div>
                 </Paper>
                 <Paper className={classes.paper} >
               <div>
-                  <h1>Holita Pepita</h1>
+                  <h1>Nos indicaste que tu negocio esta en etapa de {quizResult.businessStage}</h1>
+                  <h1>Este sera tu camino a recorrer:</h1>  
            
               </div>
                 </Paper>
                 
                 <Paper className={classes.paper} >
               <div>
-                  <h1>Holita </h1>
+                  <h1>Aqui se muestran todas las organizaciones mencionadas en el recorrido: </h1>
                   <div>
                 <h2>Organizaciones</h2>
               <TableContainer component={Paper}>
                 <div>
-                    <h4>Filters & Search would be here</h4>
+                
                 </div>
                 <Table aria-label="collapsible table">
                   <TableHead>
@@ -329,19 +209,22 @@ function UserProfile() {
                     </TableRow>
                   </TableHead>
                   <TableBody >
-                  {rows.map((row) => (
-            <Row  key={row.name} row={row} />
-          ))}
+                  {quizResult.organizations.map((row) => (<Row  key={row.name} row={row} />))}
         
-                  {/* {this.state.rows && this.state.rows.map((row) => ( <Row key={row.name} row={row} />))} */}
-
-                  
                   </TableBody>
                 </Table>
               </TableContainer>
            </div>
               </div>
                 </Paper>
+                <div>
+                <Button style={{'margin':'15px'}} variant="contained" color="secondary" href="/tce">
+                  Cancel
+                </Button>
+                <Button style={{'margin':'15px'}} variant="contained" color="primary" onClick={()=>{ saveData(); }}>
+                  Save
+                </Button>
+                </div>
             </Grid>
           )}
         </Grid>
@@ -350,4 +233,4 @@ function UserProfile() {
     </Grid>
   );
 }
-export default UserProfile;
+export default Outcome;
