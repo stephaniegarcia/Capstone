@@ -9,7 +9,7 @@ function isAuthenticated () {
     return localStorage.getItem('token');
 }
     
-function createOrganizationsData(id, name, phone, email, businessStage, businessType) {
+function createOrganizationsData(id, name, phone, email, businessStage, businessType, rating, checked) {
     return {
       id,
       name,
@@ -21,16 +21,18 @@ function createOrganizationsData(id, name, phone, email, businessStage, business
         { description: 'Proveen financiamiento alternativo a empresas medianas en Puerto Rico y Mexico. Proporcionan soluciones financieras para potenciar el crecimiento de tu negocio. Trabajan transacciones de $500K USD a $5 millones USD, pero son flexibles. ',
             },
       ],
-      open: false
+      open: false,
+      rating,
+      checked
     };
 }
 
 const organizations = [
-    createOrganizationsData(1, 'Organización 1', "787 987 6656", "asdf@goog.com", "Idea", "Microempresa"),
-    createOrganizationsData(2, 'Organización 2', "787 987 6656", "asdf@goog.com", "Prototipo", "Comerciante"),
-    createOrganizationsData(3, 'Organización 3', "787 987 6656", "asdf@goog.com", "Expansión", "Empresa Basada en Innovación"),
-    createOrganizationsData(4, 'Organización 4', "787 987 6656", "asdf@goog.com", "Lanzamiento", "Empresa en Crecimiento"),
-    createOrganizationsData(5, 'Organización 5', "787 987 6656", "asdf@goog.com", "Lanzamiento", "Acceso a Capital")
+    createOrganizationsData(1, 'Organización 1', "787 987 6656", "asdf@goog.com", "Idea", "Microempresa", 0, false),
+    createOrganizationsData(2, 'Organización 2', "787 987 6656", "asdf@goog.com", "Prototipo", "Comerciante", 0, false),
+    createOrganizationsData(3, 'Organización 3', "787 987 6656", "asdf@goog.com", "Expansión", "Empresa Basada en Innovación", 0, false),
+    createOrganizationsData(4, 'Organización 4', "787 987 6656", "asdf@goog.com", "Lanzamiento", "Empresa en Crecimiento", 0, false),
+    createOrganizationsData(5, 'Organización 5', "787 987 6656", "asdf@goog.com", "Lanzamiento", "Acceso a Capital", 0, false)
 ];
 
 const quiz= [
@@ -211,9 +213,9 @@ function handlePostRequests(path, content) {
                         businessStage: userProfile.businessStage,
                         businessType: "Microempresa",
                         organizations: [
-                            createOrganizationsData(7, 'Organización 1', "787 987 6656", "asdf@goog.com", "Lanzamiento", "Microempresa"),
-                            createOrganizationsData(8, 'Organización 2', "787 987 6656", "asdf@goog.com", "Lanzamiento", "Microempresa"),
-                            createOrganizationsData(9, 'Organización 3', "787 987 6656", "asdf@goog.com", "Lanzamiento", "Microempresa"),
+                            createOrganizationsData(7, 'Organización 1', "787 987 6656", "asdf@goog.com", "Lanzamiento", "Microempresa", 5, true),
+                            createOrganizationsData(8, 'Organización 2', "787 987 6656", "asdf@goog.com", "Lanzamiento", "Microempresa", 3, true),
+                            createOrganizationsData(9, 'Organización 3', "787 987 6656", "asdf@goog.com", "Lanzamiento", "Microempresa", 0, false),
                         ],
                         roadmap: [
                             {name:"Entrada al Mercado", organizations: ["Organización 1", "Organización 2", "Organización 3"]},
@@ -242,6 +244,27 @@ function handlePostRequests(path, content) {
                     userProfile.roadmap = state.quizResults.roadmap;
                     setUserProfile(userProfile);
                     state.quizResults = null;
+                    resolve("All good");
+                }, 1000);
+            });
+        }
+    }
+    else if(path == "organization/tracking"){
+        if(!isAuthenticated()) {
+            return new Promise(function(){
+                throw new ApiException("user is not logged in.");
+            });
+        }
+        else {
+            return new Promise((resolve, reject) => {
+                setTimeout(function(){
+                    userProfile = getUserProfile();
+                    for(var i = 0; i < userProfile.organizations.length; i++) {
+                        if(userProfile.organizations[i].id == content.organizationId) {
+                            userProfile.organizations[i].checked = content.checked;
+                        }
+                    }
+                    setUserProfile(userProfile);
                     resolve("All good");
                 }, 1000);
             });

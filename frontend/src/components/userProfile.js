@@ -22,6 +22,8 @@ import Rating from '@material-ui/lab/Rating';
 import Select from '@material-ui/core/Select';
 import Spinner from './loading'
 import Alert from './alert'
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Checkbox from '@material-ui/core/Checkbox';
 import '../index.css';
 import apiService from "./mockApiService";
 
@@ -115,7 +117,10 @@ function UserProfile() {
       var data = {organizationId: id, rating: rating};
       apiService.postRequest("organization/rating", data);
     };
-    
+    const setOrgChecked = (id, check) => {
+      var data = {organizationId: id, checked: check};
+      apiService.postRequest("organization/tracking", data);
+    };
     /*Table logic */
     const useRowStyles = makeStyles({
         root: {
@@ -127,10 +132,15 @@ function UserProfile() {
       
       function Row(props) {
         const { row } = props;
-        const [rating, setRating] = React.useState(row.raiting);
+        const [rating, setRating] = React.useState(row.rating);
+        const [check, setCheck] = React.useState(row.checked);
         const handleRatingChange = (event) => {
           setRating(event.target.value);
           setOrgRating(row.id, event.target.value)
+        };
+        const handleCheckboxChange = (event) => {
+          setCheck(event.target.checked );
+          setOrgChecked(row.id, event.target.checked )
         };
         return (
           <React.Fragment>
@@ -152,8 +162,12 @@ function UserProfile() {
               <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
                 {/* <Collapse in={row.open} timeout="auto" unmountOnExit> */}
                   <Box margin={1}>
+                  <FormControlLabel
+                    control={<Checkbox checked={check} onChange={handleCheckboxChange} />}
+                    label="Contacted"
+                  /> 
                   <Rating
-                      value={row.raiting}
+                      value={rating}
                       onChange={handleRatingChange}
                     />
                     <Typography variant="h6" gutterBottom component="div">

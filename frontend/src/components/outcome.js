@@ -20,7 +20,6 @@ import apiService from "./mockApiService";
 import '../index.css';
 
 
-// import { DataGrid } from '@material-ui/data-grid';
 
 const useStyles = makeStyles((theme) => ({
   root: {
