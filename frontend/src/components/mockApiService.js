@@ -9,8 +9,9 @@ function isAuthenticated () {
     return localStorage.getItem('token');
 }
     
-function createOrganizationsData(name, phone, email, businessStage, businessType) {
+function createOrganizationsData(id, name, phone, email, businessStage, businessType) {
     return {
+      id,
       name,
       phone,
       email,
@@ -25,15 +26,34 @@ function createOrganizationsData(name, phone, email, businessStage, businessType
 }
 
 const organizations = [
-    createOrganizationsData('Organización 1', "787 987 6656", "asdf@goog.com", "Idea", "Microempresa"),
-    createOrganizationsData('Organización 2', "787 987 6656", "asdf@goog.com", "Prototipo", "Comerciante"),
-    createOrganizationsData('Organización 3', "787 987 6656", "asdf@goog.com", "Expansión", "Empresa Basada en Innovación"),
-    createOrganizationsData('Organización 4', "787 987 6656", "asdf@goog.com", "Lanzamiento", "Empresa en Crecimiento"),
-    createOrganizationsData('Organización 5', "787 987 6656", "asdf@goog.com", "Lanzamiento", "Acceso a Capital")
+    createOrganizationsData(1, 'Organización 1', "787 987 6656", "asdf@goog.com", "Idea", "Microempresa"),
+    createOrganizationsData(2, 'Organización 2', "787 987 6656", "asdf@goog.com", "Prototipo", "Comerciante"),
+    createOrganizationsData(3, 'Organización 3', "787 987 6656", "asdf@goog.com", "Expansión", "Empresa Basada en Innovación"),
+    createOrganizationsData(4, 'Organización 4', "787 987 6656", "asdf@goog.com", "Lanzamiento", "Empresa en Crecimiento"),
+    createOrganizationsData(5, 'Organización 5', "787 987 6656", "asdf@goog.com", "Lanzamiento", "Acceso a Capital")
 ];
 
+const quiz= [
+    {
+      question: "¿Comenzaste un negocio en tu área de expertise o talento como por ejemplo, consultoría, diseño o jardinería?",
+      options: ["Si", "No"],
+    },{
+      question: "¿Comenzaste un negocio para tener un ingreso personal adicional?",
+      options: ["Si", "No"],
+    },{
+      question: "¿Trabajas por tu cuenta, por servicios profesionales o tienes una tienda online?",
+      options: ["Si", "No"],
+    },{
+      question: "¿Tienes un local físico? ¿Como por ejemplo una tienda, restaurante, colmado, cafetería o boutique?",
+      options: ["Si", "No"],
+    },{
+      question: "¿Cuentas con empleados que te ayudan a operar el negocio?",
+      options: ["Si", "No"],
+    }
+]
+
 const logInUserProfile = { firstName: "John", lastName: "Doe", email: "demo@demo.com", password: "123pescao"}; //credentials for login
-const userProfile = { //changes to from register
+let userProfile = { //changes to from register
     firstName: "John",
     lastName: "Doe",
     email: "demo@demo.com",
@@ -41,12 +61,27 @@ const userProfile = { //changes to from register
     password: "123pescao",
     accessToken: "testAccessToken",
     businessType: "",
+    businessStatus: true,
+    requiredAssistance: 'Mentoria',
     businessStage: "Prototipo",
     organizations: [],
     roadmap: []
 };
 
 let state = {};
+
+function getUserProfile() {
+    var json = localStorage.getItem('col-profile');
+    return JSON.parse(json);
+}
+function setUserProfile(profile) {
+    if(profile && profile != null) {
+        localStorage.setItem('col-profile', JSON.stringify(profile));
+    }
+    else {
+        localStorage.removeItem('col-profile');
+    }
+}
 
 function handleGetRequests(path) {
     if(path == 'profile') {
@@ -58,8 +93,22 @@ function handleGetRequests(path) {
         else {
             return new Promise((resolve, reject) => {
                 setTimeout(function(){
-                    var data = userProfile;
-                    resolve(data);
+                    userProfile = getUserProfile();
+                    resolve(userProfile);
+                }, 1000);
+            });
+        }
+    }
+    else if(path == 'quiz') {
+        if(!isAuthenticated()) {
+            return new Promise(function(){
+                throw new ApiException("user is not logged in.");
+            });
+        }
+        else {
+            return new Promise((resolve, reject) => {
+                setTimeout(function(){
+                    resolve(quiz);
                 }, 1000);
             });
         }
@@ -111,6 +160,7 @@ function handlePostRequests(path, content) {
             userProfile.firstName = logInUserProfile.firstName;
             userProfile.lastName = logInUserProfile.lastName;
             userProfile.email = logInUserProfile.email;
+            setUserProfile(userProfile);
             return new Promise((resolve, reject) => {
                 setTimeout(function(){
                     var data = userProfile;
@@ -134,9 +184,12 @@ function handlePostRequests(path, content) {
                 userProfile.password = content.password;
                 userProfile.email = content.email;
                 userProfile.phone = content.phone;
-                var data = userProfile;
-                localStorage.setItem('token', data.accessToken);
-                resolve(data);
+                userProfile.businessStage = content.businessStage;
+                userProfile.businessStatus = content.businessStatus;
+                userProfile.requiredAssistance = content.requiredAssistance;
+                setUserProfile(userProfile);
+                localStorage.setItem('token', userProfile.accessToken);
+                resolve(userProfile);
             }, 1000);
         });
     }
@@ -150,6 +203,7 @@ function handlePostRequests(path, content) {
             state.quizSubmitted = content;
             return new Promise((resolve, reject) => {
                 setTimeout(function(){
+                    userProfile = getUserProfile();
                     state.quizResults = {
                         firstName: userProfile.firstName,
                         email: userProfile.email,
@@ -157,11 +211,17 @@ function handlePostRequests(path, content) {
                         businessStage: userProfile.businessStage,
                         businessType: "Microempresa",
                         organizations: [
-                            createOrganizationsData('Organización 1', "787 987 6656", "asdf@goog.com", "Prototipo", "Microempresa"),
-                            createOrganizationsData('Organización 2', "787 987 6656", "asdf@goog.com", "Prototipo", "Microempresa"),
-                            createOrganizationsData('Organización 3', "787 987 6656", "asdf@goog.com", "Prototipo", "Microempresa"),
+                            createOrganizationsData(7, 'Organización 1', "787 987 6656", "asdf@goog.com", "Prototipo", "Microempresa"),
+                            createOrganizationsData(8, 'Organización 2', "787 987 6656", "asdf@goog.com", "Prototipo", "Microempresa"),
+                            createOrganizationsData(9, 'Organización 3', "787 987 6656", "asdf@goog.com", "Prototipo", "Microempresa"),
                         ],
-                        roadmap: []
+                        roadmap: [
+                            {name:"Placeholder 1", organizations: ["Org 1", "Org 2", "Org 3"]},
+                            {name:"Placeholder 2", organizations: ["Org 4", "Org 5", "Org 6"]},
+                            {name:"Placeholder 3", organizations: ["Org 7", "Org 8", "Org 9"]},
+                            {name:"Placeholder 4", organizations: ["Org 10", "Org 11", "Org 12"]},
+                            {name:"Placeholder 5", organizations: ["Org 13", "Org 14", "Org 15"]},
+                        ]
                     }
                     resolve(state.quizResults);
                 }, 1000);
@@ -177,10 +237,33 @@ function handlePostRequests(path, content) {
         else {
             return new Promise((resolve, reject) => {
                 setTimeout(function(){
+                    userProfile = getUserProfile();
                     userProfile.businessType = state.quizResults.businessType;
                     userProfile.organizations = state.quizResults.organizations;
                     userProfile.roadmap = state.quizResults.roadmap;
+                    setUserProfile(userProfile);
                     state.quizResults = null;
+                    resolve("All good");
+                }, 1000);
+            });
+        }
+    }
+    else if (path == 'organization/rating') {
+        if(!isAuthenticated()) {
+            return new Promise(function(){
+                throw new ApiException("user is not logged in.");
+            });
+        }
+        else {
+            return new Promise((resolve, reject) => {
+                setTimeout(function(){
+                    userProfile = getUserProfile();
+                    for(var i = 0; i < userProfile.organizations.length; i++) {
+                        if(userProfile.organizations[i].id == content.organizationId) {
+                            userProfile.organizations[i].rating = content.rating;
+                        }
+                    }
+                    setUserProfile(userProfile);
                     resolve("All good");
                 }, 1000);
             });
@@ -191,11 +274,16 @@ function handlePostRequests(path, content) {
 function handlePutRequests(path, content) {
     if (path == 'profile/update') {
         return new Promise((resolve, reject) => {
-            setTimeout(function(){
+            setTimeout(function() {
+                userProfile = getUserProfile();
                 userProfile.firstName = content.firstName;
                 userProfile.lastName = content.lastName;
-                userProfile.password = content.password;
                 userProfile.email = content.email;
+                userProfile.phone = content.phone;
+                userProfile.businessStage = content.businessStage;
+                userProfile.businessStatus = content.businessStatus;
+                userProfile.requiredAssistance = content.requiredAssistance;
+                setUserProfile(userProfile);
                 var data = userProfile;
                 resolve(data);
             }, 1000);
@@ -223,10 +311,12 @@ const apiService = {
         state.accessToken = accessToken;
     },
     isAuthenticated: () => {
-        return localStorage.getItem('token');
+        var isAuthenticated = localStorage.getItem('token') != null
+        return isAuthenticated;
     },
     logout: () => {
         localStorage.removeItem('token');
+        setUserProfile(null);
     },
     saveQuiz: (quiz) => {
         state.quiz = quiz;
@@ -235,7 +325,7 @@ const apiService = {
       return state.quiz;  
     },
     profile: () => {
-        return userProfile;
+        return getUserProfile();
     }
 };
 

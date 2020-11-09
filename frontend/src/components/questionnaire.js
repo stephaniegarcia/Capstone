@@ -1,47 +1,59 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
 import { render } from 'react-dom';
 import Ap from './qlogic';
+import { Route, Redirect } from 'react-router-dom';
+import Spinner from './loading'
+import Alert from './alert'
+import apiService from "./mockApiService";
+
+function Questionnaire() {
+  const [showErrorAlert, setShowErrorAlert] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+  const [showLoading, setShowLoading] = useState(false);
+  const [initialLoad, setInitialLoad] = useState(false);
+  const [quizQuestions, setQuizQuestions] = useState([]);
+  const onAlertClick = () => {
+    setShowErrorAlert(false);
+  };
+
+  async function getQuestions() {
+    setShowLoading(true);
+    apiService.getRequest("quiz")
+    .then((response)=>{
+      if(response) {
+        for(var i = 0; i < response.length; i++) {
+          response[i].answer = null;
+        }
+      }
+      setShowLoading(false);
+      setQuizQuestions(response);
+      setInitialLoad(true);
+    })
+    .catch(err =>{
+      setShowLoading(false);
+      setErrorMessage(err.response.data);
+      setShowErrorAlert(true);
+    });
+  };
 
 
-class Questionnaire extends Component {
-  constructor() {
-    super();
-    this.state = {
-      quiz: [
-        {
-          question: "¿Comenzaste un negocio en tu área de expertise o talento como por ejemplo, consultoría, diseño o jardinería?",
-          options: ["Si", "No"],
-          answer: null
-        },{
-          question: "¿Comenzaste un negocio para tener un ingreso personal adicional?",
-          options: ["Si", "No"],
-          answer: null
-        },{
-          question: "¿Trabajas por tu cuenta, por servicios profesionales o tienes una tienda online?",
-          options: ["Si", "No"],
-          answer: null
-        },{
-          question: "¿Tienes un local físico? ¿Como por ejemplo una tienda, restaurante, colmado, cafetería o boutique?",
-          options: ["Si", "No"],
-          answer: null
-        },{
-          question: "¿Cuentas con empleados que te ayudan a operar el negocio?",
-          options: ["Si", "No"],
-          answer: null
-        },
-      ]
-    };
-  }
+  useEffect(()=>{
+    getQuestions();
+  },[initialLoad])
 
-  render() {
-    return (
+  return (
+    !apiService.isAuthenticated() ? <Redirect to="/login" /> :
       <div>
-        <Ap quiz={this.state.quiz}/>
+        {(quizQuestions.length>0 ? <Ap quiz={quizQuestions} /> : <div></div>)}
+        <Alert
+          isOpen={showErrorAlert}
+          handleSubmit={onAlertClick}
+          title="Error"
+          text={errorMessage}
+          submitButtonText="Ok"
+        />
+        <Spinner isShown={showLoading} />
       </div>
-    );
-  }
+  );
 }
-
-render(<Questionnaire />, document.getElementById('root'));
 export default Questionnaire;
-

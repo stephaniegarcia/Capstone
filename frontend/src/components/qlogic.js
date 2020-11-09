@@ -31,7 +31,6 @@ const styles = theme => ({
 });
 
 class Questionnaire extends Component {
-//function Questionnaire(props) {
 
 constructor(props){
   super(props);
@@ -42,11 +41,6 @@ constructor(props){
     revealed: false,
   }
 }
-// const [current, setCurrent] = useState(0);
-// const [quiz, setQuiz] = useState(props.quiz);
-// const [value, setValue] = useState(0);
-// const [revealed, setRevealed] = useState(false);
-
 
 handleChange = event => {
     this.state.quiz[this.state.current].answer = event.target.value;
@@ -78,6 +72,7 @@ movePreviousClick = () => {
     var moveLeft = this.state.current-1 >= 0;
 
   return (
+    !question ? '' : 
     <div>
         <h1>Comienza Tu Recorrido Empresarial</h1>
         <h4>Contesta las siguientes preguntas para identificar tu tipo de negocio</h4>

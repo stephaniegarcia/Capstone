@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from 'react';
 
 import PropTypes from 'prop-types';
-import { makeStyles, unstable_createMuiStrictModeTheme } from '@material-ui/core/styles';
+import { makeStyles } from '@material-ui/core/styles';
 import Box from '@material-ui/core/Box';
-// import Collapse from '@material-ui/core/Collapse';
-// import IconButton from '@material-ui/core/IconButton';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -13,14 +11,14 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
-// import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
-// import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
-// import Checkbox from '@material-ui/core/Checkbox';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import Button from '@material-ui/core/Button';
+import { Redirect } from 'react-router-dom';
+import Spinner from './loading'
+import Alert from './alert'
 import apiService from "./mockApiService";
 
 export default function Organizations() {
@@ -28,6 +26,15 @@ export default function Organizations() {
   const [orgType, setOrgType] = useState('');
   const [orgStage, setOrgStage] = useState('');
   const [initialLoad, setInitialLoad] = useState(true);
+
+  const [showErrorAlert, setShowErrorAlert] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+  const [showLoading, setShowLoading] = useState(false);
+
+  const onAlertClick = () => {
+    setShowErrorAlert(false);
+  };
+
   const handleOrgTypeChange = (event) => {
     setOrgType(event.target.value);
   };
@@ -36,8 +43,14 @@ export default function Organizations() {
   };
 
   function searchOrganizations() {
+    setShowLoading(true);
     apiService.getRequest("organizations?type="+orgType+"&stage="+orgStage).then((organizationsResponse) => {
+      setShowLoading(false);
       setOrganizationData(organizationsResponse)
+    }).catch(err =>{
+      setShowLoading(false);
+      setErrorMessage(err.response.data);
+      setShowErrorAlert(true);
     });
   }
 
@@ -126,7 +139,9 @@ export default function Organizations() {
   },[initialLoad])
 
   return (
-    <div style={{'padding-top': '50px'}}>
+    !apiService.isAuthenticated() ? <Redirect to="/login" /> :
+    <div>
+      <div style={{'padding-top': '50px'}}>
       <h2>Organizaciones</h2>
       <TableContainer component={Paper}>
         <div>
@@ -177,6 +192,15 @@ export default function Organizations() {
           </TableBody>
         </Table>
       </TableContainer>
+    </div>
+    <Alert
+      isOpen={showErrorAlert}
+      handleSubmit={onAlertClick}
+      title="Error"
+      text={errorMessage}
+      submitButtonText="Ok"
+    />
+    <Spinner isShown={showLoading} />
     </div>
   );
 }
