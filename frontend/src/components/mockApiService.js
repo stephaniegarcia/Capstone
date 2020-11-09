@@ -63,7 +63,7 @@ let userProfile = { //changes to from register
     businessType: "",
     businessStatus: true,
     requiredAssistance: 'Mentoria',
-    businessStage: "Prototipo",
+    businessStage: "Lanzamiento",
     organizations: [],
     roadmap: []
 };
@@ -211,16 +211,15 @@ function handlePostRequests(path, content) {
                         businessStage: userProfile.businessStage,
                         businessType: "Microempresa",
                         organizations: [
-                            createOrganizationsData(7, 'Organización 1', "787 987 6656", "asdf@goog.com", "Prototipo", "Microempresa"),
-                            createOrganizationsData(8, 'Organización 2', "787 987 6656", "asdf@goog.com", "Prototipo", "Microempresa"),
-                            createOrganizationsData(9, 'Organización 3', "787 987 6656", "asdf@goog.com", "Prototipo", "Microempresa"),
+                            createOrganizationsData(7, 'Organización 1', "787 987 6656", "asdf@goog.com", "Lanzamiento", "Microempresa"),
+                            createOrganizationsData(8, 'Organización 2', "787 987 6656", "asdf@goog.com", "Lanzamiento", "Microempresa"),
+                            createOrganizationsData(9, 'Organización 3', "787 987 6656", "asdf@goog.com", "Lanzamiento", "Microempresa"),
                         ],
                         roadmap: [
-                            {name:"Placeholder 1", organizations: ["Org 1", "Org 2", "Org 3"]},
-                            {name:"Placeholder 2", organizations: ["Org 4", "Org 5", "Org 6"]},
-                            {name:"Placeholder 3", organizations: ["Org 7", "Org 8", "Org 9"]},
-                            {name:"Placeholder 4", organizations: ["Org 10", "Org 11", "Org 12"]},
-                            {name:"Placeholder 5", organizations: ["Org 13", "Org 14", "Org 15"]},
+                            {name:"Entrada al Mercado", organizations: ["Organización 1", "Organización 2", "Organización 3"]},
+                            {name:"Capital Para Entrada al Mercado", organizations: ["Organización 4", "Organización 5", "Organización 6"]},
+                            {name:"Coworking", organizations: ["Organización 7", "Organización 8", "Organización 9"]},
+                            {name:"Incubación", organizations: ["Organización 10", "Organización 11", "Organización 12"]},
                         ]
                     }
                     resolve(state.quizResults);
