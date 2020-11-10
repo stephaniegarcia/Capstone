@@ -9,12 +9,49 @@ router.post('/admin/login', (req,res) => {
     const {email, password} = req.body;
 
     if(email && password){
-        res.status(200).json(req.body);
+        if(validEmail(email)){
+            res.status(200).send(`Email: ${email} Password: ${password}`);
+        }
+        else{
+            res.status(404).send("Error");
+        }
     }
     else{
         res.status(404).send("Error");
     }
 
+});
+
+router.get('/admin/organizations', (req, res) => {
+    
+    if (organizations){
+        res.status(200).json(organizations);
+    }
+    else{
+        res.status(400).send("Organizations not found");
+    }
+    
+});
+
+router.get('/admin/organization/stars/:Id', (req, res) => {
+
+    let founded = false;
+    let average_stars;
+  
+    _.each(organizations, (organization, i) => {
+        console.log(organization.id);
+        if(organization.id == req.params.Id){
+            founded = true;
+            average_stars = organization.average_stars;
+        }
+    });
+
+    if(founded){
+        res.status(200).send(average_stars);
+    }
+    else{
+        res.status(404).send("Organization not found");
+    }
 });
 
 router.get("/admin/organizations/topPerType", (req, res) => {
@@ -87,6 +124,7 @@ router.get("/admin/organizations/topPerType", (req, res) => {
       res.status(404).send("Organizations not found");
     }
   });
+  
   
   router.get("/admin/organizations/poorperforming", (req, res) => {
     org = [
@@ -267,7 +305,23 @@ router.get("/admin/accountsPerWeek", (req, res) => {
     }
 });
 
-router.put('admin/organization/:id', (req, res) => {
+router.post('/admin/organization', (req, res) => {
+
+    const {organizations_name, email, phone, stage, type, link} = req.body;
+
+    console.log(type);
+    if(organizations_name && email && phone && stage && type && link){
+        if(validEmail(email) && validPhone(phone)){
+            res.status(200).json(req.body);
+        }
+    }
+    else{
+        res.status(404).send("Error")
+    }
+
+});
+
+router.put('/admin/organization/:id', (req, res) => {
 
     const {organizations_name, email, phone, stage, type, link} = req.body;
     let founded = false;
@@ -276,7 +330,7 @@ router.put('admin/organization/:id', (req, res) => {
     if (organizations_name && email && phone && stage && type && link){
         if(validEmail(email) && validPhone(phone)){
             console.log(1);
-            _.each(organizations, (organization, i) => {
+            organizations.forEach((organization) =>{
                 if(organization.id == req.params.id){
                     founded = true;
                     console.log(1);
@@ -291,13 +345,14 @@ router.put('admin/organization/:id', (req, res) => {
                     res.status(200).json(organizations);
                 }
             });
+            
         }
         else{
-            res.status(400).send("Error1");
+            res.status(400).send("Error");
         }
     }
     else{
-        res.status(400).send("Error2");
+        res.status(400).send("Error");
     }
 
     if(!founded){
@@ -306,9 +361,9 @@ router.put('admin/organization/:id', (req, res) => {
 
 });
 
-router.delete("/organization/:orgId", (req, res) => {
+router.delete("/admin/organization/:orgId", (req, res) => {
     let isDeleted = false;
-    //console.log(organizations);
+    console.log(1);
     let i = 0;
     organizations.forEach((organization) => {
       console.log(organization);
@@ -326,6 +381,14 @@ router.delete("/organization/:orgId", (req, res) => {
     }
   });
 
+  function validEmail(email) {
+    var filter = /^\s*[\w\-\+_]+(\.[\w\-\+_]+)*\@[\w\-\+_]+\.[\w\-\+_]+(\.[\w\-\+_]+)*\s*$/;
+    return String(email).search (filter) != -1;
+}
 
+function validPhone(phone) {
+    var filter = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/im;
+    return String(phone).search (filter) != -1;
+}
 
 module.exports = router;

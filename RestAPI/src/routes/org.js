@@ -36,9 +36,6 @@ router.get('/organization/stars/:Id', (req, res) => {
     }
 });
 
-router.get('organizations/top', (req,res) =>{
-
-});
 
 
 router.post('/organization', (req, res) => {

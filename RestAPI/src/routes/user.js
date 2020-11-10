@@ -44,8 +44,14 @@ router.post('/login', (req,res) => {
     const {email, password} = req.body;
    
     if(email && password){
+        if(validEmail(email)){
+            res.status(200).send(`Email: ${email} Password: ${password}`);
+        }
+        else{
+            res.status(400).send("error");
+        }
 
-        res.status(200).send("logged");
+        
     }
     else{
         res.status(400).send("error");
@@ -54,21 +60,21 @@ router.post('/login', (req,res) => {
 
 router.get('/user/:userId', (req,res) => {
     //console.log(req.params);
-    user = {
-        "id" : "1",
-        "firstname" : "juan1",
-        "lastname" : "del pueblo",
-        "business_status" : "activo",
-        "email" : "test@test.com",
-        "phone_number" : "123-456-9999",
-        "requested_assistance" : "money",
-        "password" : "password"
+    
+    let i = 0;
+    let founded = false;
+
+    if(users){
+        users.forEach((user) => {
+            if(req.params.userId == user.id){
+                res.status(200).json(user);
+                founded = true;
+            }
+        })
+
     }
 
-    if (user){
-        res.status(200).json(user);
-    }
-    else{
+    if (!founded){
         res.status(404).send("User not found");
     }
 
@@ -85,9 +91,7 @@ router.put('/user/:userId', (req, res) => {
             
             if(validName(firstname) && validName(lastname) && validPhone(phone_number)){
                 
-                _.each(users, (user, i) => {
-                    console.log(user.id);
-                    
+                users.forEach((user) => {
                     if(user.id == req.params.userId){
                         founded = true;
                         user.firstname = firstname;
@@ -119,9 +123,9 @@ router.put('/user/:userId', (req, res) => {
 
 router.delete('/user/:userId', (req,res) => {
     let isDeleted = false;
-    //console.log(users);
     
-    _.each(users, (user, i) => {  
+    let i = 0;
+    users.forEach((user) => {
         console.log(user);          
         if(user.id == req.params.userId){
             

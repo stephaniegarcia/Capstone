@@ -88,7 +88,7 @@ router.get('/tce/businesstype/user/:userID', (req, res) => {
     }
 });
 
-router.post('tce/answers/:userID', (req, res) => {
+router.post('/tce/answers/:userID', (req, res) => {
     const {answer1,answer2,answer3,answer4,answer5,answer6,answer7,
     answer8,answer9,answer10,answer11} = req.body;
     let type = "";
@@ -275,7 +275,7 @@ router.post('/tce/organization/:orgID/user/:userID/check', (req, res) => {
 });
 
 
-router.put('tce/answers/:userID', (req, res) => {
+router.put('/tce/answers/:userID', (req, res) => {
     const {answer1,answer2,answer3,answer4,answer5,answer6,answer7,
     answer8,answer9,answer10,answer11} = req.body;
     let type = "";
