@@ -42,6 +42,7 @@ export default function Organizations() {
     setOrgStage(event.target.value);
   };
 
+  //populate organizations table 
   function searchOrganizations() {
     setShowLoading(true);
     apiService.getRequest("organizations?type="+orgType+"&stage="+orgStage).then((organizationsResponse) => {
@@ -86,113 +87,80 @@ export default function Organizations() {
           <TableCell align="right">{row.businessType}</TableCell>
         </TableRow>
         <TableRow>
-          <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
-            {/* <Collapse in={row.open} timeout="auto" unmountOnExit> */}
-              <Box margin={1}>
-                <Typography variant="h6" gutterBottom component="div">
-                  Descripción
-                </Typography>
-                <Table size="small" aria-label="purchases">
-                  {/* <TableHead>
-                    <TableRow>
-                      <TableCell>Descripción</TableCell>
-                    </TableRow>
-                  </TableHead> */}
-                  <TableBody>
-                    {row.moreInfo.map((historyRow) => (
-                      <TableRow key={historyRow.description}>
-                        <TableCell component="th" scope="row">
-                          {historyRow.description}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </Box>
-            {/* </Collapse> */}
-          </TableCell>
+            <TableCell colSpan="5" style={{padding: "0 80px 30px 80px"}}>
+              <Typography gutterBottom component="div">
+                Descripción:
+              </Typography>
+              {row.moreInfo.map((historyRow) => (
+                <p>
+                  {historyRow.description}
+                </p>
+              ))}
+            </TableCell>
         </TableRow>
       </React.Fragment>
     );
   }
-
-  Row.propTypes = {
-    row: PropTypes.shape({
-      phone: PropTypes.number.isRequired,
-      email: PropTypes.number.isRequired,
-      businessStage: PropTypes.number.isRequired,
-      moreInfo: PropTypes.arrayOf(
-      PropTypes.shape({
-        amount: PropTypes.number.isRequired,
-        customerId: PropTypes.string.isRequired,
-        description: PropTypes.string.isRequired,
-      }),
-      ).isRequired,
-      name: PropTypes.string.isRequired,
-      price: PropTypes.number.isRequired,
-      businessType: PropTypes.number.isRequired,
-    }).isRequired,
-  };
-      
+  
   useEffect(()=>{
     searchOrganizations();
   },[initialLoad])
 
   return (
     !apiService.isAuthenticated() ? <Redirect to="/login" /> :
-    <div>
-      <div style={{'padding-top': '50px'}}>
-      <h2>Organizaciones</h2>
-      <TableContainer component={Paper}>
-        <div>
-          <FormControl className={classes.formControl} style={{'margin':'15px'}}>
-            <InputLabel>Tipo</InputLabel>
-            <Select
-              style={{'width':'150px'}}
-              value={orgType}
-              onChange={handleOrgTypeChange}>
-              <MenuItem value=''>Todos</MenuItem>
-              <MenuItem value='Microempresa'>Microempresa</MenuItem>
-              <MenuItem value='Comerciante'>Comerciante</MenuItem>
-              <MenuItem value='Empresa Basada en Innovación'>Empresa Basada en Innovación</MenuItem>
-              <MenuItem value='Empresa en Crecimiento'>Empresa en Crecimiento</MenuItem>
-              <MenuItem value='Acceso a Capital'>Acceso a Capital</MenuItem>
-            </Select>
-          </FormControl>
-          <FormControl className={classes.formControl} style={{'margin':'15px'}}>
-            <InputLabel>Etapa</InputLabel>
-            <Select
-              style={{'width':'150px'}}
-              value={orgStage}
-              onChange={handleOrgStageChange}>
-              <MenuItem value=''>Todos</MenuItem>
-              <MenuItem value='Idea'>Idea</MenuItem>
-              <MenuItem value='Prototipo'>Prototipo</MenuItem>
-              <MenuItem value='Expansión'>Expansión</MenuItem>
-              <MenuItem value='Lanzamiento'>Lanzamiento</MenuItem>
-            </Select>
-          </FormControl>
-          <Button style={{'margin':'15px'}} variant="contained" color="primary" onClick={()=>{ searchOrganizations(); }}>
-            Filter
-          </Button>
-        </div>
-        <Table aria-label="collapsible table">
-          <TableHead>
-            <TableRow>
-              <TableCell />
-              <TableCell>Nombre</TableCell>
-              <TableCell align="right">Teléfono</TableCell>
-              <TableCell align="right">Correo Electrónico&nbsp;</TableCell>
-              <TableCell align="right">Etapa&nbsp;</TableCell>
-              <TableCell align="right">Tipo&nbsp;</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {organizationData.map((organization) => ( <Row key={organization.name} row={organization} /> ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-    </div>
+    <div className="top-margin">
+      <Paper className="paper-margin" elevation="10">
+        <h2>Organizaciones</h2>
+        <TableContainer>
+          <div>
+            <FormControl className={classes.formControl} style={{'margin':'15px'}}>
+              <InputLabel>Tipo</InputLabel>
+              <Select
+                style={{'width':'150px'}}
+                value={orgType}
+                onChange={handleOrgTypeChange}>
+                <MenuItem value=''>Todos</MenuItem>
+                <MenuItem value='Microempresa'>Microempresa</MenuItem>
+                <MenuItem value='Comerciante'>Comerciante</MenuItem>
+                <MenuItem value='Empresa Basada en Innovación'>Empresa Basada en Innovación</MenuItem>
+                <MenuItem value='Empresa en Crecimiento'>Empresa en Crecimiento</MenuItem>
+                <MenuItem value='Acceso a Capital'>Acceso a Capital</MenuItem>
+              </Select>
+            </FormControl>
+            <FormControl className={classes.formControl} style={{'margin':'15px'}}>
+              <InputLabel>Etapa</InputLabel>
+              <Select
+                style={{'width':'150px'}}
+                value={orgStage}
+                onChange={handleOrgStageChange}>
+                <MenuItem value=''>Todos</MenuItem>
+                <MenuItem value='Idea'>Idea</MenuItem>
+                <MenuItem value='Prototipo'>Prototipo</MenuItem>
+                <MenuItem value='Expansión'>Expansión</MenuItem>
+                <MenuItem value='Lanzamiento'>Lanzamiento</MenuItem>
+              </Select>
+            </FormControl>
+            <Button style={{'margin':'15px'}} variant="contained" color="primary" onClick={()=>{ searchOrganizations(); }}>
+              Filtrar
+            </Button>
+          </div>
+          <Table aria-label="collapsible table">
+            <TableHead>
+              <TableRow>
+                <TableCell />
+                <TableCell>Nombre</TableCell>
+                <TableCell align="right">Teléfono</TableCell>
+                <TableCell align="right">Correo Electrónico&nbsp;</TableCell>
+                <TableCell align="right">Etapa&nbsp;</TableCell>
+                <TableCell align="right">Tipo&nbsp;</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {organizationData.map((organization) => ( <Row key={organization.name} row={organization} /> ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Paper>    
     <Alert
       isOpen={showErrorAlert}
       handleSubmit={onAlertClick}

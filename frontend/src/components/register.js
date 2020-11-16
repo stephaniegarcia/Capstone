@@ -5,14 +5,13 @@ import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import MenuItem from '@material-ui/core/MenuItem';
 import InputLabel from '@material-ui/core/InputLabel';
+import FormControl from '@material-ui/core/FormControl'
 import Select from '@material-ui/core/Select';
 import Spinner from './loading'
 import Alert from './alert'
 import apiService from "./mockApiService";
 
 function Register() {
-    const history = useHistory();
-
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -104,7 +103,7 @@ function Register() {
             firstName: firstName,
             lastName: lastName,
             phone: phone,
-            businessStatus: Boolean(businessStatus),
+            businessStatus: String(businessStatus).toLowerCase() == 'true',
             businessStage: businessStage,
             requiredAssistance: requiredAssistance
         };
@@ -122,41 +121,59 @@ function Register() {
 
     return(
         apiService.isAuthenticated() ? <Redirect to="/" /> :
-        <div>
-            <Paper className="form form--wrapper" elevation={10}>
-                <div style={{'padding-top': '50px'}}></div>
+        <div className="top-margin">
+            <Paper className="form form--wrapper paper-margin" elevation="10">
                 <h1>Register</h1>
-                <div style={{'padding-top': '50px'}}></div>
-                <div>
+                <div className="margin-25">
                     <TextField
+                        InputLabelProps={{
+                            shrink: true,
+                        }}  
+                        className="form-control"
                         label="Nombre:"
                         error={!validFirstName}
                         onChange={handleFirstNameChange}
                         value={firstName} />
                 </div>
-                <div>
+                <div className="margin-25">
                     <TextField
+                        InputLabelProps={{
+                            shrink: true,
+                        }}  
+                        className="form-control"
                         label="Apellido:"
                         error={!validLastName}
                         onChange={handleLastNameChange}
                         value={lastName} />
                 </div>
-                <div>
+                <div className="margin-25">
                     <TextField
+                        InputLabelProps={{
+                            shrink: true,
+                        }}  
+                        className="form-control"
                         label="Telefono:"
                         error={!validPhone}
                         onChange={handlePhoneChange}
                         value={phone} />
                 </div>
-                <div>
+                <div className="margin-25">
                     <TextField
+                        InputLabelProps={{
+                            shrink: true,
+                        }}  
+                        className="form-control"
                         label="Correo Electrónico:"
                         error={!validEmail}
                         onChange={handleEmailChange}
                         value={email} />
                 </div>
-                <div>
+                <div className="margin-25">
                     <TextField
+                        InputLabelProps={{
+                            shrink: true,
+                        }}  
+                        className="form-control"
                         type="password"
                         label="Contraseña:"
                         error={!validPassword}
@@ -164,8 +181,12 @@ function Register() {
                         onChange={handlePasswordChange}
                         value={password} />
                 </div>
-                <div>
+                <div className="margin-25">
                     <TextField
+                        InputLabelProps={{
+                            shrink: true,
+                        }}      
+                        className="form-control"
                         type="password"
                         label="Confirmar Contraseña:"
                         helperText="Contraseña debe ser igual a la anterior"
@@ -173,50 +194,53 @@ function Register() {
                         onChange={handleConfirmPasswordChange}
                         value={confirmPassword} />
                 </div>
-                <div>
-                <InputLabel>Etapa de Negocio</InputLabel>
-                    <Select
-                    style={{'width':'150px'}}
-                    value={businessStage}
-                    onChange={handleBusinessStageChange}>
-                    <MenuItem value='Idea'>Idea</MenuItem>
-                    <MenuItem value='Prototipo'>Prototipo</MenuItem>
-                    <MenuItem value='Expansión'>Expansión</MenuItem>
-                    <MenuItem value='Lanzamiento'>Lanzamiento</MenuItem>
-                    </Select>
+                <div className="margin-25">
+                    <TextField
+                        label="Etapa de Negocio"
+                        select
+                        className="form-control"
+                        value={businessStage}
+                        onChange={handleBusinessStageChange}>
+                        <MenuItem value='Idea'>Idea</MenuItem>
+                        <MenuItem value='Prototipo'>Prototipo</MenuItem>
+                        <MenuItem value='Expansión'>Expansión</MenuItem>
+                        <MenuItem value='Lanzamiento'>Lanzamiento</MenuItem>
+                    </TextField>
                  </div>
-                <div>
-                    <InputLabel>Tipo de Asistencia </InputLabel>
-                    <Select
-                    style={{'width':'150px'}}
-                    value={requiredAssistance}
-                    onChange={handleRequiredAssistanceChange}>
-                    <MenuItem value='Ninguna'>Ninguna</MenuItem>
-                    <MenuItem value='Asuntos Legales'>Asuntos Legales</MenuItem>
-                    <MenuItem value='Prestamos'>Prestamos</MenuItem>
-                    <MenuItem value='Mentoria'>Mentoria</MenuItem>
-                    </Select>
+                <div className="margin-25">
+                    <TextField
+                        label="Tipo de Asistencia"
+                        select
+                        className="form-control"
+                        value={requiredAssistance}
+                        onChange={handleRequiredAssistanceChange}>
+                            <MenuItem value='Ninguna'>Ninguna</MenuItem>
+                            <MenuItem value='Asuntos Legales'>Asuntos Legales</MenuItem>
+                            <MenuItem value='Prestamos'>Prestamos</MenuItem>
+                            <MenuItem value='Mentoria'>Mentoria</MenuItem>
+                    </TextField>
                  </div>
-                 <div>
-                    <InputLabel>Negocio está Operando Actualmente</InputLabel>
-                    <Select
-                    style={{'width':'150px'}}
-                    value={businessStatus}
-                    onChange={handleBusinessStatusChange}>
-                    <MenuItem value='true'>Si</MenuItem>
-                    <MenuItem value='false'>No</MenuItem>
-                    </Select>
+                 <div className="margin-25">
+                    <TextField
+                        label="Negocio está Operando Actualmente"
+                        select
+                        className="form-control"
+                        value={businessStatus}
+                        onChange={handleBusinessStatusChange}>
+                        <MenuItem value='true'>Si</MenuItem>
+                        <MenuItem value='false'>No</MenuItem>
+                    </TextField>
                  </div>
                 <div>
                     <Button
-                    type="submit"
-                    variant="contained"
-                    color="primary"
-                    onClick={handleRegisterClick}
-                    disabled= {!validEmail || !email.length>0 || !validPassword || !password.length>0 || !validConfirmPassword || !confirmPassword.length>0 || !validPhone || !phone.length>0 || !validFirstName || !firstName.length>0 || !validLastName || !lastName.length>0}
-                    style={{ margin: '16px' }}
-                    >
-                        Submit
+                        className="form-control"
+                        type="submit"
+                        variant="contained"
+                        color="primary"
+                        onClick={handleRegisterClick}
+                        disabled= {!validEmail || !email.length>0 || !validPassword || !password.length>0 || !validConfirmPassword || !confirmPassword.length>0 || !validPhone || !phone.length>0 || !validFirstName || !firstName.length>0 || !validLastName || !lastName.length>0}
+                        style={{ margin: '16px' }} >
+                            Submit
                     </Button>
                 </div>
             </Paper>

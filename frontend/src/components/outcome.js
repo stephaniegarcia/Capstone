@@ -98,68 +98,31 @@ function Outcome() {
         return (
           <React.Fragment>
             <TableRow className={classes.root}>
-              <TableCell>
-                {/* <IconButton aria-label="expand row" size="small" onClick={() => row.open = !row.open }>
-                  {row.open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-                </IconButton> */}
+              <TableCell className="no-bottom-border">
               </TableCell>
-              <TableCell component="th" scope="row">
+              <TableCell className="no-bottom-border" scope="row">
                 {row.name}
               </TableCell>
-              <TableCell align="right">{row.phone}</TableCell>
-              <TableCell align="right">{row.email}</TableCell>
-              <TableCell align="right">{row.businessStage}</TableCell>
-              <TableCell align="right">{row.businessType}</TableCell>
+              <TableCell className="no-bottom-border" align="right">{row.phone}</TableCell>
+              <TableCell className="no-bottom-border" align="right">{row.email}</TableCell>
+              <TableCell className="no-bottom-border" align="right">{row.businessStage}</TableCell>
+              <TableCell className="no-bottom-border" align="right">{row.businessType}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
-                {/* <Collapse in={row.open} timeout="auto" unmountOnExit> */}
-                  <Box margin={1}>
-                    <Typography variant="h6" gutterBottom component="div">
-                      Descripción
-                    </Typography>
-                    <Table size="small" aria-label="purchases">
-                      {/* <TableHead>
-                        <TableRow>
-                          <TableCell>Descripción</TableCell>
-                        </TableRow>
-                      </TableHead> */}
-                      <TableBody>
-                        {row.moreInfo.map((historyRow) => (
-                          <TableRow key={historyRow.description}>
-                            <TableCell component="th" scope="row">
-                              {historyRow.description}
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </Box>
-                {/* </Collapse> */}
-              </TableCell>
+                <TableCell colSpan="5" style={{padding: "0 80px 30px 80px"}}>
+                  <Typography gutterBottom component="div">
+                    Descripción:
+                  </Typography>
+                  {row.moreInfo.map((historyRow) => (
+                    <p>
+                      {historyRow.description}
+                    </p>
+                  ))}
+                </TableCell>
             </TableRow>
           </React.Fragment>
         );
       }
-      
-      Row.propTypes = {
-        row: PropTypes.shape({
-            phone: PropTypes.number.isRequired,
-          email: PropTypes.number.isRequired,
-          businessStage: PropTypes.number.isRequired,
-          moreInfo: PropTypes.arrayOf(
-            PropTypes.shape({
-              amount: PropTypes.number.isRequired,
-              customerId: PropTypes.string.isRequired,
-              description: PropTypes.string.isRequired,
-            }),
-          ).isRequired,
-          name: PropTypes.string.isRequired,
-          price: PropTypes.number.isRequired,
-          businessType: PropTypes.number.isRequired,
-        }).isRequired,
-      };
-
       function RoadmapOrganizationRow(props) {
         const { row } = props;
         const classes = useRowStyles();
@@ -239,13 +202,8 @@ function Outcome() {
   return (
     !apiService.isAuthenticated() ? <Redirect to="/login" /> :
     <div>
-      <Grid container className={classes.root} spacing={0}>
-      <Grid item xs={12}>
-        <Grid container justify="center" spacing={spacing}>
-          {(
-            <Grid  item>
-                <div style={{'padding-top': '50px'}}></div>
-              <Paper className={classes.paper} >
+      <div style={{'padding-top': '50px'}}></div>
+              <Paper className="paper-margin" elevation="10" >
               <div>
                   <h1>Segun tus respuestas tu tipo de negocio es:</h1>
                   <h1> {quizResult.businessType}</h1>
@@ -262,12 +220,12 @@ function Outcome() {
                   
               </div>
                 </Paper>
-                <Paper className={classes.paper} >
+                <Paper className="paper-margin" elevation="10" >
                 <div>
                   <div>
                      <h1>Nos indicaste que tu negocio esta en etapa de {quizResult.businessStage}</h1>
                   <h1>Este sera tu camino a recorrer:</h1>  
-                    <TableContainer component={Paper}>
+                    <TableContainer>
                       <Table aria-label="table" className={'rm-table'}>
                         <TableBody >
                           {quizResult.roadmap.map((row) => (<RoadmapRow  key={row.name} row={row} />))}
@@ -278,12 +236,12 @@ function Outcome() {
                 </div>
                 </Paper>  
                 
-                <Paper className={classes.paper} >
+                <Paper className="paper-margin" elevation="10" >
               <div>
                   <h1>Aqui se muestran todas las organizaciones mencionadas en el recorrido: </h1>
                   <div>
                 <h2>Organizaciones</h2>
-              <TableContainer component={Paper}>
+              <TableContainer>
                 <div>
                 
                 </div>
@@ -309,17 +267,12 @@ function Outcome() {
                 </Paper>
                 <div>
                 <Button style={{'margin':'15px'}} variant="contained" color="secondary" href="/tce">
-                  Cancel
+                  Repetir el Cuestionario
                 </Button>
                 <Button style={{'margin':'15px'}} variant="contained" color="primary" onClick={()=>{ saveData(); }}>
-                  Save
+                  Guardar en Tu Perfil
                 </Button>
                 </div>
-            </Grid>
-          )}
-        </Grid>
-      </Grid>
-    </Grid>
     <Alert
     isOpen={showErrorAlert}
     handleSubmit={onAlertClick}

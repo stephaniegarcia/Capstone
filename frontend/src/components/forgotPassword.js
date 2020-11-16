@@ -11,7 +11,7 @@ import Paper from '@material-ui/core/Paper'
 import Spinner from './loading'
 import Alert from './alert'
 
-export default class PasswordReset extends Component {
+export default class ForgotPassword extends Component {
   state = {
     passChangeSuccess: false,
   }
@@ -40,7 +40,7 @@ export default class PasswordReset extends Component {
   }
 
   _handleSubmit = ({
-    currentPass,
+    email,
     newPass,
     confirmPass,
     setSubmitting,
@@ -63,23 +63,23 @@ export default class PasswordReset extends Component {
         
       <Formik
         initialValues={{
-          currentPass: '',
+          email: '',
           newPass: '',
           confirmPass: '',
         }}
         validationSchema={object().shape({
-          currentPass: string().required('Current password is required'),
+          email: string().required('Email is required'),
           newPass: string().required('New password is required'),
           confirmPass: string()
             .oneOf([ref('newPass')], 'Passwords do not match')
             .required('Password is required'),
         })}
         onSubmit={(
-          { currentPass, newPass, confirmPass },
+          { email, newPass, confirmPass },
           { setSubmitting, resetForm }
         ) =>
           this._handleSubmit({
-            currentPass,
+            email,
             newPass,
             confirmPass,
             setSubmitting,
@@ -109,25 +109,25 @@ export default class PasswordReset extends Component {
               <div style={{'padding-top': '50px'}}></div>
                 <FormControl fullWidth margin="dense">
                   <InputLabel
-                    htmlFor="password-current"
-                    error={Boolean(touched.currentPass && errors.currentPass)}
+                    htmlFor="email"
+                    error={Boolean(touched.email && errors.email)}
                   >
-                    {'Current Password'}
+                    {'Correo Electronico'}
                   </InputLabel>
                   <Input
-                    id="password-current"
-                    name="currentPass"
-                    type="password"
-                    value={values.currentPass}
+                    id="email"
+                    name="email"
+                   
+                    value={values.email}
                     onChange={handleChange}
                     onBlur={handleBlur}
-                    error={Boolean(touched.currentPass && errors.currentPass)}
+                    error={Boolean(touched.email && errors.email)}
                   />
                   <FormHelperText
-                    error={Boolean(touched.currentPass && errors.currentPass)}
+                    error={Boolean(touched.email && errors.email)}
                   >
-                    {touched.currentPass && errors.currentPass
-                      ? errors.currentPass
+                    {touched.email && errors.email
+                      ? errors.email
                       : ''}
                   </FormHelperText>
                 </FormControl>

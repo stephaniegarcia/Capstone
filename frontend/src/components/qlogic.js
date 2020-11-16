@@ -76,7 +76,7 @@ movePreviousClick = () => {
     <div>
         <h1>Comienza Tu Recorrido Empresarial</h1>
         <h4>Contesta las siguientes preguntas para identificar tu tipo de negocio</h4>
-      <Paper className={this.props.classes.root} elevation={4}>
+      <Paper className="paper-margin" elevation="10">
         <Typography component="p">
           <Button variant="fab" color="primary" aria-label="add" className={this.props.classes.button}>
            <LiveHelp />
@@ -104,9 +104,9 @@ movePreviousClick = () => {
         </div>
         ))}
         <div className={this.props.classes.footer}>
-          <Button href="/outcome" disabled={!this.state.canSubmit} variant="raised" color="secondary">Submit</Button>
-          <Button disabled={!moveRight} onClick={this.moveNextClick} variant="raised" color="primary" style={{float: "right"}}>Next</Button>
-          <Button disabled={!moveLeft} onClick={this.movePreviousClick} variant="raised" color="primary" style={{float: "right", marginRight: "50px"}}>Previous</Button>
+          <Button href="/outcome" disabled={!this.state.canSubmit} variant="raised" color="secondary">Someter</Button>
+          <Button disabled={!moveRight} onClick={this.moveNextClick} variant="raised" color="primary" style={{float: "right"}}>Siguiente</Button>
+          <Button disabled={!moveLeft} onClick={this.movePreviousClick} variant="raised" color="primary" style={{float: "right", marginRight: "50px"}}>Anterior</Button>
         </div>
       </Paper>
     </div>

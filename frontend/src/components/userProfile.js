@@ -144,76 +144,40 @@ function UserProfile() {
         };
         return (
           <React.Fragment>
-            <TableRow className={classes.root}>
-              <TableCell>
+            <TableRow >
+              <TableCell className="no-bottom-border">
                 {/* <IconButton aria-label="expand row" size="small" onClick={() => row.open = !row.open }>
                   {row.open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
                 </IconButton> */}
               </TableCell>
-              <TableCell component="th" scope="row">
+              <TableCell className="no-bottom-border" scope="row">
                 {row.name}
               </TableCell>
-              <TableCell align="right">{row.phone}</TableCell>
-              <TableCell align="right">{row.email}</TableCell>
-              <TableCell align="right">{row.businessStage}</TableCell>
-              <TableCell align="right">{row.businessType}</TableCell>
+              <TableCell className="no-bottom-border" align="right">{row.phone}</TableCell>
+              <TableCell className="no-bottom-border" align="right">{row.email}</TableCell>
+              <TableCell className="no-bottom-border" align="right">{row.businessStage}</TableCell>
+              <TableCell className="no-bottom-border" align="right">{row.businessType}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
-                {/* <Collapse in={row.open} timeout="auto" unmountOnExit> */}
-                  <Box margin={1}>
-                  <FormControlLabel
-                    control={<Checkbox checked={check} onChange={handleCheckboxChange} />}
-                    label="Contacted"
-                  /> 
-                  <Rating
-                      value={rating}
-                      onChange={handleRatingChange}
-                    />
-                    <Typography variant="h6" gutterBottom component="div">
-                      Descripción
-                    </Typography>
-                    <Table size="small" aria-label="purchases">
-                      {/* <TableHead>
-                        <TableRow>
-                          <TableCell>Descripción</TableCell>
-                        </TableRow>
-                      </TableHead> */}
-                      <TableBody>
-                        {row.moreInfo.map((historyRow) => (
-                          <TableRow key={historyRow.description}>
-                            <TableCell component="th" scope="row">
-                              {historyRow.description}
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </Box>
-                {/* </Collapse> */}
+              <TableCell colSpan="6" style={{padding: "0 80px 30px 80px"}}>
+                <Typography gutterBottom component="div">
+                  Descripción:
+                </Typography>
+                {row.moreInfo.map((historyRow) => (
+                  <p>
+                    {historyRow.description}
+                  </p>
+                ))}
+                <Rating
+                  value={rating}
+                  onChange={handleRatingChange} />
+                <br/>
+                <br/>
               </TableCell>
             </TableRow>
           </React.Fragment>
         );
       }
-      
-      Row.propTypes = {
-        row: PropTypes.shape({
-            phone: PropTypes.number.isRequired,
-          email: PropTypes.number.isRequired,
-          businessStage: PropTypes.number.isRequired,
-          moreInfo: PropTypes.arrayOf(
-            PropTypes.shape({
-              amount: PropTypes.number.isRequired,
-              customerId: PropTypes.string.isRequired,
-              description: PropTypes.string.isRequired,
-            }),
-          ).isRequired,
-          name: PropTypes.string.isRequired,
-          price: PropTypes.number.isRequired,
-          businessType: PropTypes.number.isRequired,
-        }).isRequired,
-      };
 
       function RoadmapOrganizationRow(props) {
         const { row } = props;
@@ -228,7 +192,7 @@ function UserProfile() {
           </React.Fragment>
         );
       }
-
+//Drawing Roadmap Logic
       function RoadmapRow(props) {
         const { row } = props;
         const [anchorEl, setAnchorEl] = React.useState(null);
@@ -290,6 +254,7 @@ function UserProfile() {
         );
       }
 
+      //sets all fields to be able to edit them 
       function getProfile() {
         var profile = apiService.profile();
         if(profile) {
@@ -314,7 +279,7 @@ function UserProfile() {
           phone: phone,
           businessStage: businessStage,
           requiredAssistance: requiredAssistance,
-          businessStatus: Boolean(businessStatus)
+          businessStatus: String(businessStatus).toLowerCase() == 'true'
         };
         setShowLoading(true);
         apiService.putRequest("profile/update", data).then(response => {
@@ -333,176 +298,174 @@ function UserProfile() {
 
   return (
     !apiService.isAuthenticated() ? <Redirect to="/login" /> :
-    <div>
-      <Grid container className={classes.root} spacing={0}>
-      <Grid item xs={12}>
-        <Grid container justify="center" spacing={spacing}>
-          {(
-            <Grid  item>
-              <div style={{'padding-top': '50px'}}></div>
-              <Paper className={classes.paper} >
-              <div>
-                  <h1>Tu Perfil</h1>
-                  <form className={classes.root} noValidate autoComplete="off">
-                <div>
-                 <TextField
-                 onChange={handleFirstNameChange}
-                 error={!validFirstName}
-                 label="Nombre:"
-                  defaultValue=" "
-                  value={firstName}
-                />
-                </div>
-                <br/>
-               <br/>
-               <div>
-                 <TextField
-                 onChange={handleLastNameChange}
-                 error={!validLastName}
-                 label="Apellido:"
-                  defaultValue=" "
-                  value={lastName}
-                />
-                </div>
-                <br/>
-               <br/>
-                <div>
-                <TextField
-                onChange={handleEmailChange}
-                error={!validEmail}
-                 label="Correo Electrónico:"
-                 defaultValue=" "
-                 value={email}
-                />
-                </div>
-                <br/>
-               <br/>
-                <div>
-                <TextField
-                onChange={handlePhoneChange}
-                error={!validPhone}
-                 label="Teléfono:"
-                 defaultValue=" "
-                 value={phone}
-                />
-                </div>
-                <br/>
-                <br/>
-                <div>
-                <InputLabel>Etapa de Negocio</InputLabel>
-                <Select
-                  style={{'width':'150px'}}
-                  value={businessStage}
-                  onChange={handleBusinessStageChange}>
-                  <MenuItem value=''></MenuItem>
-                  <MenuItem value='Idea'>Idea</MenuItem>
-                  <MenuItem value='Prototipo'>Prototipo</MenuItem>
-                  <MenuItem value='Expansión'>Expansión</MenuItem>
-                  <MenuItem value='Lanzamiento'>Lanzamiento</MenuItem>
-                </Select>
-                 </div>
-                  <br/>
-                <br/>
-                <div>
-                <InputLabel>Tipo de Asistencia </InputLabel>
-                <Select
-                  style={{'width':'150px'}}
-                  value={requiredAssistance}
-                  onChange={handleRequiredAssistanceChange}>
-                  <MenuItem value='Ninguna'>Ninguna</MenuItem>
-                  <MenuItem value='Asuntos Legales'>Asuntos Legales</MenuItem>
-                  <MenuItem value='Prestamos'>Prestamos</MenuItem>
-                  <MenuItem value='Mentoria'>Mentoria</MenuItem>
-                </Select>
-                 </div>
-                  <br/>
-                <br/>
-                <div>
-                <InputLabel>Negocio está Operando Actualmente</InputLabel>
-                <Select
-                  style={{'width':'150px'}}
-                  value={businessStatus}
-                  onChange={handleBusinessStatusChange}>
-                  <MenuItem value='true'>Si</MenuItem>
-                  <MenuItem value='false'>No</MenuItem>
-                </Select>
-                 </div>
-                  <br/>
-                <br/>
-                <div>
-                   <TextField
-                 label="Tipo de Negocio"
-                 defaultValue=" "
-                 value={businessType}
-                  InputProps={{
-                    readOnly: true,
-                  }}
-                />
-               
-                </div>
-                <Button style={{'margin':'15px'}}
-                  disabled= {!validEmail || !validPhone || !validFirstName || !validLastName}
-                  variant="contained" color="primary" onClick={()=>{ updateProfile(); }}>
-                  Update
+    <div className="top-margin">
+      <Paper className="paper-margin" elevation="10">
+      <h1>Tu Perfil</h1>
+        <form className={classes.root} noValidate autoComplete="off">
+          <div className="margin-25">
+            <TextField
+              InputLabelProps={{
+                  shrink: true,
+              }}      
+              className="form-control"
+              onChange={handleFirstNameChange}
+              error={!validFirstName}
+              label="Nombre:"
+              defaultValue=" "
+              value={firstName} />
+          </div>
+          <div className="margin-25">
+            <TextField
+              InputLabelProps={{
+                  shrink: true,
+              }}      
+              className="form-control"
+              onChange={handleLastNameChange}
+              error={!validLastName}
+              label="Apellido:"
+              defaultValue=" "
+              value={lastName} />
+          </div>
+          <div className="margin-25">
+            <TextField
+              InputLabelProps={{
+                  shrink: true,
+              }}      
+              className="form-control"
+              onChange={handleEmailChange}
+              error={!validEmail}
+              label="Correo Electrónico:"
+              defaultValue=" "
+              value={email} />
+          </div>
+          <div className="margin-25">
+            <TextField
+              InputLabelProps={{
+                  shrink: true,
+              }}      
+              className="form-control"
+              onChange={handlePhoneChange}
+              error={!validPhone}
+              label="Teléfono:"
+              defaultValue=" "
+              value={phone} />
+          </div>
+          <div className="margin-25">
+              <TextField
+                label="Etapa de Negocio"
+                select
+                className="form-control"
+                value={businessStage}
+                onChange={handleBusinessStageChange}>
+                <MenuItem value=''></MenuItem>
+                <MenuItem value='Idea'>Idea</MenuItem>
+                <MenuItem value='Prototipo'>Prototipo</MenuItem>
+                <MenuItem value='Expansión'>Expansión</MenuItem>
+                <MenuItem value='Lanzamiento'>Lanzamiento</MenuItem>
+              </TextField>
+          </div>  
+          <div className="margin-25">
+            <TextField
+              select
+              InputLabelProps={{
+                  shrink: true,
+              }}
+              label="Tipo de Asistencia"
+              className="form-control"
+              value={requiredAssistance}
+              onChange={handleRequiredAssistanceChange}>
+              <MenuItem value='Ninguna'>Ninguna</MenuItem>
+              <MenuItem value='Asuntos Legales'>Asuntos Legales</MenuItem>
+              <MenuItem value='Prestamos'>Prestamos</MenuItem>
+              <MenuItem value='Mentoria'>Mentoria</MenuItem>
+            </TextField>
+          </div>
+          <div className="margin-25">
+            <TextField
+              label="Negocio está Operando Actualmente"
+              select
+              className="form-control"
+              value={businessStatus}
+              onChange={handleBusinessStatusChange}>
+              <MenuItem value='true'>Si</MenuItem>
+              <MenuItem value='false'>No</MenuItem>
+            </TextField>
+          </div>
+          <div className="margin-25">
+            <TextField
+              InputLabelProps={{
+                  shrink: true,
+              }}  
+              className="form-control"
+              label="Tipo de Negocio"
+              defaultValue=" "
+              value={businessType}
+              InputProps={{
+                readOnly: true,
+              }} />
+          </div>
+          <Button
+            style={{'margin':'15px'}}
+            className="form-control"
+            disabled= {!validEmail || !validPhone || !validFirstName || !validLastName}
+            variant="contained" color="primary" onClick={()=>{ updateProfile(); }}>
+            Actualizar Tu Perfil
+          </Button>
+          <br/>
+          <Button
+                    href="/forgotPassword"
+                    color="inherit"
+                    className="form-control">
+                        Cambiar Contrasena
                 </Button>
-                  </form>
-              </div>
-                </Paper>
-                <Paper className={classes.paper} >
-              <div>
-                  <h1>Tu Camino a Recorrer</h1>
-                  <TableContainer component={Paper}>
-                      <Table aria-label="table" className={'rm-table'}>
-                        <TableBody >
-                          {roadmap.map((row) => (<RoadmapRow  key={row.name} row={row} />))}
-                        </TableBody>
-                      </Table>
-                    </TableContainer>
-              </div>
-                </Paper>
-                
-                <Paper className={classes.paper} >
-              <div>
-                  <h1>Tus Organizaciones</h1>
-                  <div>
-                {/* <h2>Organizaciones</h2> */}
-              <TableContainer component={Paper}>
-                <Table aria-label="collapsible table">
-                  <TableHead>
-                    <TableRow>
-                      <TableCell />
-                      <TableCell >Nombre</TableCell>
-                      <TableCell align="right">Teléfono</TableCell>
-                      <TableCell align="right">Correo Electrónico&nbsp;</TableCell>
-                      <TableCell align="right">Etapa&nbsp;</TableCell>
-                      <TableCell align="right">Tipo&nbsp;</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody >
-                  {organizations.map((row) => (<Row  key={row.name} row={row} />))}
-        
-                  {/* {this.state.rows && this.state.rows.map((row) => ( <Row key={row.name} row={row} />))} */}
+        </form> 
+      </Paper>
 
-                  
-                  </TableBody>
-                </Table>
-              </TableContainer>
-           </div>
-              </div>
-                </Paper>
-            </Grid>
-          )}
-        </Grid>
-      </Grid>
-    </Grid>
-    <Alert
-      isOpen={showErrorAlert}
-      handleSubmit={onAlertClick}
-      title="Error"
-      text={errorMessage}
-      submitButtonText="Ok"
-    />
-    <Spinner isShown={showLoading} />
+      <Paper className="paper-margin" elevation="10" >
+        <div>
+          <h1>Tu Camino a Recorrer</h1>
+          <TableContainer>
+            <Table aria-label="table" className={'rm-table'}>
+              <TableBody >
+                {roadmap.map((row) => (<RoadmapRow  key={row.name} row={row} />))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </div>
+      </Paper>
+                
+      <Paper className="paper-margin" elevation="10" >
+        <div>
+          <h1>Tus Organizaciones</h1>
+          <div>
+            <TableContainer>
+              <Table aria-label="collapsible table">
+                <TableHead>
+                  <TableRow>
+                    <TableCell />
+                    <TableCell >Nombre</TableCell>
+                    <TableCell align="right">Teléfono</TableCell>
+                    <TableCell align="right">Correo Electrónico&nbsp;</TableCell>
+                    <TableCell align="right">Etapa&nbsp;</TableCell>
+                    <TableCell align="right">Tipo&nbsp;</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody >
+                  {organizations.map((row) => (<Row  key={row.name} row={row} />))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </div>
+        </div>
+      </Paper>
+        
+      <Alert
+        isOpen={showErrorAlert}
+        handleSubmit={onAlertClick}
+        title="Error"
+        text={errorMessage}
+        submitButtonText="Ok" />
+      <Spinner isShown={showLoading} />
     </div>
   );
 }

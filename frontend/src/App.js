@@ -1,5 +1,6 @@
 import './App.css';
-import React, { Component } from 'react';
+import './index.css';
+import React from 'react';
 import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
 import Home from './components/home';
 import Login from './components/login';
@@ -13,9 +14,7 @@ import Outcome from './components/outcome';
 import Navbar from './components/navbar';
 import PasswordReset from './components/passwordReset';
 
-
 function App() {
-
   return (
     <Router>
       <div className="App">
@@ -38,5 +37,4 @@ function App() {
     </Router>
   );
 }
-
 export default App;

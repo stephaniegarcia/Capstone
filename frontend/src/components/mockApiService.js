@@ -187,7 +187,7 @@ function handlePostRequests(path, content) {
                 userProfile.email = content.email;
                 userProfile.phone = content.phone;
                 userProfile.businessStage = content.businessStage;
-                userProfile.businessStatus = content.businessStatus;
+                userProfile.businessStatus = String(content.businessStatus).toLowerCase() == 'true';
                 userProfile.requiredAssistance = content.requiredAssistance;
                 setUserProfile(userProfile);
                 localStorage.setItem('token', userProfile.accessToken);
@@ -303,7 +303,7 @@ function handlePutRequests(path, content) {
                 userProfile.email = content.email;
                 userProfile.phone = content.phone;
                 userProfile.businessStage = content.businessStage;
-                userProfile.businessStatus = content.businessStatus;
+                userProfile.businessStatus = String(content.businessStatus).toLowerCase() == 'true';
                 userProfile.requiredAssistance = content.requiredAssistance;
                 setUserProfile(userProfile);
                 var data = userProfile;
