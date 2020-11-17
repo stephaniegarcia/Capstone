@@ -41,8 +41,6 @@ export default class ForgotPassword extends Component {
 
   _handleSubmit = ({
     email,
-    newPass,
-    confirmPass,
     setSubmitting,
     resetForm,
   }) => {
@@ -64,24 +62,16 @@ export default class ForgotPassword extends Component {
       <Formik
         initialValues={{
           email: '',
-          newPass: '',
-          confirmPass: '',
         }}
         validationSchema={object().shape({
           email: string().required('Email is required'),
-          newPass: string().required('New password is required'),
-          confirmPass: string()
-            .oneOf([ref('newPass')], 'Passwords do not match')
-            .required('Password is required'),
         })}
         onSubmit={(
-          { email, newPass, confirmPass },
+          { email },
           { setSubmitting, resetForm }
         ) =>
           this._handleSubmit({
             email,
-            newPass,
-            confirmPass,
             setSubmitting,
             resetForm,
           })
@@ -103,7 +93,7 @@ export default class ForgotPassword extends Component {
               
             <Paper className="paper-margin" elevation="10">
                 <div style={{'padding-top': '50px'}}></div>
-               <h1>Recupera tu contrasena</h1>
+               <h1>Recupera Tu Contrasena</h1>
                
               <form className="form" onSubmit={handleSubmit}>
               <div style={{'padding-top': '50px'}}></div>
@@ -131,60 +121,8 @@ export default class ForgotPassword extends Component {
                       : ''}
                   </FormHelperText>
                 </FormControl>
-                <FormControl
-                  fullWidth
-                  margin="dense"
-                  error={Boolean(touched.newPass && errors.newPass)}
-                >
-                  <InputLabel
-                    htmlFor="password-new"
-                    error={Boolean(touched.newPass && errors.newPass)}
-                  >
-                    {'New Password'}
-                  </InputLabel>
-                  <Input
-                    id="password-new"
-                    name="newPass"
-                    type="password"
-                    value={values.newPass}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    error={Boolean(touched.newPass && errors.newPass)}
-                  />
-                  <FormHelperText
-                    error={Boolean(touched.newPass && errors.newPass)}
-                  >
-                    {touched.newPass && errors.newPass ? errors.newPass : ''}
-                  </FormHelperText>
-                </FormControl>
-                <FormControl
-                  fullWidth
-                  margin="dense"
-                  error={Boolean(touched.confirmPass && errors.confirmPass)}
-                >
-                  <InputLabel
-                    htmlFor="password-confirm"
-                    error={Boolean(touched.confirmPass && errors.confirmPass)}
-                  >
-                    {'Confirm Password'}
-                  </InputLabel>
-                  <Input
-                    id="password-confirm"
-                    name="confirmPass"
-                    type="password"
-                    value={values.confirmPass}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    error={Boolean(touched.confirmPass && errors.confirmPass)}
-                  />
-                  <FormHelperText
-                    error={Boolean(touched.confirmPass && errors.confirmPass)}
-                  >
-                    {touched.confirmPass && errors.confirmPass
-                      ? errors.confirmPass
-                      : ''}
-                  </FormHelperText>
-                </FormControl>
+     
+           
                 <Button
                   type="submit"
                   variant="raised"

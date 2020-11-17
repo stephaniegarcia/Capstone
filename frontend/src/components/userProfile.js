@@ -413,7 +413,7 @@ function UserProfile() {
           </Button>
           <br/>
           <Button
-                    href="/forgotPassword"
+                    href="/passwordReset"
                     color="inherit"
                     className="form-control">
                         Cambiar Contrasena

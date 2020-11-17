@@ -13,6 +13,7 @@ import UserProfile from './components/userProfile';
 import Outcome from './components/outcome';
 import Navbar from './components/navbar';
 import PasswordReset from './components/passwordReset';
+import ForgotPassword from './components/forgotPassword';
 
 function App() {
   return (
@@ -28,6 +29,7 @@ function App() {
           <Route path='/register' component={Register} />
 
           <Route path='/passwordReset' component={PasswordReset} />
+          <Route path='/forgotPassword' component={ForgotPassword} />
           <Route path='/tce' component={Questionnaire} />
           <Route path='/outcome' component={Outcome} />
           <Route path='/organizaciones' component={Organizations} />

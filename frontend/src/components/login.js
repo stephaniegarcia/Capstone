@@ -104,7 +104,7 @@ function Login() {
                 </div>
                 <br/>
                 <Button
-                    href="/passwordReset"
+                    href="/forgotPassword"
                     color="inherit"
                     className="form-control">
                         Reset Password

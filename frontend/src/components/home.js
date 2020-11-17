@@ -24,11 +24,14 @@ function Home(props)
     ]
  
     return (
-        <Carousel>
+        <div>
+            <Carousel>
             {
                 items.map( (item, i) => <Item key={i} item={item} /> )
             }
         </Carousel>
+        <iframe width="560" height="315" src="https://www.youtube.com/embed/videoseries?list=PLpc-BRL4RhWChZwVywGethXrgUCMFtxkd" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
     )
 }
 export default Home;
@@ -38,11 +41,9 @@ function Item(props)
     return (
        <div className="top-margin">
            <Paper className="paper-margin" elevation="10">
-               <br/>
-               <br/>
-               <br/>
-               <br/>
-               <br/>
+            <iframe width="420" height="315"
+                src="https://www.youtube.com/playlist?list=PLpc-BRL4RhWChZwVywGethXrgUCMFtxkd">
+            </iframe> 
                    <h2>{props.item.name}</h2>
                    <p>{props.item.description}</p>
                    <br/>
