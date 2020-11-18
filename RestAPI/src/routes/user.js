@@ -1,11 +1,128 @@
 
 const { Router } = require('express');
-const { nodemailer } = require('nodemailer');
+var nodemailer  = require('nodemailer');
 const { _ } = require('underscore');
 const users = require('../users.json');
+var crypto = require('crypto');
+const randomstring = require('randomstring');
+
 const router = Router();
 
 
+let transporter = nodemailer.createTransport({
+    service: 'gmail',
+ auth: {
+        user: 'fernan3119@gmail.com',
+        pass: 'fernandin12'
+    }
+});
+
+router.post('/user/changePassword', (req, res) => {
+
+    const email = req.body.email;
+    console.log(email);
+    passwordtoken = randomstring.generate();
+    host=req.get('host');
+    link="http://"+req.get('host')+"/newPassword/user/" +email+ "?id="+passwordtoken;
+    mailOptions={
+        from: 'fernan3119@gmail.com',
+        to : email,
+        subject : "Cambio de contraseña",
+        html : "<br> Presione el enlace para cambiar su contraseña.<br><a href="+link+">Presione aqui.</a>" 
+    }
+    console.log(mailOptions);
+    transporter.sendMail(mailOptions, (error, response) => {
+        if(error){
+            console.log(error);
+            res.send("error");
+        }
+        else{
+            console.log("Message sent: " + response.message);
+            res.send("sent");
+        }
+});
+});
+
+
+router.get('/newPassword/user/:email',(req,res) =>{
+    //console.log(email)
+    //console.log(req);
+    console.log(req.query.id);
+    const email = req.params.body;   
+    if((req.protocol+"://"+req.get('host'))==("http://"+host))
+    {
+        console.log("Domain is matched. Information is from Authentic email");
+        
+        if(req.query.id==passwordtoken)
+        {
+            console.log("email is verified");
+            res.end("<h1>Email "+mailOptions.to+" is been Successfully verified");
+        }
+        else
+        {       
+            console.log("email is not verified");
+            res.end("<h1>Bad Request</h1>");
+        }
+    }
+    else
+    {
+        res.end("<h1>Request is from unknown source");
+    }
+});
+
+
+router.put('user/password', (req,res) => {
+
+});
+
+
+
+  router.get('/verifyEmail',function(req,res){
+
+    token = randomstring.generate();
+    host=req.get('host');
+    link="http://"+req.get('host')+"/verify?id="+token;
+    mailOptions={
+        from: 'fernan3119@gmail.com',
+        to : 'fernando.guzman2@upr.edu',
+        subject : "Favor de confirmar su correo electronico",
+        html : "<br> Presione el enalce para confirmar su cuenta.<br><a href="+link+">Click here to verify</a>" 
+    }
+    console.log(mailOptions);
+    transporter.sendMail(mailOptions, function(error, response){
+        if(error){
+            console.log(error);
+            res.send("error");
+        }
+        else{
+            console.log("Message sent: " + response.message);
+            res.send("sent");
+        }
+});
+});
+
+router.get('/verify',function(req,res){
+    
+    console.log(req.protocol+":/"+req.get('host'));
+    if((req.protocol+"://"+req.get('host'))==("http://"+host))
+    {
+        console.log("Domain is matched. Information is from Authentic email");
+        if(req.query.id==token)
+        {
+            console.log("email is verified");
+            res.end("<h1>Email "+mailOptions.to+" is been Successfully verified");
+        }
+        else
+        {       
+            console.log("email is not verified");
+            res.end("<h1>Bad Request</h1>");
+        }
+    }
+    else
+    {
+        res.end("<h1>Request is from unknown source");
+    }
+});
 
 
 
