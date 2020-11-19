@@ -9,7 +9,7 @@ import '../index.css';
 import apiService from "./mockApiService";
 //import apiService from "./apiService";
 
-function Login() {
+function AdminLogin() {
     //State Variables getters & setters
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -58,12 +58,12 @@ function Login() {
         //Show Loading
         setShowLoading(true);
 
-        //Perform login request
-        apiService.postRequest("login", { email: email, password: password }).then(response => {
-            //Handle login
-            apiService.profile(response);
+        //Perform admin login request
+        apiService.postRequest("admin/login", { email: email, password: password }).then(response => {
+            //Handle admin login
+            apiService.adminProfile(response);
             setShowLoading(false);
-            window.location.href = "/";
+            window.location.href = "/admin/organizaciones";
         }).catch(err =>{
             //Handle error
             setShowLoading(false);
@@ -73,14 +73,14 @@ function Login() {
     };
 
     return(
-        apiService.isAuthenticated() ? 
+        apiService.isAdminAuthenticated() ? 
         //If authenticated go to home page
-        <Redirect to="/" /> :
+        <Redirect to="/adminorgs" /> :
 
         //Show login view
         <div className="top-margin">
             <Paper className="form form--wrapper paper-margin" elevation={10}> 
-                <h2>Entra tus credenciales para acceder a tu perfil</h2>
+                <h2>Portal de Administradores</h2>
                 <div className="margin-25">
                     <TextField
                         InputLabelProps={{
@@ -119,23 +119,6 @@ function Login() {
                             Iniciar Sesión
                     </Button>
                 </div>
-                <br/>
-                <Button
-                    href="/forgotPassword"
-                    color="inherit"
-                    className="form-control">
-                        Reset Password
-                </Button>
-                <p>Nuevo Usuario? </p>
-                <Button
-                    className="form-control"
-                    type="submit"
-                    variant="contained"
-                    color="primary"
-                    href="/register"
-                    style={{ margin: '16px' }}>
-                    Regístrate!
-                </Button>
             </Paper>
             <Alert
                 isOpen={showErrorAlert}
@@ -147,4 +130,4 @@ function Login() {
         </div>
     );
 }
-export default Login;
+export default AdminLogin;

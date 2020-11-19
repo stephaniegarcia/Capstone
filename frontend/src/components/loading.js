@@ -7,10 +7,10 @@ export default function Loading({isShown = true}) {
     <div
       style={{
         display: display,
-        "flex-direction": "column",
+        flexDirection: "column",
         position: "absolute",
-        "justify-content": "center",
-        "align-items": "center",
+        justifyContent: "center",
+        alignItems: "center",
         height: "100%",
         width: "100%",
         top: "0",

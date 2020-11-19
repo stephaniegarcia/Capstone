@@ -13,7 +13,7 @@ function Glossary() {
   };        
   return (
     <div className="top-margin">
-      <Paper className="paper-margin" elevation="10">
+      <Paper className="paper-margin" elevation={10}>
         <h2>Glosario</h2>
         <Accordion expanded={expanded === 'panel1'} onChange={handleChange('panel1')}>
           <AccordionSummary

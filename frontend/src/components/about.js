@@ -4,7 +4,7 @@ import Paper from '@material-ui/core/Paper';
 function About() {
   return (
     <div className="top-margin">
-      <Paper className="paper-margin" elevation="10">
+      <Paper className="paper-margin" elevation={10}>
         <div>
             <h1>Colmena66</h1>
               Colmena66 es un programa del Fideicomiso para la Ciencia, Tecnología e Investigación de Puerto Rico cuya misión es ayudar a los empresarios y comerciantes en Puerto Rico proporcionando un acceso fácil y libre de costo a los recursos que necesitan para comenzar o hacer crecer tu negocio.

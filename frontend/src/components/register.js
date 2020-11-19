@@ -4,14 +4,13 @@ import Paper from '@material-ui/core/Paper'
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import MenuItem from '@material-ui/core/MenuItem';
-import InputLabel from '@material-ui/core/InputLabel';
-import FormControl from '@material-ui/core/FormControl'
-import Select from '@material-ui/core/Select';
 import Spinner from './loading'
 import Alert from './alert'
 import apiService from "./mockApiService";
+//import apiService from "./apiService";
 
 function Register() {
+    //State Variables getters & setters
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -27,12 +26,11 @@ function Register() {
     const [validFirstName, setValidFirstName] = useState(true);
     const [validLastName, setValidLastName] = useState(true);
     const [validPhone, setValidPhone] = useState(true);
-
     const [showErrorAlert, setShowErrorAlert] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
-
     const [showLoading, setShowLoading] = useState(false);
 
+    //email validation helper function
     function isValidEmail(email) {
         if(email && email.length == 0) {
             return true;
@@ -41,6 +39,7 @@ function Register() {
         return re.test(String(email).toLowerCase());
     }
 
+    //password validation helper function
     function isValidPass(text) {
         if(text && text.length == 0) {
             return true;
@@ -48,71 +47,97 @@ function Register() {
         return text.length > 5
     }
     
-      function isValidPhone(phone) {
+    //phone validation helper function
+    function isValidPhone(phone) {
         const re = /^[+]*[(]{0,1}[0-9]{1,3}[)]{0,1}[-\s\./0-9]*$/g;
         return re.test(String(phone));
-      }
-      function isValidName(text) {
-        const re = /^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$/g;
+    }
+    
+    //name validation helper function
+    function isValidName(text) {
+        const re = /^[a-zA-Z ]+(([',. -][a-zA-Z ])?[a-zA-Z ]*)*$/g;
         return text.length >= 2 && re.test(String(text))
-      }
-      
-      const handleFirstNameChange = (event) => {
+    }
+    
+    //first name change event callback
+    const handleFirstNameChange = (event) => {
         setFirstName(event.target.value.trim());
         setValidFirstName((isValidName(event.target.value.trim())));
-      };
-      const handleLastNameChange = (event) => {
+    };
+    
+    //last name change event callback
+    const handleLastNameChange = (event) => {
         setLastName(event.target.value.trim());
         setValidLastName((isValidName(event.target.value.trim())));
-      };
-      const handlePhoneChange = (event) => {
+    };
+    
+    //phone change event callback
+    const handlePhoneChange = (event) => {
         setPhone(event.target.value.trim());
         setValidPhone((isValidPhone(event.target.value.trim())));
-      };
-      const handleBusinessStageChange = (event) => {
+    };
+    
+    //business stage change event callback
+    const handleBusinessStageChange = (event) => {
         setBusinessStage(event.target.value);
-      };
-      const handleBusinessStatusChange = (event) => {
+    };
+    
+    //business status change event callback
+    const handleBusinessStatusChange = (event) => {
         setBusinessStatus(event.target.value);
-      };
-      const handleRequiredAssistanceChange = (event) => {
-        setRequiredAssistance(event.target.value);
-      };
+    };
 
+    //require assistance change event callback
+    const handleRequiredAssistanceChange = (event) => {
+        setRequiredAssistance(event.target.value);
+    };
+
+    //email change event callback
     const handleEmailChange = (event) => {
         setEmail(event.target.value.toLowerCase().trim());
         setValidEmail((isValidEmail(email)));
     };
+
+    //password change event callback
     const handlePasswordChange = (event) => {
         setValidPassword((isValidPass(event.target.value)));
         setPassword(event.target.value);
     };
+
+    //comfirm password change event callback
     const handleConfirmPasswordChange = (event) => {
         setValidConfirmPassword((isValidPass(event.target.value) && event.target.value == password));
         setConfirmPassword(event.target.value);
     };
+
+    //alert button click event callback
     const onAlertClick = () => {
         setShowErrorAlert(false);
     };
 
+    //register button click event callback
     const handleRegisterClick = () => {
+        //Show Loading
         setShowLoading(true);
+
         var data = {
             email: email, 
             password: password,
-            firstName: firstName,
-            lastName: lastName,
-            phone: phone,
-            businessStatus: String(businessStatus).toLowerCase() == 'true',
-            businessStage: businessStage,
-            requiredAssistance: requiredAssistance
+            firstname: firstName,
+            lastname: lastName,
+            phone_number: phone,
+            business_status: String(businessStatus).toLowerCase() == 'true',
+            business_stage: businessStage,
+            required_assistance: requiredAssistance
         };
+        //Perform register request
         apiService.postRequest("register", data).then(response => {
-            apiService.setAccessToken(response.accessToken);
+            //Handle register
+            apiService.profile(response);
             setShowLoading(false);
-            //history.push("/");
             window.location.href = "/";
         }).catch(err =>{
+            //Handle error
             setShowLoading(false);
             setErrorMessage(err.response.data);
             setShowErrorAlert(true);
@@ -120,9 +145,13 @@ function Register() {
     };
 
     return(
-        apiService.isAuthenticated() ? <Redirect to="/" /> :
+        apiService.isAuthenticated() ?
+        //If authenticated go to home page
+        <Redirect to="/" /> :
+        
+        //Show register view
         <div className="top-margin">
-            <Paper className="form form--wrapper paper-margin" elevation="10">
+            <Paper className="form form--wrapper paper-margin" elevation={10}>
                 <h1>Register</h1>
                 <div className="margin-25">
                     <TextField

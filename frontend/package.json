@@ -14,11 +14,13 @@
     "eslint-plugin-react-hooks": "^4.2.0",
     "formik": "^2.2.3",
     "react": "^17.0.1",
+    "react-charts": "^2.0.0-beta.7",
     "react-dom": "^17.0.1",
     "react-material-ui-carousel": "^2.1.1",
     "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.0",
     "react-spinners": "^0.9.0",
+    "recharts": "^1.8.5",
     "web-vitals": "^0.2.4",
     "yup": "^0.29.3"
   },

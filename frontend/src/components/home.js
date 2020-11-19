@@ -40,7 +40,7 @@ function Item(props)
 {
     return (
        <div className="top-margin">
-           <Paper className="paper-margin" elevation="10">
+           <Paper className="paper-margin" elevation={10}>
             <iframe width="420" height="315"
                 src="https://www.youtube.com/playlist?list=PLpc-BRL4RhWChZwVywGethXrgUCMFtxkd">
             </iframe> 

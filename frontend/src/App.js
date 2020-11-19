@@ -14,6 +14,9 @@ import Outcome from './components/outcome';
 import Navbar from './components/navbar';
 import PasswordReset from './components/passwordReset';
 import ForgotPassword from './components/forgotPassword';
+import AdminLogin from './components/adminLogin';
+import AdminReports from './components/adminReports';
+import AdminOrganizations from './components/adminOrganizations';
 
 function App() {
   return (
@@ -34,6 +37,10 @@ function App() {
           <Route path='/outcome' component={Outcome} />
           <Route path='/organizaciones' component={Organizations} />
           <Route path='/userprofile' component={UserProfile} />
+          <Route path='/admin' component={AdminLogin} />
+
+          <Route exact path='/adminreports' component={AdminReports} />
+          <Route exact path='/adminorgs' component={AdminOrganizations} />
         </Switch>
     </div>
     </Router>

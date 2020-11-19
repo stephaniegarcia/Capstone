@@ -20,6 +20,10 @@ body {
      height: 100vh;
 }
 
+.MuiCard-root > div{
+  position: relative;
+}
+
 .nav-links {
   position: absolute;
   right: 0;

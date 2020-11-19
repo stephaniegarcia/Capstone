@@ -7,9 +7,10 @@ import FormControl from '@material-ui/core/FormControl'
 import FormHelperText from '@material-ui/core/FormHelperText'
 import Button from '@material-ui/core/Button'
 import Paper from '@material-ui/core/Paper'
-
 import Spinner from './loading'
 import Alert from './alert'
+import apiService from "./mockApiService";
+//import apiService from "./apiService";
 
 export default class PasswordReset extends Component {
   state = {
@@ -101,7 +102,7 @@ export default class PasswordReset extends Component {
             <Spinner />
           ) : (
               
-            <Paper className="paper-margin" elevation="10">
+            <Paper className="paper-margin" elevation={10}>
                 <div style={{'padding-top': '50px'}}></div>
                <h1>Recupera tu contrasena</h1>
                

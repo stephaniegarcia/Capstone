@@ -23,7 +23,7 @@ export default function Alert({
   return (
     <Dialog
       open={isOpen}
-      transition={Transition}
+      //transition={Transition}
       keepMounted
       onClose={handleClose}
       aria-labelledby="alert-dialog-slide-title"

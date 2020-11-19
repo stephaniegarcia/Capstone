@@ -20,6 +20,7 @@ import { Redirect } from 'react-router-dom';
 import Spinner from './loading'
 import Alert from './alert'
 import apiService from "./mockApiService";
+//import apiService from "./apiService";
 
 export default function Organizations() {
   const [organizationData, setOrganizationData] = useState([]);
@@ -109,7 +110,7 @@ export default function Organizations() {
   return (
     !apiService.isAuthenticated() ? <Redirect to="/login" /> :
     <div className="top-margin">
-      <Paper className="paper-margin" elevation="10">
+      <Paper className="paper-margin" elevation={10}>
         <h2>Organizaciones</h2>
         <TableContainer>
           <div>

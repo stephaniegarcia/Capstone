@@ -6,7 +6,10 @@ function ApiResponse(data) {
     this.response = { data: data };
 }
 function isAuthenticated () {
-    return localStorage.getItem('token');
+    return localStorage.getItem('col-profile') != null;
+}
+function isAdminAuthenticated () {
+    return localStorage.getItem('col-admin-profile') != null;
 }
     
 function createOrganizationsData(id, name, phone, email, businessStage, businessType, rating, checked) {
@@ -26,6 +29,218 @@ function createOrganizationsData(id, name, phone, email, businessStage, business
       checked
     };
 }
+
+const mostContacted = [
+    {
+        "name": [
+            "Los gapos",
+            "Places787",
+            "Tempis",
+            "OneX",
+            "Bravos Cidra"
+        ]
+    }
+];
+
+const poorPerforming = 
+[
+    {
+        "name": [
+            "JunX",
+            "SSS",
+            "MMM",
+            "Logitech",
+            "Infox",
+            "JacksonX",
+            "Los gapos",
+            "Places787",
+            "Tempis",
+            "OneX",
+            "Bravos Cidra",
+            "Mulos",
+            "Pentatonix",
+            "Bulldogs"
+        ]
+    }
+]
+
+const topPerStage =
+[
+    {
+        "stage": "Idea/Concepto",
+        "names": [
+            "JunX",
+            "SSS",
+            "MMM",
+            "Logitech",
+            "Infox",
+            "JacksonX",
+            "Los gapos",
+            "Places787",
+            "Tempis",
+            "OneX"
+        ]
+    },
+    {
+        "stage": "Prueba de Concepto",
+        "names": [
+            "Bravos Cidra",
+            "Mulos",
+            "Pentatonix",
+            "Bulldogs",
+            "Infox",
+            "JacksonX",
+            "Los gapos",
+            "Places787",
+            "Tempis",
+            "OneX"
+        ]
+    },
+    {
+        "stage": "Prototipo",
+        "names": [
+            "Cayeyanos",
+            "Lolas",
+            "Chiviri",
+            "5 de Maya",
+            "Cabra tosta",
+            "Centenaria",
+            "Bamba",
+            "EXP",
+            "TEMPO",
+            "Chronome"
+        ]
+    },
+    {
+        "stage": "Lanzamiento",
+        "names": [
+            "Spooky",
+            "Skreetch",
+            "Rick",
+            "E=MC",
+            "SNEEK",
+            "JJ COOling style",
+            "Zombie",
+            "Wind",
+            "Tempis",
+            "U"
+        ]
+    },
+    {
+        "stage": "Crecimiento",
+        "names": [
+            "Spooky",
+            "Skreetch",
+            "Rick",
+            "E=MC",
+            "SNEEK",
+            "JJ COOling style",
+            "Zombie",
+            "Wind",
+            "Tempis",
+            "U"
+        ]
+    },
+    {
+        "stage": "Expansión",
+        "names": [
+            "JunX",
+            "SSS",
+            "MMM",
+            "Logitech",
+            "Infox",
+            "JacksonX",
+            "Los gapos",
+            "Places787",
+            "Tempis",
+            "OneX"
+        ]
+    }
+]
+
+const topPerType = 
+[
+    {
+        "type": "microempresas",
+        "name": [
+            "JunX",
+            "SSS",
+            "MMM",
+            "Logitech",
+            "Infox",
+            "JacksonX",
+            "Los gapos",
+            "Places787",
+            "Tempis",
+            "OneX"
+        ]
+    },
+    {
+        "type": "comercial",
+        "name": [
+            "Bravos Cidra",
+            "Mulos",
+            "Pentatonix",
+            "Bulldogs",
+            "Infox",
+            "JacksonX",
+            "Los gapos",
+            "Places787",
+            "Tempis",
+            "OneX"
+        ]
+    },
+    {
+        "type": "Empresa basada en inovacion",
+        "name": [
+            "Cayeyanos",
+            "Lolas",
+            "Chiviri",
+            "5 de Maya",
+            "Cabra tosta",
+            "Centenaria",
+            "Bamba",
+            "EXP",
+            "TEMPO",
+            "Chronome"
+        ]
+    },
+    {
+        "type": "Empresa en crecimiento",
+        "name": [
+            "Spooky",
+            "Skreetch",
+            "Rick",
+            "E=MC",
+            "SNEEK",
+            "JJ COOling style",
+            "Zombie",
+            "Wind",
+            "Tempis",
+            "U"
+        ]
+    }
+]
+
+const accountsPerWeek = 
+[
+    {
+        "week": "week 1",
+        "count": "2"
+    },
+    {
+        "week": "week 2",
+        "count": "5"
+    },
+    {
+        "week": "week 3",
+        "count": "10"
+    },
+    {
+        "week": "week 4",
+        "count": "0"
+    }
+]
 
 const organizations = [
     createOrganizationsData(1, 'Organización 1', "787 987 6656", "asdf@goog.com", "Idea", "Microempresa", 0, false),
@@ -56,6 +271,7 @@ const quiz= [
 
 const logInUserProfile = { firstName: "John", lastName: "Doe", email: "demo@demo.com", password: "123pescao"}; //credentials for login
 let userProfile = { //changes to from register
+    id: "userid",
     firstName: "John",
     lastName: "Doe",
     email: "demo@demo.com",
@@ -82,6 +298,19 @@ function setUserProfile(profile) {
     }
     else {
         localStorage.removeItem('col-profile');
+    }
+}
+
+function getAdminProfile() {
+    var json = localStorage.getItem('col-admin-profile');
+    return JSON.parse(json);
+}
+function setAdminProfile(profile) {
+    if(profile && profile != null) {
+        localStorage.setItem('col-admin-profile', JSON.stringify(profile));
+    }
+    else {
+        localStorage.removeItem('col-admin-profile');
     }
 }
 
@@ -154,6 +383,77 @@ function handleGetRequests(path) {
             });
         }
     }
+    else if (path == "admin/accountsPerWeek") {
+        if(!isAdminAuthenticated()) {
+            return new Promise(function(){
+                throw new ApiException("admin is not logged in.");
+            });
+        }
+        else {
+            return new Promise((resolve, reject) => {
+                setTimeout(function(){
+                    resolve(accountsPerWeek);
+                }, 10);
+            });
+        }
+    }
+    else if (path == "admin/organizations/poorperforming") {
+        if(!isAdminAuthenticated()) {
+            return new Promise(function(){
+                throw new ApiException("admin is not logged in.");
+            });
+        }
+        else {
+            return new Promise((resolve, reject) => {
+                setTimeout(function(){
+                    resolve(poorPerforming);
+                }, 10);
+            });
+        }
+    }
+    else if (path == "admin/organizations/topPerStage") {
+        if(!isAdminAuthenticated()) {
+            return new Promise(function(){
+                throw new ApiException("admin is not logged in.");
+            });
+        }
+        else {
+            return new Promise((resolve, reject) => {
+                setTimeout(function(){
+                    resolve(topPerStage);
+                }, 10);
+            });
+        }
+    }
+    else if (path == "admin/organizations/topPerType") {
+        if(!isAdminAuthenticated()) {
+            return new Promise(function(){
+                throw new ApiException("admin is not logged in.");
+            });
+        }
+        else {
+            return new Promise((resolve, reject) => {
+                setTimeout(function(){
+                    resolve(topPerType);
+                }, 10);
+            });
+        }
+    }
+    else if (path == "admin/organizations/mostContacted") {
+        if(!isAdminAuthenticated()) {
+            return new Promise(function(){
+                throw new ApiException("admin is not logged in.");
+            });
+        }
+        else {
+            return new Promise((resolve, reject) => {
+                setTimeout(function(){
+                    resolve(mostContacted);
+                }, 10);
+            });
+        }
+    }
+    
 }
 
 function handlePostRequests(path, content) {
@@ -169,6 +469,25 @@ function handlePostRequests(path, content) {
                     localStorage.setItem('token', data.accessToken);
                     resolve(data);
 
+                }, 1000);
+            });
+        }
+        else {
+            return new Promise(function(){
+                throw new ApiException("Email/password was incorrect.");
+            });
+        }
+    }
+    else if(path == 'admin/login') {
+        if(content.email == logInUserProfile.email && content.password == logInUserProfile.password) {
+            userProfile.firstName = logInUserProfile.firstName;
+            userProfile.lastName = logInUserProfile.lastName;
+            userProfile.email = logInUserProfile.email;
+            setAdminProfile(userProfile);
+            return new Promise((resolve, reject) => {
+                setTimeout(function(){
+                    var data = userProfile;
+                    resolve(data);
                 }, 1000);
             });
         }
@@ -294,7 +613,7 @@ function handlePostRequests(path, content) {
 }
 
 function handlePutRequests(path, content) {
-    if (path == 'profile/update') {
+    if (path == 'user/'+getUserProfile().id) {
         return new Promise((resolve, reject) => {
             setTimeout(function() {
                 userProfile = getUserProfile();
@@ -329,9 +648,9 @@ const apiService = {
     putRequest: (path, content) => {
         return handlePutRequests(path, content);
     },
-    setAccessToken: (accessToken) => {
-        state.accessToken = accessToken;
-    },
+    // setAccessToken: (accessToken) => {
+    //     state.accessToken = accessToken;
+    // },
     isAuthenticated: () => {
         var isAuthenticated = localStorage.getItem('token') != null
         return isAuthenticated;
@@ -340,14 +659,31 @@ const apiService = {
         localStorage.removeItem('token');
         setUserProfile(null);
     },
+    adminLogout: () => {
+        setAdminProfile(null);
+    },
     saveQuiz: (quiz) => {
-        state.quiz = quiz;
+        localStorage.setItem('col-quiz', JSON.stringify(quiz));
     },
     getQuiz: () => {
-      return state.quiz;  
+        var json = localStorage.getItem('col-quiz');
+        return JSON.parse(json); 
+    },
+    clearQuiz: (quiz) => {
+        localStorage.removeItem('col-quiz');
     },
     profile: () => {
         return getUserProfile();
+    },
+    adminProfile: (profile) => {
+        if(profile && profile != null) {
+            setAdminProfile(profile);
+        }
+        return getAdminProfile();
+    },
+    isAdminAuthenticated: ()=>{
+        var isAuthenticated = localStorage.getItem('col-admin-profile') != null
+        return isAuthenticated;
     }
 };
 

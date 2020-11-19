@@ -17,6 +17,7 @@ import Popover from '@material-ui/core/Popover';
 import Spinner from './loading'
 import Alert from './alert'
 import apiService from "./mockApiService";
+//import apiService from "./apiService";
 import '../index.css';
 
 
@@ -203,7 +204,7 @@ function Outcome() {
     !apiService.isAuthenticated() ? <Redirect to="/login" /> :
     <div>
       <div style={{'padding-top': '50px'}}></div>
-              <Paper className="paper-margin" elevation="10" >
+              <Paper className="paper-margin" elevation={10} >
               <div>
                   <h1>Segun tus respuestas tu tipo de negocio es:</h1>
                   <h1> {quizResult.businessType}</h1>
@@ -220,7 +221,7 @@ function Outcome() {
                   
               </div>
                 </Paper>
-                <Paper className="paper-margin" elevation="10" >
+                <Paper className="paper-margin" elevation={10} >
                 <div>
                   <div>
                      <h1>Nos indicaste que tu negocio esta en etapa de {quizResult.businessStage}</h1>
@@ -236,7 +237,7 @@ function Outcome() {
                 </div>
                 </Paper>  
                 
-                <Paper className="paper-margin" elevation="10" >
+                <Paper className="paper-margin" elevation={10} >
               <div>
                   <h1>Aqui se muestran todas las organizaciones mencionadas en el recorrido: </h1>
                   <div>
