@@ -162,7 +162,7 @@ router.post('/login', (req,res) => {
    
     if(email && password){
         if(validEmail(email)){
-            res.status(200).send(`Email: ${email} Password: ${password}`);
+            res.status(200).send(users[0]);
         }
         else{
             res.status(400).send("error");

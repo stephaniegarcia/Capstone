@@ -1,5 +1,7 @@
 
 const { Router } = require('express');
+const organizations = require('../organizations.json');
+
 
 const router = Router();
 
@@ -444,6 +446,18 @@ router.delete('/tce/organization/:orgID/user/:userID/check/:checkID', (req, res)
     }
     else{
         res.status(400).send("Error");
+    }
+
+});
+
+router.get('/tce/user/:userID/organizations', (req, res) => {
+
+    console.log(req.params.userID);
+    if(req.params.userID){
+        res.status(200).send(organizations);
+    }
+    else{
+        res.status(404).send("User not found");
     }
 
 });

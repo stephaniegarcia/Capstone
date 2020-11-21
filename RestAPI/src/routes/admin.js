@@ -267,9 +267,21 @@ router.get('/admin/organizations/topPerStage', (req, res) => {
 router.get("/admin/organizations/mostContacted", (req, res) => {
     org = [
       {
-        name: ["Los gapos", "Places787", "Tempis", "OneX", "Bravos Cidra"],
+        name: "Los gapos",
+        total: 30  
       },
+      {
+        name: "Tempis",
+        total: 25
+      },
+      {
+        name: "Places787",
+        total: 22
+      }
+
     ];
+
+  
   
     if (org) {
       res.status(200).json(org);
