@@ -5,6 +5,18 @@ const { _ } = require('underscore');
 const users = require('../users.json');
 var crypto = require('crypto');
 const randomstring = require('randomstring');
+const {createUser, getUsers} = require('../DAO/user_dao.js');
+
+
+//Authentication with Database
+const Pool = require('pg').Pool
+const pool = new Pool({
+    user: 'colmena66@tucaminoempresarial2',
+    host: 'tucaminoempresarial2.postgres.database.azure.com',
+    database: 'capstone',
+    password: '6rrz9afwZ1994!@',
+    port: 5432,
+})
 
 const router = Router();
 
@@ -126,6 +138,7 @@ router.get('/verify',function(req,res){
 
 
 
+
 router.post('/register', (req, res) => {
 
     const {firstname, lastname, business_status, email, phone_number, requested_assistance, password} = req.body;
@@ -137,7 +150,7 @@ router.post('/register', (req, res) => {
         if(phone_number){
             
             if(validName(firstname) && validName(lastname) && validEmail(email) && validPhone(phone_number)){
-                console.log("Insert user");
+                createUser(firstname,lastname,email,password, true, phone_number, null, null, 1, 1);
                 res.status(200).send("User registered");
             }
             else{
@@ -153,7 +166,14 @@ router.post('/register', (req, res) => {
     
 });
 
-
+router.get('/users', (req,res) =>{
+    pool.query('SELECT * FROM users ORDER BY user_id ASC', (error, results) => {
+        if (error) 
+            throw error
+        else
+            res.send(results.rows);
+    })
+});
 
 router.post('/login', (req,res) => {
 
@@ -176,20 +196,20 @@ router.post('/login', (req,res) => {
 });
 
 router.get('/user/:userId', (req,res) => {
-    //console.log(req.params);
+    const id = parseInt(request.params.userId)
     
     let i = 0;
     let founded = false;
 
-    if(users){
-        users.forEach((user) => {
-            if(req.params.userId == user.id){
-                res.status(200).json(user);
-                founded = true;
-            }
-        })
+    
+    pool.query('SELECT * FROM users WHERE user_id = $1', [id], (error, results) => {
+        if (error) {
+            throw error
+        }
+        response.status(200).json(results.rows)
+    })
 
-    }
+   
 
     if (!founded){
         res.status(404).send("User not found");
