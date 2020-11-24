@@ -5,6 +5,16 @@ const organizations = require('../organizations.json');
 
 const router = Router();
 
+router.get('/tce/questions', async (req, res) => {
+
+});
+
+
+router.get('tce/organizations/filter', async (req, res) => {
+
+});
+
+
 
 router.get('/tce/answers/user/:userID', (req, res) => {
 

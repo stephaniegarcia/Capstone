@@ -2,7 +2,6 @@
 const { Router } = require('express');
 var nodemailer  = require('nodemailer');
 const users = require('../users.json');
-var crypto = require('crypto');
 const randomstring = require('randomstring');
 const dao  = require('../DAO/user_dao');
 
@@ -24,8 +23,8 @@ const router = Router();
 let transporter = nodemailer.createTransport({
     service: 'gmail',
  auth: {
-        user: '',
-        pass: ''
+        user: 'capstonehelix@gmail.com',
+        pass: 'zybcev-reRfac-0vikpo'
     }
 });
 
@@ -151,12 +150,12 @@ router.post('/register', (req, res) => {
         if(phone_number){
             
             if(validName(firstname) && validName(lastname) && validEmail(email) && validPhone(phone_number)){
-                dao.createUser(firstname,lastname,email,password, true, phone_number, null, null, 1, 1);
+                dao.createUser(firstname,lastname,email,password, true, phone_number, null, null, 1, 0);
                 token = randomstring.generate();
                 host=req.get('host');
                 link="http://"+req.get('host')+"/verify?id="+token;
                 mailOptions={
-                    from: 'fernan3119@gmail.com',
+                    from: 'capstonehelix@gmail.com',
                     to : email,
                     subject : "Favor de confirmar su correo electronico",
                     html : "<br> Presione el enalce para confirmar su cuenta.<br><a href="+link+">Click here to verify</a>" 
@@ -238,66 +237,53 @@ router.get('/user/:userId', (req,res) => {
 
 });
 
-router.put('/user/:userId', (req, res) => {
+router.put('/user/:userId', async (req, res) => {
     
-    const {firstname, lastname, business_status, phone_number} = req.body;
-    let founded = false;
+    const {firstname, lastname, business_status, phone_number, business_stage} = req.body;
     
-    if (firstname && lastname && business_status ){
-      
-        if(phone_number){
-            
+    
+    if (firstname && lastname && business_status){
+        if(phone_number){  
             if(validName(firstname) && validName(lastname) && validPhone(phone_number)){
                 
-                users.forEach((user) => {
-                    if(user.id == req.params.userId){
-                        founded = true;
-                        user.firstname = firstname;
-                        user.lastname = lastname;
-                        user.business_status = business_status;
-                        user.phone_number = phone_number;
-                        console.log("Update user: " + req.params.userId);
-                        res.status(200).json(users);
-                    }
-                });
-                
+                let value = await dao.updateUser(req.params.userId, firstname, lastname, business_status, phone_number, business_stage);
+                console.log(value)
+                if(value instanceof Error){
+                    
+                    res.status(400).send("Error in query");
+                }
+                else{
+                    res.status(200).send(value);
+                }    
             }
             else{
-                res.status(400).send("Error");
+                res.status(400).send("Error in validation");
             }
         }
         
     }
     else{
-        res.status(400).send("Error");
+        res.status(400).send("Error in values");
     }
 
-    if(!founded){
-        res.status(404).send("User not found");
-    }
 });
 
 
 
-router.delete('/user/:userId', (req,res) => {
-    let isDeleted = false;
+router.delete('/user/:userId', async (req,res) => {
     
-    let i = 0;
-    users.forEach((user) => {
-        console.log(user);          
-        if(user.id == req.params.userId){
-            
-            users.splice(i,1);
-            isDeleted = true;
-        }
-    });
+    
 
-    if(isDeleted){
-        res.status(200).json(users);
+    let result = await dao.deleteUser(req.params.userId)
+
+    if(result instanceof Error){
+        res.status(400).send("error");
     }
-    else {
-        res.status(404).send('User not found.');
+    else{
+        res.status(200).send("User deleted!")
     }
+    
+
     
 });
 
