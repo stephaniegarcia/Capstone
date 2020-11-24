@@ -1,11 +1,11 @@
 
 const { Router } = require('express');
 var nodemailer  = require('nodemailer');
-const { _ } = require('underscore');
 const users = require('../users.json');
 var crypto = require('crypto');
 const randomstring = require('randomstring');
-const {createUser, getUsers} = require('../DAO/user_dao.js');
+const dao  = require('../DAO/user_dao');
+
 
 
 //Authentication with Database
@@ -24,8 +24,8 @@ const router = Router();
 let transporter = nodemailer.createTransport({
     service: 'gmail',
  auth: {
-        user: '',
-        pass: ''
+        user: 'fernan3119',
+        pass: '#Rafael12'
     }
 });
 
@@ -89,7 +89,7 @@ router.put('user/password', (req,res) => {
 
 
 
-  router.get('/verifyEmail',function(req,res){
+router.get('/verifyEmail',function(req,res){
 
     token = randomstring.generate();
     host=req.get('host');
@@ -110,7 +110,7 @@ router.put('user/password', (req,res) => {
             console.log("Message sent: " + response.message);
             res.send("sent");
         }
-});
+    });
 });
 
 router.get('/verify',function(req,res){
@@ -121,8 +121,9 @@ router.get('/verify',function(req,res){
         console.log("Domain is matched. Information is from Authentic email");
         if(req.query.id==token)
         {
-            console.log("email is verified");
-            res.end("<h1>Email "+mailOptions.to+" is been Successfully verified");
+            dao.verify(true);
+            //console.log("email is verified");
+            //res.end("<h1>Email "+mailOptions.to+" is been Successfully verified");
         }
         else
         {       
@@ -150,7 +151,29 @@ router.post('/register', (req, res) => {
         if(phone_number){
             
             if(validName(firstname) && validName(lastname) && validEmail(email) && validPhone(phone_number)){
-                createUser(firstname,lastname,email,password, true, phone_number, null, null, 1, 1);
+                dao.createUser(firstname,lastname,email,password, true, phone_number, null, null, 1, 1);
+                //user_dao.createUser
+                token = randomstring.generate();
+                host=req.get('host');
+                link="http://"+req.get('host')+"/verify?id="+token;
+                mailOptions={
+                    from: 'fernan3119@gmail.com',
+                    to : email,
+                    subject : "Favor de confirmar su correo electronico",
+                    html : "<br> Presione el enalce para confirmar su cuenta.<br><a href="+link+">Click here to verify</a>" 
+                }
+                console.log(mailOptions);
+                transporter.sendMail(mailOptions, function(error, response){
+                    if(error){
+                        console.log(error);
+                        res.send("error");
+                    }
+                    else{
+                        console.log("Message sent: " + response.message);
+                        res.send("sent");
+                    }
+                });
+
                 res.status(200).send("User registered");
             }
             else{
@@ -166,13 +189,12 @@ router.post('/register', (req, res) => {
     
 });
 
-router.get('/users', (req,res) =>{
-    pool.query('SELECT * FROM users ORDER BY user_id ASC', (error, results) => {
-        if (error) 
-            throw error
-        else
-            res.send(results.rows);
-    })
+router.get('/users', async (req,res) =>{
+
+    const users = await dao.getUsers()
+    console.log(users)
+    
+   res.send(users)
 });
 
 router.post('/login', (req,res) => {

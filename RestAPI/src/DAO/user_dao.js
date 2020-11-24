@@ -22,6 +22,20 @@ const createUser =  (first_name, last_name, email, user_password, business_statu
         }
     })
 }
+
+
+const verify =  (is_verified) => {
+
+    pool.query('UPDATE public.users SET is_verified = $1', [is_verified], (error, results) => {
+        if (error) {
+            throw error
+        }
+        else{
+            return results.rows;
+        }
+    })
+}
+
 const updateUser = (id, first_name, last_name, email, user_password, business_status, phone_number, bt_id, bs_id, is_active, is_verified) => {
     
     pool.query(
@@ -48,12 +62,38 @@ const getUserById = (request, response) => {
     })
 }
 
-const getUsers = () => {
-    pool.query('SELECT * FROM users ORDER BY user_id ASC', (error, results) => {
-        if (error) 
+async function getUsers(){
+    try {
+        const res = await pool.query(
+          `SELECT * FROM users ORDER BY user_id ASC`
+        );
+        console.log(res.rows)
+        return res.rows;
+      } catch (err) {
+        return err.stack;
+      }
+    
+}
+
+const deleteUser = async (email) => {
+    
+    
+    pool.query('DELETE FROM users WHERE email = $1', [email], (error, results) => {
+        if (error) {
             throw error
-        else
-            return results.rows;
+        }
+        else{
+            return results
+        }
     })
 }
 
+
+module.exports = {
+    createUser, 
+    getUsers,
+    getUserById, 
+    updateUser,
+    verify,
+    deleteUser
+}
