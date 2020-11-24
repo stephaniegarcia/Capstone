@@ -24,8 +24,8 @@ const router = Router();
 let transporter = nodemailer.createTransport({
     service: 'gmail',
  auth: {
-        user: 'fernan3119',
-        pass: '#Rafael12'
+        user: '',
+        pass: ''
     }
 });
 
@@ -152,7 +152,6 @@ router.post('/register', (req, res) => {
             
             if(validName(firstname) && validName(lastname) && validEmail(email) && validPhone(phone_number)){
                 dao.createUser(firstname,lastname,email,password, true, phone_number, null, null, 1, 1);
-                //user_dao.createUser
                 token = randomstring.generate();
                 host=req.get('host');
                 link="http://"+req.get('host')+"/verify?id="+token;
