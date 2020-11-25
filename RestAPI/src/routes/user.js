@@ -6,8 +6,6 @@ var crypto = require('crypto');
 const randomstring = require('randomstring');
 const dao  = require('../DAO/user_dao');
 
-
-
 //Authentication with Database
 const Pool = require('pg').Pool
 const pool = new Pool({
@@ -40,7 +38,7 @@ router.post('/user/changePassword', (req, res) => {
         from: 'fernan3119@gmail.com',
         to : email,
         subject : "Cambio de contraseña",
-        html : "<br> Presione el enlace para cambiar su contraseña.<br><a href="+link+">Presione aqui.</a>" 
+        html : "<br> Presione el enlace para cambiar su contraseña.<br><a href="+link+">Presione aqui.</a>"
     }
     console.log(mailOptions);
     transporter.sendMail(mailOptions, (error, response) => {
@@ -60,18 +58,17 @@ router.get('/newPassword/user/:email',(req,res) =>{
     //console.log(email)
     //console.log(req);
     console.log(req.query.id);
-    const email = req.params.body;   
+    const email = req.params.body;
     if((req.protocol+"://"+req.get('host'))==("http://"+host))
     {
         console.log("Domain is matched. Information is from Authentic email");
-        
         if(req.query.id==passwordtoken)
         {
             console.log("email is verified");
             res.end("<h1>Email "+mailOptions.to+" is been Successfully verified");
         }
         else
-        {       
+        {
             console.log("email is not verified");
             res.end("<h1>Bad Request</h1>");
         }
@@ -86,8 +83,6 @@ router.get('/newPassword/user/:email',(req,res) =>{
 router.put('user/password', (req,res) => {
 
 });
-
-
 
 router.get('/verifyEmail',function(req,res){
 
@@ -114,7 +109,6 @@ router.get('/verifyEmail',function(req,res){
 });
 
 router.get('/verify',function(req,res){
-    
     console.log(req.protocol+":/"+req.get('host'));
     if((req.protocol+"://"+req.get('host'))==("http://"+host))
     {
@@ -126,7 +120,7 @@ router.get('/verify',function(req,res){
             //res.end("<h1>Email "+mailOptions.to+" is been Successfully verified");
         }
         else
-        {       
+        {
             console.log("email is not verified");
             res.end("<h1>Bad Request</h1>");
         }
@@ -137,19 +131,13 @@ router.get('/verify',function(req,res){
     }
 });
 
-
-
-
 router.post('/register', (req, res) => {
 
     const {firstname, lastname, business_status, email, phone_number, requested_assistance, password} = req.body;
 
     if (firstname && lastname && business_status && email && password){
         //insert query should be here
-
-
         if(phone_number){
-            
             if(validName(firstname) && validName(lastname) && validEmail(email) && validPhone(phone_number)){
                 dao.createUser(firstname,lastname,email,password, true, phone_number, null, null, 1, 1);
                 token = randomstring.generate();
@@ -179,20 +167,15 @@ router.post('/register', (req, res) => {
                 res.status(400).send("Error");
             }
         }
-        
     }
     else{
         res.status(400).send("Error");
     }
-
-    
 });
 
 router.get('/users', async (req,res) =>{
-
     const users = await dao.getUsers()
     console.log(users)
-    
    res.send(users)
 });
 
@@ -200,7 +183,7 @@ router.post('/login', (req,res) => {
 
     console.log(req.body);
     const {email, password} = req.body;
-   
+
     if(email && password){
         if(validEmail(email)){
             res.status(200).send(users[0]);
@@ -208,47 +191,24 @@ router.post('/login', (req,res) => {
         else{
             res.status(400).send("error");
         }
-
-        
     }
     else{
         res.status(400).send("error");
     }
 });
 
-router.get('/user/:userId', (req,res) => {
-    const id = parseInt(request.params.userId)
-    
-    let i = 0;
-    let founded = false;
-
-    
-    pool.query('SELECT * FROM users WHERE user_id = $1', [id], (error, results) => {
-        if (error) {
-            throw error
-        }
-        response.status(200).json(results.rows)
-    })
-
-   
-
-    if (!founded){
-        res.status(404).send("User not found");
-    }
-
+router.get('/user/:userId', async (req,res) => {
+    const users = await dao.getUserById(req.params.userId)
+    console.log(users)
+    res.send(users)
 });
 
 router.put('/user/:userId', (req, res) => {
-    
     const {firstname, lastname, business_status, phone_number} = req.body;
     let founded = false;
-    
     if (firstname && lastname && business_status ){
-      
         if(phone_number){
-            
             if(validName(firstname) && validName(lastname) && validPhone(phone_number)){
-                
                 users.forEach((user) => {
                     if(user.id == req.params.userId){
                         founded = true;
@@ -284,9 +244,8 @@ router.delete('/user/:userId', (req,res) => {
     
     let i = 0;
     users.forEach((user) => {
-        console.log(user);          
+        console.log(user);
         if(user.id == req.params.userId){
-            
             users.splice(i,1);
             isDeleted = true;
         }
