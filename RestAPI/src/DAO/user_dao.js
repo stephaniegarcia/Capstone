@@ -51,16 +51,19 @@ const updateUser = async (id, first_name, last_name, business_status, phone_numb
     
 }
 
-const getUserById = (request, response) => {
-    const id = parseInt(request.params.id)
+const getUserById = async (id) => {
 
-    pool.query('SELECT * FROM users WHERE user_id = $1', [id], (error, results) => {
-        if (error) 
-            throw error
-        else
-            return results.rows;    
+    try {
+        const res = await pool.query(
+            'SELECT * FROM users WHERE user_id = $1', [id]
+        );
+        console.log(res.rows)
+        return res.rows;
+      } catch (err) {
+        return err;
+      }
+
  
-    })
 }
 
 async function getUsers(){
@@ -76,18 +79,22 @@ async function getUsers(){
     
 }
 
-const deleteUser = async (id) => {
-    
-    
-    pool.query('UPDATE public.users SET is_active=false WHERE user_id=$1;', [id], (error, results) => {
-        if (error) {
-            throw error
-        }
-        else{
-            return results.rows
-        }
-    })
-}
+
+
+const login = async (email, password) =>{
+
+    try{
+
+        const res = await pool.query(
+            `select user_password = $1 as Match, user_id from users where email = $2`, [password, email]
+        );
+        return res.rows;
+
+    }catch(err){
+        return err;
+    }
+
+};
 
 
 module.exports = {
@@ -96,5 +103,5 @@ module.exports = {
     getUserById, 
     updateUser,
     verify,
-    deleteUser
+    login
 }

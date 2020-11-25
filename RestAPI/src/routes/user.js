@@ -88,30 +88,6 @@ router.put('user/password', (req,res) => {
 
 
 
-router.get('/verifyEmail',function(req,res){
-
-    token = randomstring.generate();
-    host=req.get('host');
-    link="http://"+req.get('host')+"/verify?id="+token;
-    mailOptions={
-        from: 'fernan3119@gmail.com',
-        to : 'fernando.guzman2@upr.edu',
-        subject : "Favor de confirmar su correo electronico",
-        html : "<br> Presione el enalce para confirmar su cuenta.<br><a href="+link+">Click here to verify</a>" 
-    }
-    console.log(mailOptions);
-    transporter.sendMail(mailOptions, function(error, response){
-        if(error){
-            console.log(error);
-            res.send("error");
-        }
-        else{
-            console.log("Message sent: " + response.message);
-            res.send("sent");
-        }
-    });
-});
-
 router.get('/verify',function(req,res){
     
     console.log(req.protocol+":/"+req.get('host'));
@@ -135,7 +111,6 @@ router.get('/verify',function(req,res){
         res.end("<h1>Request is from unknown source");
     }
 });
-
 
 
 
@@ -195,14 +170,19 @@ router.get('/users', async (req,res) =>{
    res.send(users)
 });
 
-router.post('/login', (req,res) => {
+router.post('/login', async (req,res) => {
 
-    console.log(req.body);
     const {email, password} = req.body;
    
     if(email && password){
         if(validEmail(email)){
-            res.status(200).send(users[0]);
+            let login = await dao.login(email, password);
+            if(login instanceof Error){
+                res.status(400).send("wrong credentials")
+            }
+            else{
+                res.status(200).send(login);
+            }
         }
         else{
             res.status(400).send("error");
@@ -215,25 +195,20 @@ router.post('/login', (req,res) => {
     }
 });
 
-router.get('/user/:userId', (req,res) => {
-    const id = parseInt(request.params.userId)
-    
-    let i = 0;
-    let founded = false;
+router.get('/user/:userId', async (req,res) => {
+    const id = parseInt(req.params.userId)
 
-    
-    pool.query('SELECT * FROM users WHERE user_id = $1', [id], (error, results) => {
-        if (error) {
-            throw error
-        }
-        response.status(200).json(results.rows)
-    })
+    let user = await dao.getUserById(id);
 
-   
-
-    if (!founded){
+    if(user instanceof Error){
         res.status(404).send("User not found");
     }
+    else{
+        res.status(200).send(user);
+    }
+    
+
+
 
 });
 
@@ -270,22 +245,6 @@ router.put('/user/:userId', async (req, res) => {
 
 
 
-router.delete('/user/:userId', async (req,res) => {
-    
-    
-
-    let result = await dao.deleteUser(req.params.userId)
-
-    if(result instanceof Error){
-        res.status(400).send("error");
-    }
-    else{
-        res.status(200).send("User deleted!")
-    }
-    
-
-    
-});
 
 // Validates email address of course.
 function validEmail(email) {
