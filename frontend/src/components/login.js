@@ -124,7 +124,7 @@ function Login() {
                     href="/forgotPassword"
                     color="inherit"
                     className="form-control">
-                        Reset Password
+                        Restablecer la contraseña
                 </Button>
                 <p>Nuevo Usuario? </p>
                 <Button

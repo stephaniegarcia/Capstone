@@ -17,8 +17,14 @@ import ForgotPassword from './components/forgotPassword';
 import AdminLogin from './components/adminLogin';
 import AdminReports from './components/adminReports';
 import AdminOrganizations from './components/adminOrganizations';
+import AdminForgotPassword from './components/adminForgotPassword';
+import GAReports from './components/gaReports';
+import ReactGA from 'react-ga';
 
 function App() {
+  const trackingId = "G-6J4HWVEF9W";
+  //ReactGA.initialize(trackingId);
+  
   return (
     <Router>
       <div className="App">
@@ -39,9 +45,13 @@ function App() {
           <Route path='/userprofile' component={UserProfile} />
           <Route path='/admin' component={AdminLogin} />
 
+          <Route path='/adminforgotPassword' component={AdminForgotPassword} />
           <Route exact path='/adminreports' component={AdminReports} />
+          <Route exact path='/gareports' component={GAReports} />
           <Route exact path='/adminorgs' component={AdminOrganizations} />
         </Switch>
+
+
     </div>
     </Router>
   );

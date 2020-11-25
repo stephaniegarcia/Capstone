@@ -123,11 +123,11 @@ function Register() {
         var data = {
             email: email, 
             password: password,
-            firstname: firstName,
-            lastname: lastName,
+            first_name: firstName,
+            last_name: lastName,
             phone_number: phone,
             business_status: String(businessStatus).toLowerCase() == 'true',
-            business_stage: businessStage,
+            bs_id: businessStage,
             required_assistance: requiredAssistance
         };
         //Perform register request

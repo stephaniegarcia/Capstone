@@ -8,7 +8,7 @@ export default function Loading({isShown = true}) {
       style={{
         display: display,
         flexDirection: "column",
-        position: "absolute",
+        position: "fixed",
         justifyContent: "center",
         alignItems: "center",
         height: "100%",

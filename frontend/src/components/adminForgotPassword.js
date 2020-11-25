@@ -12,8 +12,7 @@ import Alert from './alert'
 import apiService from "./mockApiService";
 //import apiService from "./apiService";
 
-export default class ForgotPassword extends Component {
-  
+export default class AdminForgotPassword extends Component {
   state = {
     passChangeSuccess: false,
   }
@@ -53,7 +52,7 @@ export default class ForgotPassword extends Component {
       this.setState(() => ({
         passChangeSuccess: true,
       }))
-      apiService.postRequest('user/changePassword', email);
+      apiService.postRequest('admin/changePassword', email);
       resetForm()
     }, 1000)
   }

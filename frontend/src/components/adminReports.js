@@ -41,21 +41,6 @@ function AdminReports() {
     const [poorPerforming, setPoorPerforming] = useState({"name":[]});
     const [accountsPerWeek, setAccountsPerWeek] = useState([]);
 
-    // const columnChartSeries = React.useMemo(
-    //     () => ({
-    //         type: "bar"
-    //     }),
-    //     []
-    // );
-
-    // const columnChartAxes = React.useMemo(
-    //     () => [
-    //         { primary: true, type: 'linear', position: 'bottom' },
-    //         { type: 'linear', position: 'left' },
-    //     ],
-    //     []
-    // );
-
     //alert button click event callback
     const onAlertClick = () => {
         setShowErrorAlert(false);

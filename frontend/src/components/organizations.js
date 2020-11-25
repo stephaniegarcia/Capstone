@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 
-import PropTypes from 'prop-types';
 import { makeStyles } from '@material-ui/core/styles';
-import Box from '@material-ui/core/Box';
+import TextField from '@material-ui/core/TextField';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
+import Link from '@material-ui/core/Link';
 import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
 import InputLabel from '@material-ui/core/InputLabel';
@@ -20,12 +20,14 @@ import { Redirect } from 'react-router-dom';
 import Spinner from './loading'
 import Alert from './alert'
 import apiService from "./mockApiService";
+import { string } from 'yup';
 //import apiService from "./apiService";
 
 export default function Organizations() {
   const [organizationData, setOrganizationData] = useState([]);
   const [orgType, setOrgType] = useState('');
   const [orgStage, setOrgStage] = useState('');
+  const [searchString, setsearchString] = useState('');
   const [initialLoad, setInitialLoad] = useState(true);
 
   const [showErrorAlert, setShowErrorAlert] = useState(false);
@@ -42,14 +44,25 @@ export default function Organizations() {
   const handleOrgStageChange = (event) => {
     setOrgStage(event.target.value);
   };
+  const handleSearchStringChange = (event) => {
+    setsearchString(event.target.value);
+  };
 
   //populate organizations table 
   function searchOrganizations() {
     setShowLoading(true);
     apiService.getRequest("organizations?type="+orgType+"&stage="+orgStage).then((organizationsResponse) => {
+      var finalData = [];
+      for(var i = 0; i < organizationsResponse.length; i++) {
+        var org = organizationsResponse[i];
+        if(org && (org.name && String(org.name).includes(searchString)) || (org.phone && String(org.phone).includes(searchString)) || (org.email && String(org.email).includes(searchString))) {
+          finalData.push(org);
+        }
+      }
       setShowLoading(false);
-      setOrganizationData(organizationsResponse)
+      setOrganizationData(finalData)
     }).catch(err =>{
+      console.log(err)
       setShowLoading(false);
       setErrorMessage(err.response.data);
       setShowErrorAlert(true);
@@ -84,19 +97,18 @@ export default function Organizations() {
           </TableCell>
           <TableCell align="right">{row.phone}</TableCell>
           <TableCell align="right">{row.email}</TableCell>
-          <TableCell align="right">{row.businessStage}</TableCell>
-          <TableCell align="right">{row.businessType}</TableCell>
+          <TableCell align="right">{row.bs_id}</TableCell>
+          <TableCell align="right">{row.bt_id}</TableCell>
         </TableRow>
         <TableRow>
-            <TableCell colSpan="5" style={{padding: "0 80px 30px 80px"}}>
+            <TableCell colSpan="6" style={{padding: "0 80px 30px 80px"}}>
               <Typography gutterBottom component="div">
                 Descripción:
               </Typography>
-              {row.moreInfo.map((historyRow) => (
-                <p>
-                  {historyRow.description}
-                </p>
-              ))}
+              <p>
+                {row.description}
+              </p>
+              <Link href={row.link} target='_blank'>Ver más información</Link>
             </TableCell>
         </TableRow>
       </React.Fragment>
@@ -113,6 +125,19 @@ export default function Organizations() {
       <Paper className="paper-margin" elevation={10}>
         <h2>Organizaciones</h2>
         <TableContainer>
+          <div>
+            <FormControl className={classes.formControl} style={{'margin':'15px', 'width':'100%'}}>
+              <TextField
+                  style={{margin:"auto"}}
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                  label="Busqueda"
+                  className="form-control"
+                  onChange={handleSearchStringChange}
+                  value={searchString} />
+            </FormControl>
+          </div>
           <div>
             <FormControl className={classes.formControl} style={{'margin':'15px'}}>
               <InputLabel>Tipo</InputLabel>

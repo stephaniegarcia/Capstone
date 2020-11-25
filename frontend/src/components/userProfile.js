@@ -11,17 +11,18 @@ import TableCell from '@material-ui/core/TableCell';
 import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
+import Link from '@material-ui/core/Link';
 import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
 import Popover from '@material-ui/core/Popover';
 import Button from '@material-ui/core/Button';
 import MenuItem from '@material-ui/core/MenuItem';
-import Rating from '@material-ui/lab/Rating';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
+import Rating from '@material-ui/lab/Rating';
 import Spinner from './loading'
 import Alert from './alert'
 import FormControlLabel from '@material-ui/core/FormControlLabel';
@@ -35,6 +36,7 @@ function UserProfile() {
   const [shouldLoad, setShouldLoad] = React.useState(false);
   const [spacing, setSpacing] = React.useState(1);
   const [name, setName] = React.useState('Composed TextField');
+  const [userId, setUserId] = React.useState('');
   const [firstName, setFirstName] = React.useState('');
   const [lastName, setLastName] = React.useState('');
   const [email, setEmail] = React.useState('');
@@ -42,7 +44,7 @@ function UserProfile() {
   const [businessType, setBusinessType] = React.useState('');
   const [businessStage, setBusinessStage] = React.useState('');
   const [requiredAssistance, setRequiredAssistance] = React.useState('');
-  const [businessStatus, setBusinessStatus] = React.useState('');
+  const [businessStatus, setBusinessStatus] = React.useState(false);
   const [organizations, setOrganizations] = React.useState([]);
   const [roadmap, setRoadmap] = React.useState([]);
   const [showErrorAlert, setShowErrorAlert] = React.useState(false);
@@ -116,89 +118,80 @@ function UserProfile() {
     setRequiredAssistance(event.target.value);
   };
 
-  //organization rating change event callback
-  const setOrgRating = (id, rating) => {
-    var data = {organizationId: id, rating: rating};
-    apiService.postRequest("organization/rating", data);
-  };
-
-  //organization check change event callback
-  const setOrgChecked = (id, check) => {
-    var data = {organizationId: id, checked: check};
-    apiService.postRequest("organization/tracking", data);
+  //organization feedback submit event
+  const setOrgRating = (id, rating, comments) => {
+    handleClose();
+    var ratingData = {organizationId: id, rating: rating};
+    var commentsData = {organizationId: id, comments: comments};
+    apiService.postRequest("tce/organization/"+id+"/user/"+userId+"/rating", rating);
+    apiService.postRequest("tce/organization/"+id+"/user/"+userId+"/comment", rating);
+    apiService.postRequest("tce/organization/"+id+"/user/"+userId+"/check", true);
   };
 
   //Organization row snippet
   function Row(props) {
     const { row } = props;
     const [rating, setRating] = React.useState(row.rating);
-    const [check, setCheck] = React.useState(row.checked);
+    const [comments, setComments] = React.useState(row.comments);
     const handleRatingChange = (event) => {
       setRating(event.target.value);
-      setOrgRating(row.id, event.target.value)
     };
-
+    const handleCommentsChange = (event) => {
+      setComments(event.target.value.trim());
+    };
     return (
       <React.Fragment>
         <TableRow >
-          <TableCell className="no-bottom-border">
-            {/* <IconButton aria-label="expand row" size="small" onClick={() => row.open = !row.open }>
-              {row.open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-            </IconButton> */}
-          </TableCell>
+          <TableCell className="no-bottom-border"></TableCell>
           <TableCell className="no-bottom-border" scope="row">
             {row.name}
           </TableCell>
           <TableCell className="no-bottom-border" align="right">{row.phone}</TableCell>
           <TableCell className="no-bottom-border" align="right">{row.email}</TableCell>
-          <TableCell className="no-bottom-border" align="right">{row.businessStage}</TableCell>
-          <TableCell className="no-bottom-border" align="right">{row.businessType}</TableCell>
+          <TableCell className="no-bottom-border" align="right">{row.bs_id}</TableCell>
+          <TableCell className="no-bottom-border" align="right">{row.bt_id}</TableCell>
         </TableRow>
         <TableRow>
           <TableCell colSpan="6" style={{padding: "0 80px 30px 80px"}}>
             <Typography gutterBottom component="div">
               Descripción:
             </Typography>
-            {row.moreInfo.map((historyRow) => (
-              <p>
-                {historyRow.description}
-              </p>
-            ))}
+            <p>
+              {row.description}
+            </p>
+              <Link href={row.link} target='_blank'>Ver más información</Link>
 
-
-<Button variant="outlined" color="primary" onClick={handleClickOpen}>
-        Clasificación
-      </Button>
-      <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
-        <DialogTitle id="form-dialog-title">Clasificación</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            Entra aquí tu clasificación y deja un comentario sobre la calidad del servicio de esta organización.
-          </DialogContentText>
-          <Rating
-              value={rating}
-              onChange={handleRatingChange} />
-          <TextField
-            autoFocus
-            margin="dense"
-            id="comment"
-            label="Comentario"
-            fullWidth
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose} color="primary">
-            Cancelar
-          </Button>
-          <Button onClick={handleClose} color="primary">
-            Someter
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      
-            <br/>
-            <br/>
+              <div style={{marginTop: "15px"}}>
+                <Button variant="outlined" color="primary" onClick={handleClickOpen}>
+                  Clasificación
+                </Button>
+                <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
+                  <DialogTitle id="form-dialog-title">Clasificación</DialogTitle>
+                  <DialogContent>
+                    <DialogContentText>
+                      Déjanos saber como ha sido la calidad del servicio y tu experiencia con esta organización
+                    </DialogContentText>
+                    <Rating
+                        value={rating}
+                        onChange={handleRatingChange} />
+                    <TextField
+                      autoFocus
+                      value={comments}
+                      onChange={handleCommentsChange}
+                      margin="dense"
+                      label="Comentario"
+                      fullWidth />
+                  </DialogContent>
+                  <DialogActions>
+                    <Button onClick={handleClose} color="primary">
+                      Cancelar
+                    </Button>
+                    <Button onClick={()=>{ setOrgRating(row.id, rating, comments); }} color="primary">
+                      Someter
+                    </Button>
+                  </DialogActions>
+                </Dialog>
+              </div>
           </TableCell>
         </TableRow>
       </React.Fragment>
@@ -285,22 +278,41 @@ function UserProfile() {
   function getProfile() {
     var profile = apiService.profile();
     if(profile) {
-      setFirstName(profile.firstname);
-      setLastName(profile.lastname);
+      setUserId(profile.id);
+      setFirstName(profile.first_name);
+      setLastName(profile.last_name);
       setEmail(profile.email);
       setPhone(profile.phone_number);
-      setBusinessType(profile.business_type);
-      setBusinessStage(profile.business_stage);
+      setBusinessStage(profile.bs_id);
       setBusinessStatus(String(profile.business_status));
       setRequiredAssistance(profile.required_assistance);
 
-      if(!profile.organizations) {
-        profile.organizations = [];
-      }
+      apiService.getRequest('tce/user/'+profile.id+'/organizations').then(response => {
+        //Handle organization response
+        if(!response) {
+          response = [];
+        }
+        setOrganizations(response);          
+      }).catch(err =>{
+        //Handle error
+        setShowLoading(false);
+        setErrorMessage(err.response.data);
+        setShowErrorAlert(true);
+      });
+
+      apiService.getRequest('tce/businesstype/'+profile.id).then(response => {
+        //Handle business type response
+        setBusinessType(response);
+      }).catch(err =>{
+        //Handle error
+        setShowLoading(false);
+        setErrorMessage(err.response.data);
+        setShowErrorAlert(true);
+      });
+
       if(!profile.roadmap) {
         profile.roadmap = [];
       }
-      setOrganizations(profile.organizations);
       setRoadmap(profile.roadmap);
     }
   }
@@ -308,11 +320,11 @@ function UserProfile() {
   //update profile button click event callback
   const updateProfile = () => {
     var data = {
-      firstname: firstName,
-      lastname: lastName,
+      first_name: firstName,
+      last_name: lastName,
       email: email,
       phone_number: phone,
-      business_stage: businessStage,
+      bs_id: businessStage,
       required_assistance: requiredAssistance,
       business_status: String(businessStatus).toLowerCase() == 'true'
     };
@@ -328,13 +340,7 @@ function UserProfile() {
         setShowErrorAlert(true);
     });
   };
-
-  //Load profile into view
-  React.useEffect(()=> {
-    getProfile();
-  }, [shouldLoad]);
-
-  //dialog logic
+//Rating and Comment Button
   const [open, setOpen] = React.useState(false);
 
   const handleClickOpen = () => {
@@ -344,6 +350,10 @@ function UserProfile() {
   const handleClose = () => {
     setOpen(false);
   };
+  //Load profile into view
+  React.useEffect(()=> {
+    getProfile();
+  }, [shouldLoad]);
 
   return (
     !apiService.isAuthenticated() ?

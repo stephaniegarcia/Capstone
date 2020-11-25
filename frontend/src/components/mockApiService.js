@@ -15,18 +15,16 @@ function isAdminAuthenticated () {
 function createOrganizationsData(id, name, phone, email, businessStage, businessType, rating, checked) {
     return {
       id,
-      name,
+      name: name,
       phone,
       email,
-      businessStage,
-      businessType,
-      moreInfo: [
-        { description: 'Proveen financiamiento alternativo a empresas medianas en Puerto Rico y Mexico. Proporcionan soluciones financieras para potenciar el crecimiento de tu negocio. Trabajan transacciones de $500K USD a $5 millones USD, pero son flexibles. ',
-            },
-      ],
+      bs_id: businessStage,
+      bt_id: businessType,
+      description: 'Proveen financiamiento alternativo a empresas medianas en Puerto Rico y Mexico. Proporcionan soluciones financieras para potenciar el crecimiento de tu negocio. Trabajan transacciones de $500K USD a $5 millones USD, pero son flexibles.',
       open: false,
       rating,
-      checked
+      checked,
+      link: 'https://www/google.com'
     };
 }
 
@@ -269,19 +267,19 @@ const quiz= [
     }
 ]
 
-const logInUserProfile = { firstName: "John", lastName: "Doe", email: "demo@demo.com", password: "123pescao"}; //credentials for login
+const logInUserProfile = { first_name: "John", last_name: "Doe", email: "demo@demo.com", password: "123pescao"}; //credentials for login
 let userProfile = { //changes to from register
     id: "userid",
-    firstName: "John",
-    lastName: "Doe",
+    first_name: "John",
+    last_name: "Doe",
     email: "demo@demo.com",
     phone: '939 460 2020',
     password: "123pescao",
     accessToken: "testAccessToken",
-    businessType: "",
-    businessStatus: true,
+    bt_id: "",
+    bs_id: "Lanzamiento",
     requiredAssistance: 'Mentoria',
-    businessStage: "Lanzamiento",
+    business_status: true,
     organizations: [],
     roadmap: []
 };
@@ -289,6 +287,10 @@ let userProfile = { //changes to from register
 let state = {};
 
 function getUserProfile() {
+    var adminProfile = getAdminProfile();
+    if(adminProfile) {
+        return adminProfile;
+    }
     var json = localStorage.getItem('col-profile');
     return JSON.parse(json);
 }
@@ -330,6 +332,36 @@ function handleGetRequests(path) {
             });
         }
     }
+    else if (path == 'tce/user/'+userProfile.id+'/organizations') {
+        if(!isAuthenticated()) {
+            return new Promise(function(){
+                throw new ApiException("user is not logged in.");
+            });
+        }
+        else {
+            return new Promise((resolve, reject) => {
+                setTimeout(function(){
+                    userProfile = getUserProfile();
+                    resolve(userProfile.organizations);
+                }, 1000);
+            });
+        }
+    }
+    else if (path == 'tce/businesstype/'+userProfile.id) {
+        if(!isAuthenticated()) {
+            return new Promise(function(){
+                throw new ApiException("user is not logged in.");
+            });
+        }
+        else {
+            return new Promise((resolve, reject) => {
+                setTimeout(function(){
+                    userProfile = getUserProfile();
+                    resolve(userProfile.bt_id);
+                }, 1000);
+            });
+        }
+    }
     else if(path == 'quiz') {
         if(!isAuthenticated()) {
             return new Promise(function(){
@@ -341,6 +373,21 @@ function handleGetRequests(path) {
                 setTimeout(function(){
                     resolve(quiz);
                 }, 1000);
+            });
+        }
+    }
+    else if (path == 'admin/organizations') {
+        if(!isAdminAuthenticated()) {
+            return new Promise(function(){
+                throw new ApiException("user is not logged in.");
+            });
+        }
+        else {
+            return new Promise((resolve, reject) => {
+                setTimeout(function(){
+                    var data = organizations;
+                    resolve(data);
+                }, 3000);
             });
         }
     }
@@ -359,10 +406,10 @@ function handleGetRequests(path) {
                     var stage = elems[1].replace("stage=","");
                     var data = organizations;
                     if(type && type.length>0) {
-                        data = data.filter(org => org.businessType == type);
+                        data = data.filter(org => org.bt_id == type);
                     }
                     if(stage && stage.length>0) {
-                        data = data.filter(org => org.businessStage == stage);
+                        data = data.filter(org => org.bs_id == stage);
                     }
                     resolve(data);
                 }, 3000);
@@ -457,10 +504,40 @@ function handleGetRequests(path) {
 }
 
 function handlePostRequests(path, content) {
-    if(path == 'login') {
+    if(path == 'admin/changePassword') {
+        if(content) {
+            return new Promise((resolve, reject) => {
+                setTimeout(function(){
+                    console.log('admin reset')
+                    resolve(true);
+                }, 1000);
+            });
+        }
+        else {
+            return new Promise(function(){
+                throw new ApiException("Email/password was incorrect.");
+            });
+        }
+    }
+    else if(path == 'user/changePassword') {
+        if(content) {
+            return new Promise((resolve, reject) => {
+                setTimeout(function(){
+                    console.log('user reset')
+                    resolve(true);
+                }, 1000);
+            });
+        }
+        else {
+            return new Promise(function(){
+                throw new ApiException("Email/password was incorrect.");
+            });
+        }
+    }
+    else if(path == 'login') {
         if(content.email == logInUserProfile.email && content.password == logInUserProfile.password) {
-            userProfile.firstName = logInUserProfile.firstName;
-            userProfile.lastName = logInUserProfile.lastName;
+            userProfile.first_name = logInUserProfile.first_name;
+            userProfile.last_name = logInUserProfile.last_name;
             userProfile.email = logInUserProfile.email;
             setUserProfile(userProfile);
             return new Promise((resolve, reject) => {
@@ -480,8 +557,8 @@ function handlePostRequests(path, content) {
     }
     else if(path == 'admin/login') {
         if(content.email == logInUserProfile.email && content.password == logInUserProfile.password) {
-            userProfile.firstName = logInUserProfile.firstName;
-            userProfile.lastName = logInUserProfile.lastName;
+            userProfile.first_name = logInUserProfile.first_name;
+            userProfile.last_name = logInUserProfile.last_name;
             userProfile.email = logInUserProfile.email;
             setAdminProfile(userProfile);
             return new Promise((resolve, reject) => {
@@ -500,13 +577,13 @@ function handlePostRequests(path, content) {
     else if (path == 'register') {
         return new Promise((resolve, reject) => {
             setTimeout(function(){
-                userProfile.firstName = content.firstName;
-                userProfile.lastName = content.lastName;
+                userProfile.first_name = content.first_name;
+                userProfile.last_name = content.last_name;
                 userProfile.password = content.password;
                 userProfile.email = content.email;
                 userProfile.phone = content.phone;
-                userProfile.businessStage = content.businessStage;
-                userProfile.businessStatus = String(content.businessStatus).toLowerCase() == 'true';
+                userProfile.bs_id = content.bs_id;
+                userProfile.business_status = String(content.business_status).toLowerCase() == 'true';
                 userProfile.requiredAssistance = content.requiredAssistance;
                 setUserProfile(userProfile);
                 localStorage.setItem('token', userProfile.accessToken);
@@ -526,11 +603,11 @@ function handlePostRequests(path, content) {
                 setTimeout(function(){
                     userProfile = getUserProfile();
                     state.quizResults = {
-                        firstName: userProfile.firstName,
+                        first_name: userProfile.first_name,
                         email: userProfile.email,
                         phone: userProfile.phone,
-                        businessStage: userProfile.businessStage,
-                        businessType: "Microempresa",
+                        bs_id: userProfile.bs_id,
+                        bt_id: "Microempresa",
                         organizations: [
                             createOrganizationsData(7, 'Organización 1', "787 987 6656", "asdf@goog.com", "Lanzamiento", "Microempresa", 5, true),
                             createOrganizationsData(8, 'Organización 2', "787 987 6656", "asdf@goog.com", "Lanzamiento", "Microempresa", 3, true),
@@ -558,7 +635,7 @@ function handlePostRequests(path, content) {
             return new Promise((resolve, reject) => {
                 setTimeout(function(){
                     userProfile = getUserProfile();
-                    userProfile.businessType = state.quizResults.businessType;
+                    userProfile.bt_id = state.quizResults.bt_id;
                     userProfile.organizations = state.quizResults.organizations;
                     userProfile.roadmap = state.quizResults.roadmap;
                     setUserProfile(userProfile);
@@ -589,7 +666,7 @@ function handlePostRequests(path, content) {
             });
         }
     }
-    else if (path == 'organization/rating') {
+    else if (path.startsWith('tce/organization/') && path.endsWith('/check')) {
         if(!isAuthenticated()) {
             return new Promise(function(){
                 throw new ApiException("user is not logged in.");
@@ -598,15 +675,84 @@ function handlePostRequests(path, content) {
         else {
             return new Promise((resolve, reject) => {
                 setTimeout(function(){
+                    var id = path.replace('tce/organization/', '').replace('/user/'+userProfile.id+'/check')
                     userProfile = getUserProfile();
                     for(var i = 0; i < userProfile.organizations.length; i++) {
-                        if(userProfile.organizations[i].id == content.organizationId) {
-                            userProfile.organizations[i].rating = content.rating;
+                        if(userProfile.organizations[i].id == id) {
+                            userProfile.organizations[i].check = content;
                         }
                     }
                     setUserProfile(userProfile);
                     resolve("All good");
                 }, 1000);
+            });
+        }
+    }
+    else if (path.startsWith('tce/organization/') && path.endsWith('/rating')) {
+        if(!isAuthenticated()) {
+            return new Promise(function(){
+                throw new ApiException("user is not logged in.");
+            });
+        }
+        else {
+            return new Promise((resolve, reject) => {
+                setTimeout(function(){
+                    var id = path.replace('tce/organization/', '').replace('/user/'+userProfile.id+'/rating')
+                    userProfile = getUserProfile();
+                    for(var i = 0; i < userProfile.organizations.length; i++) {
+                        if(userProfile.organizations[i].id == id) {
+                            userProfile.organizations[i].rating = content;
+                        }
+                    }
+                    setUserProfile(userProfile);
+                    resolve("All good");
+                }, 1000);
+            });
+        }
+    }
+    else if (path.startsWith('tce/organization/') && path.endsWith('/comment')) {
+        if(!isAuthenticated()) {
+            return new Promise(function(){
+                throw new ApiException("user is not logged in.");
+            });
+        }
+        else {
+            return new Promise((resolve, reject) => {
+                setTimeout(function(){
+                    var id = path.replace('tce/organization/', '').replace('/user/'+userProfile.id+'/comment')
+                    userProfile = getUserProfile();
+                    for(var i = 0; i < userProfile.organizations.length; i++) {
+                        if(userProfile.organizations[i].id == id) {
+                            userProfile.organizations[i].comments = content;
+                        }
+                    }
+                    setUserProfile(userProfile);
+                    resolve("All good");
+                }, 1000);
+            });
+        }
+    }
+    else if (path == 'admin/organization') {
+        if(!isAdminAuthenticated()) {
+            return new Promise(function(){
+                throw new ApiException("user is not logged in.");
+            });
+        }
+        else {
+            return new Promise((resolve, reject) => {
+                setTimeout(function() {
+                    organizations.push({
+                        id: organizations.length+1,
+                        name: content.name,
+                        phone: content.phone,
+                        email: content.email,
+                        bs_id: content.bs_id,
+                        bt_id: content.bt_id,
+                        description: content.description,
+                        open: false,
+                        link:content.link
+                    });
+                }, 3000);
             });
         }
     }
@@ -617,12 +763,12 @@ function handlePutRequests(path, content) {
         return new Promise((resolve, reject) => {
             setTimeout(function() {
                 userProfile = getUserProfile();
-                userProfile.firstName = content.firstName;
+                userProfile.first_name = content.first_name;
                 userProfile.lastName = content.lastName;
                 userProfile.email = content.email;
                 userProfile.phone = content.phone;
-                userProfile.businessStage = content.businessStage;
-                userProfile.businessStatus = String(content.businessStatus).toLowerCase() == 'true';
+                userProfile.bs_id = content.bs_id;
+                userProfile.business_status = String(content.business_status).toLowerCase() == 'true';
                 userProfile.requiredAssistance = content.requiredAssistance;
                 setUserProfile(userProfile);
                 var data = userProfile;
@@ -630,7 +776,43 @@ function handlePutRequests(path, content) {
             }, 1000);
         });
     }
+    else if (path.startsWith("admin/organization?id=")) {
+        return new Promise((resolve, reject) => {
+            setTimeout(function() {
+                var id = path.replace("admin/organization?id=","");
+                for(var i = 0; i < organizations.length; i++) {
+                    if(organizations[i].id == id) {
+                        organizations[i].name = content.name;
+                        organizations[i].email = content.email;
+                        organizations[i].phone = content.phone;
+                        organizations[i].bs_id = content.bs_id;
+                        organizations[i].bt_id = content.bt_id;
+                        organizations[i].description = content.description;
+                        organizations[i].link = content.link;
+                    }
+                }
+                resolve(organizations);
+            }, 1000);
+        });
+    }
 }
+
+function handleDeleteRequests(path, content) {
+    if (path.startsWith("admin/organization?orgId=")) {
+        return new Promise((resolve, reject) => {
+            setTimeout(function() {
+                var id = path.replace("admin/organization?orgId=","");
+                for(var i = 0; i < organizations.length; i++) {
+                    if(organizations[i].id == id) {
+                        organizations.splice(i, 1);
+                    }
+                }
+                resolve(organizations);
+            }, 1000);
+        });
+    }
+}
+
 
 const apiService = {
     initialize: (config) =>{
@@ -647,6 +829,9 @@ const apiService = {
     },
     putRequest: (path, content) => {
         return handlePutRequests(path, content);
+    },
+    deleteRequest: (path, content) => {
+        return handleDeleteRequests(path, content);
     },
     // setAccessToken: (accessToken) => {
     //     state.accessToken = accessToken;

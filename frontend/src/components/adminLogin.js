@@ -80,7 +80,7 @@ function AdminLogin() {
         //Show login view
         <div className="top-margin">
             <Paper className="form form--wrapper paper-margin" elevation={10}> 
-                <h2>Portal de Administradores</h2>
+                <h2>Portal de Adminitradores</h2>
                 <div className="margin-25">
                     <TextField
                         InputLabelProps={{
@@ -119,6 +119,13 @@ function AdminLogin() {
                             Iniciar Sesión
                     </Button>
                 </div>
+                <br/>
+                <Button
+                    href="/adminforgotPassword"
+                    color="inherit"
+                    className="form-control">
+                        Restablecer la contraseña
+                </Button>
             </Paper>
             <Alert
                 isOpen={showErrorAlert}

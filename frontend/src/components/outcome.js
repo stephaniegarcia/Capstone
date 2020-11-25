@@ -5,6 +5,7 @@ import { makeStyles, unstable_createMuiStrictModeTheme } from '@material-ui/core
 import Box from '@material-ui/core/Box';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
+import Link from '@material-ui/core/Link';
 import TableCell from '@material-ui/core/TableCell';
 import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
@@ -106,19 +107,18 @@ function Outcome() {
               </TableCell>
               <TableCell className="no-bottom-border" align="right">{row.phone}</TableCell>
               <TableCell className="no-bottom-border" align="right">{row.email}</TableCell>
-              <TableCell className="no-bottom-border" align="right">{row.businessStage}</TableCell>
-              <TableCell className="no-bottom-border" align="right">{row.businessType}</TableCell>
+              <TableCell className="no-bottom-border" align="right">{row.bs_id}</TableCell>
+              <TableCell className="no-bottom-border" align="right">{row.bt_id}</TableCell>
             </TableRow>
             <TableRow>
-                <TableCell colSpan="5" style={{padding: "0 80px 30px 80px"}}>
+                <TableCell colSpan="6" style={{padding: "0 80px 30px 80px"}}>
                   <Typography gutterBottom component="div">
                     Descripción:
                   </Typography>
-                  {row.moreInfo.map((historyRow) => (
-                    <p>
-                      {historyRow.description}
-                    </p>
-                  ))}
+                  <p>
+                    {row.description}
+                  </p>
+                  <Link href={row.link} target='_blank'>Ver más información</Link>
                 </TableCell>
             </TableRow>
           </React.Fragment>
@@ -207,7 +207,7 @@ function Outcome() {
               <Paper className="paper-margin" elevation={10} >
               <div>
                   <h1>Segun tus respuestas tu tipo de negocio es:</h1>
-                  <h1> {quizResult.businessType}</h1>
+                  <h1> {quizResult.bt_id}</h1>
                   <h3>¡Sigue el camino rojo! Si empezaste tu negocio porque es lo que te apasiona, 
                     con el propósito de generar ingreso personal adicional o porque quieres tener
                      flexibilidad con tu tiempo, tienes una microempresa.</h3>
@@ -224,7 +224,7 @@ function Outcome() {
                 <Paper className="paper-margin" elevation={10} >
                 <div>
                   <div>
-                     <h1>Nos indicaste que tu negocio esta en etapa de {quizResult.businessStage}</h1>
+                     <h1>Nos indicaste que tu negocio esta en etapa de {quizResult.bs_id}</h1>
                   <h1>Este sera tu camino a recorrer:</h1>  
                     <TableContainer>
                       <Table aria-label="table" className={'rm-table'}>
