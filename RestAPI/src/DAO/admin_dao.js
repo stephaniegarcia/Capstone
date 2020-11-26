@@ -34,15 +34,17 @@ async function getAdminByID(id){
       }
 }
 
-const createAdmin =  (user_id) => {
-    pool.query('INSERT INTO public.admin(user_id) VALUES($1)', [user_id], (error, results) => {
-        if (error) {
-            throw error
-        }
-        else{
-            return results.rows;
-        }
-    })
+async function createAdmin (user_id) {
+
+    try {
+        const res = await pool.query(
+            'INSERT INTO public.admin2(user_id) VALUES ($1);', [user_id]
+        );
+        console.log(res.rows)
+        return res.rows;
+      } catch (err) {
+        return err.stack;
+      }
 }
 
 module.exports = {

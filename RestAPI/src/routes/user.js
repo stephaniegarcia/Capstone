@@ -3,6 +3,8 @@ const { Router } = require('express');
 var nodemailer  = require('nodemailer');
 const users = require('../users.json');
 var crypto = require('crypto');
+var bcrypt = require('bcrypt');
+const saltRounds = 10;
 const randomstring = require('randomstring');
 const dao  = require('../DAO/user_dao');
 

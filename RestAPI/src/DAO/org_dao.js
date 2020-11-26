@@ -36,7 +36,7 @@ async function getOrganizationByID(id){
 }
 
 const createOrg =  (name, description, email, phone_number, bt_id, bs_id, is_active, org_link) => {
-    pool.query('INSERT INTO public.users(name, description, email, phone_number, bt_id, bs_id, is_active, org_link) VALUES($1, $2, $3, $4, $5, $6, $7, $8)', [name, description, email, phone_number, bt_id, bs_id, is_active, org_link], (error, results) => {
+    pool.query('INSERT INTO public.organization(name, description, email, phone_number, bt_id, bs_id, is_active, org_link) VALUES($1, $2, $3, $4, $5, $6, $7, $8)', [name, description, email, phone_number, bt_id, bs_id, is_active, org_link], (error, results) => {
         if (error) {
             throw error
         }
