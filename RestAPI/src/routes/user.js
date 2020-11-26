@@ -5,8 +5,6 @@ const users = require('../users.json');
 const randomstring = require('randomstring');
 const dao  = require('../DAO/user_dao');
 
-
-
 //Authentication with Database
 const Pool = require('pg').Pool
 const pool = new Pool({
@@ -39,7 +37,7 @@ router.post('/user/changePassword', (req, res) => {
         from: 'fernan3119@gmail.com',
         to : email,
         subject : "Cambio de contraseña",
-        html : "<br> Presione el enlace para cambiar su contraseña.<br><a href="+link+">Presione aqui.</a>" 
+        html : "<br> Presione el enlace para cambiar su contraseña.<br><a href="+link+">Presione aqui.</a>"
     }
     console.log(mailOptions);
     transporter.sendMail(mailOptions, (error, response) => {
@@ -59,18 +57,17 @@ router.get('/newPassword/user/:email',(req,res) =>{
     //console.log(email)
     //console.log(req);
     console.log(req.query.id);
-    const email = req.params.body;   
+    const email = req.params.body;
     if((req.protocol+"://"+req.get('host'))==("http://"+host))
     {
         console.log("Domain is matched. Information is from Authentic email");
-        
         if(req.query.id==passwordtoken)
         {
             console.log("email is verified");
             res.end("<h1>Email "+mailOptions.to+" is been Successfully verified");
         }
         else
-        {       
+        {
             console.log("email is not verified");
             res.end("<h1>Bad Request</h1>");
         }
@@ -89,7 +86,6 @@ router.put('user/password', (req,res) => {
 
 
 router.get('/verify',function(req,res){
-    
     console.log(req.protocol+":/"+req.get('host'));
     if((req.protocol+"://"+req.get('host'))==("http://"+host))
     {
@@ -101,7 +97,7 @@ router.get('/verify',function(req,res){
             //res.end("<h1>Email "+mailOptions.to+" is been Successfully verified");
         }
         else
-        {       
+        {
             console.log("email is not verified");
             res.end("<h1>Bad Request</h1>");
         }
@@ -112,18 +108,13 @@ router.get('/verify',function(req,res){
     }
 });
 
-
-
 router.post('/register', (req, res) => {
 
     const {firstname, lastname, business_status, email, phone_number, requested_assistance, password} = req.body;
 
     if (firstname && lastname && business_status && email && password){
         //insert query should be here
-
-
         if(phone_number){
-            
             if(validName(firstname) && validName(lastname) && validEmail(email) && validPhone(phone_number)){
                 dao.createUser(firstname,lastname,email,password, true, phone_number, null, null, 1, 0);
                 token = randomstring.generate();
@@ -153,27 +144,22 @@ router.post('/register', (req, res) => {
                 res.status(400).send("Error");
             }
         }
-        
     }
     else{
         res.status(400).send("Error");
     }
-
-    
 });
 
 router.get('/users', async (req,res) =>{
-
     const users = await dao.getUsers()
     console.log(users)
-    
    res.send(users)
 });
 
 router.post('/login', async (req,res) => {
 
     const {email, password} = req.body;
-   
+
     if(email && password){
         if(validEmail(email)){
             let login = await dao.login(email, password);
@@ -187,8 +173,6 @@ router.post('/login', async (req,res) => {
         else{
             res.status(400).send("error");
         }
-
-        
     }
     else{
         res.status(400).send("error");
@@ -199,7 +183,6 @@ router.get('/user/:userId', async (req,res) => {
     const id = parseInt(req.params.userId)
 
     let user = await dao.getUserById(id);
-
     if(user instanceof Error){
         res.status(404).send("User not found");
     }
@@ -207,8 +190,6 @@ router.get('/user/:userId', async (req,res) => {
         res.status(200).send(user);
     }
     
-
-
 
 });
 
@@ -242,6 +223,7 @@ router.put('/user/:userId', async (req, res) => {
     }
 
 });
+
 
 
 

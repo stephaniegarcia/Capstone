@@ -1,102 +1,63 @@
+
 const { Router } = require('express');
 const router = Router();
 const { _ } = require('underscore');
 const organizations = require('../organizations.json');
+const dao  = require('../DAO/org_dao');
 
-
-router.get('/organizations', (req, res) => {
-    
-    if (organizations){
-        res.status(200).json(organizations);
-    }
-    else{
-        res.status(400).send("Organizations not found");
-    }
-    
+//Function to get all the organizations in the system
+router.get('/organizations', async (req,res) =>{
+  const organization = await dao.getOrganizations()
+  console.log(organization)
+ res.send(organization)
 });
 
-router.get('/organization/stars/:Id', (req, res) => {
-
-    let founded = false;
-    let average_stars;
-  
-    _.each(organizations, (organization, i) => {
-        console.log(organization.id);
-        if(organization.id == req.params.Id){
-            founded = true;
-            average_stars = organization.average_stars;
-        }
-    });
-
-    if(founded){
-        res.status(200).send(average_stars);
-    }
-    else{
-        res.status(404).send("Organization not found");
-    }
+router.get('/organization/:orgId', async (req,res) => {
+  const organization = await dao.getOrganizationByID(req.params.orgId)
+  console.log(organization)
+  res.send(organization)
 });
-
-
 
 router.post('/organization', (req, res) => {
 
-    const {organizations_name, email, phone, stage, type, link} = req.body;
-
-    console.log(type);
-    if(organizations_name && email && phone && stage && type && link){
-        if(validEmail(email) && validPhone(phone)){
-            res.status(200).json(req.body);
-        }
-    }
-    else{
-        res.status(404).send("Error")
-    }
-
-});
-
-router.get("/organizationsByType", (req, res) => {
-    const { type } = req.body;
-  
-    if (type) {
-      res.status(200).send(type);
-    } else {
-      res.status(404).send("Types not found");
-    }
-});
-
-router.get("/organizationsByStage", (req, res) => {
-    const { stage } = req.body;
-  
-    if (stage) {
-      res.status(200).send(stage);
-    } else {
-      res.status(404).send("Stage not found");
-    }
-});
-
-router.get("/organization/comments/:Id", (req, res) => {
-    let founded = false;
-    let i = 0;
-    let comments;
-  
-    organizations.forEach((organization) => {
-      if (organization.id == req.params.Id) {
-        founded = true;
-        comments = organization.comments;
+  const {organizations_name, email, phone, bt_id, bs_id, is_active, org_link} = req.body;
+  if(organizations_name && email && phone && stage && type && link){
+      if(validEmail(email) && validPhone(phone)){
+          dao.createOrg(organizations_name, email, phone, bt_id, bs_id, is_active, org_link)
       }
-  
-      i++;
-    });
-  
-    if (founded) {
-      res.status(200).send(comments);
-    } else {
-      res.status(404).send("Comments not found");
-    }
-  });
+      res.status(200).send("Organization registered");
+  }
+  else{
+      res.status(404).send("Error")
+  }
+});
 
+router.post('/organization', (req, res) => {
 
+  const {org_id, name, description, email, phone, bt_id, bs_id, is_active, org_link} = req.body;
+  if(organizations_name && email && phone && stage && type && link){
+      if(validEmail(email) && validPhone(phone)){
+          dao.updateOrg(org_id, name, description, email, phone, bt_id, bs_id, is_active, org_link)
+      }
+      res.status(200).send("Organization updated.");
+  }
+  else{
+      res.status(404).send("Error")
+  }
 
+});
+
+router.post('/inactiveOrganization/:orgID', (req, res) => {
+
+  const {org_id, is_active} = req.body;
+  if(org_id){
+        dao.inactivateOrg(org_id, is_active)
+        res.status(200).send("Organization updated.");
+  }
+  else{
+      res.status(404).send("Error")
+  }
+});
 
 
 // Validates email address of course.

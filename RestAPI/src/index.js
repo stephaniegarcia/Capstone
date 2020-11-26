@@ -16,6 +16,10 @@ app.use(require('./routes/user'));
 app.use(require('./routes/tce'));
 app.use(require('./routes/admin'));
 app.use(require('./routes/org'));
+app.use(require('./routes/ratings'));
+app.use(require('./routes/questions'));
+app.use(require('./routes/businessType'));
+app.use(require('./routes/businessStep'));
 
 
 //starting the server
