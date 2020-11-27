@@ -11,9 +11,9 @@ const pool = new Pool({
 
 
 
-const createUser =  async (first_name, last_name, email, user_password, business_status, phone_number, bt_id, bs_id, is_active, is_verified) => {
+const createUser =  async (first_name, last_name, email, user_password, business_status, phone_number, bt_id, bs_id, is_active, is_verified, token) => {
 
-    pool.query('INSERT INTO public.users(first_name, last_name, email, user_password, business_status, phone_number, bt_id, bs_id, is_active, is_verified) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)', [first_name, last_name, email, user_password, business_status, phone_number, bt_id, bs_id, is_active, is_verified], (error, results) => {
+    pool.query('INSERT INTO public.users(first_name, last_name, email, user_password, business_status, phone_number, bt_id, bs_id, is_active, is_verified, verify_token) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)', [first_name, last_name, email, user_password, business_status, phone_number, bt_id, bs_id, is_active, is_verified, token], (error, results) => {
         if (error) {
             throw error
         }
@@ -24,15 +24,20 @@ const createUser =  async (first_name, last_name, email, user_password, business
 }
 
 
-const verify =  (is_verified) => {
-    pool.query('UPDATE public.users SET is_verified = $1', [is_verified], (error, results) => {
-        if (error) {
-            throw error
-        }
-        else{
-            return results.rows;
-        }
-    })
+
+const verify =  async (email) => {
+    try {
+
+        const res = await pool.query(
+            `UPDATE public.users SET is_verified = true where email = $1`,
+            [email]
+        );
+        console.log(res.rows)
+        return res;
+      } catch (err) {
+        return err;
+      }
+
 }
 
 const updateUser = async (id, first_name, last_name, business_status, phone_number, business_stage) => {
@@ -108,6 +113,20 @@ const changePassword = async (email, password) => {
 
 }
 
+const getToken = async (email) => {
+    try{
+
+        const res = await pool.query(
+            `select verify_token from public.users where email = $1`, [email]
+        );
+        return res.rows;
+
+    }catch(err){
+        return err;
+    }
+
+
+}
 
 module.exports = {
     createUser, 
@@ -116,5 +135,6 @@ module.exports = {
     updateUser,
     verify,
     login,
-    changePassword
+    changePassword,
+    getToken
 }

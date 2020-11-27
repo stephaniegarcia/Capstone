@@ -99,27 +99,29 @@ router.put('user/password', (req,res) => {
 
 
 
-router.get('/verify',function(req,res){
+router.get('/verify/:email', async (req,res) => {
     console.log(req.protocol+":/"+req.get('host'));
-    if((req.protocol+"://"+req.get('host'))==("http://"+host))
-    {
-        console.log("Domain is matched. Information is from Authentic email");
-        if(req.query.id==token)
-        {
-            dao.verify(true);
-            //console.log("email is verified");
-            //res.end("<h1>Email "+mailOptions.to+" is been Successfully verified");
+    let userToken = await dao.getToken(req.params.email);
+    console.log(userToken[0]["verify_token"])
+    console.log(req.params.email)
+
+    console.log("Domain is matched. Information is from Authentic email");
+    if(req.query.id==userToken[0]["verify_token"]) {
+        const ver = dao.verify(req.params.email);
+        if(ver instanceof Error){
+            res.status(400).send("error")
         }
-        else
-        {
-            console.log("email is not verified");
-            res.end("<h1>Bad Request</h1>");
+        else{
+        console.log("email is verified");
+        res.send("<h1>Email "+req.params.email+" is been Successfully verified");
         }
     }
     else
     {
-        res.end("<h1>Request is from unknown source");
+        console.log("email is not verified");
+        res.send("<h1>Bad Request</h1>");
     }
+    
 });
 
 router.post('/register', (req, res) => {
@@ -130,10 +132,11 @@ router.post('/register', (req, res) => {
         //insert query should be here
         if(phone_number){
             if(validName(firstname) && validName(lastname) && validEmail(email) && validPhone(phone_number)){
-                dao.createUser(firstname,lastname,email,password, true, phone_number, null, null, 1, 0);
+                
                 token = randomstring.generate();
+                dao.createUser(firstname,lastname,email,password, true, phone_number, null, null, 1, 0, token);
                 host=req.get('host');
-                link="http://"+req.get('host')+"/verify?id="+token;
+                link="http://"+req.get('host')+"/verify/" + email + "?id="+token;
                 mailOptions={
                     from: 'capstonehelix@gmail.com',
                     to : email,
