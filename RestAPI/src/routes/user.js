@@ -1,7 +1,6 @@
 
 const { Router } = require('express');
 var nodemailer  = require('nodemailer');
-const users = require('../users.json');
 const randomstring = require('randomstring');
 const dao  = require('../DAO/user_dao');
 
@@ -12,7 +11,7 @@ const pool = new Pool({
     host: 'tucaminoempresarial2.postgres.database.azure.com',
     database: 'capstone',
     password: '6rrz9afwZ1994!@',
-    port: 5432,
+    port: 5432
 })
 
 const router = Router();
@@ -54,8 +53,7 @@ router.post('/user/changePassword', (req, res) => {
 
 
 router.get('/newPassword/user/:email',(req,res) =>{
-    //console.log(email)
-    //console.log(req);
+
     console.log(req.query.id);
     const email = req.params.body;
     if((req.protocol+"://"+req.get('host'))==("http://"+host))
@@ -80,7 +78,23 @@ router.get('/newPassword/user/:email',(req,res) =>{
 
 
 router.put('user/password', (req,res) => {
+    const email = req.body.email;
+    const password = req.body.password;
 
+    if(email && password){
+
+        let change = dao.changePassword(email, password);
+        if(change instanceof Error){
+            res.status.send("Query error")
+        }
+        else{
+            res.status(200).send(change)
+        }
+
+    }
+    else{
+        res.status(400).send("Error");
+    }
 });
 
 

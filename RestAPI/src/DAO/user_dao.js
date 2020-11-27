@@ -83,7 +83,7 @@ const login = async (email, password) =>{
     try{
 
         const res = await pool.query(
-            `select user_password = $1 as Match, user_id from users where email = $2`, [password, email]
+            `select user_password = $1 as Match, user_id from users where email = $2;`, [password, email]
         );
         return res.rows;
 
@@ -93,6 +93,21 @@ const login = async (email, password) =>{
 
 };
 
+const changePassword = async (email, password) => {
+
+    try{
+
+        const res = await pool.query(
+            `update public.user set user_password = $1 where email = $2;`, [password, email]
+        );
+        return res.rows;
+
+    }catch(err){
+        return err;
+    }
+
+}
+
 
 module.exports = {
     createUser, 
@@ -100,5 +115,6 @@ module.exports = {
     getUserById, 
     updateUser,
     verify,
-    login
+    login,
+    changePassword
 }
