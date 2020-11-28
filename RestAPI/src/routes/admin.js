@@ -17,9 +17,10 @@ router.get('/admin/:adminID', async (req,res) => {
   res.send(admin)
 });
 
-router.post('/admin/:userID', async (req, res) => {
-  const admin = await dao.createAdmin(req.params.userID)
-  res.send(admin)
+router.post('/admin', async (req, res) => {
+  const {user_id} = req.body;
+  dao.createAdmin(user_id)
+  res.send(user_id)
 });
 
 module.exports = router;

@@ -21,7 +21,7 @@ router.get('/organization/:orgId', async (req,res) => {
 router.post('/organization', (req, res) => {
 
   const {name, description, email, phone_number, bt_id, bs_id, is_active, org_link} = req.body;
-  if(organizations_name && email && phone && stage && type && org_link){
+  if(name && email && phone_number && bt_id && bs_id && org_link){
       if(validEmail(email) && validPhone(phone)){
           dao.createOrg(name, description, email, phone_number, bt_id, bs_id, is_active, org_link)
       }
@@ -33,28 +33,25 @@ router.post('/organization', (req, res) => {
 });
 
 router.put('/organization', (req, res) => {
-
-  const {org_id, name, description, email, phone, bt_id, bs_id, is_active, org_link} = req.body;
-  if(organizations_name && email && phone && stage && type && link){
-      if(validEmail(email) && validPhone(phone)){
-          dao.updateOrg(org_id, name, description, email, phone, bt_id, bs_id, is_active, org_link)
-      }
-      res.status(200).send("Organization updated.");
+  const {name, description, email, phone_number, bt_id, bs_id, org_link, org_id} = req.body;
+  if(name && email && phone_number && bt_id && bs_id && org_link && org_id){
+    dao.updateOrganization(name, description, email, phone_number, bt_id, bs_id, org_link, org_id)
+    res.status(200).send("Organization updated.");
   }
   else{
-      res.status(404).send("Error")
+    res.status(404).send("Error: Missing Parameter")
   }
 });
 
-router.put('/inactiveOrganization/:orgID', (req, res) => {
-
-  const {org_id, is_active} = req.body;
-  if(org_id){
-        dao.inactivateOrg(org_id, is_active)
-        res.status(200).send("Organization updated.");
+router.put('/inactiveOrganization', (req, res) => {
+  const {is_active, org_id} = req.body;
+  if(is_active && org_id)
+  {
+    dao.inactivateOrganization(is_active, org_id)
+    res.status(200).send("Organization inactivated.");
   }
   else{
-      res.status(404).send("Error")
+    res.status(404).send("Error: Missing Parameter")
   }
 });
 
