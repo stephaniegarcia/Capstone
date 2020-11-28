@@ -25,7 +25,7 @@ async function getAdmins(){
 async function getAdminByID(id){
     try {
         const res = await pool.query(
-            'SELECT * FROM admin WHERE admin_id = $1', [id]
+            'SELECT A.admin_id, U.first_name from admin as A inner join users as U ON A.user_id = U.user_id WHERE admin_id = $1', [id]
         );
         console.log(res.rows)
         return res.rows;
@@ -33,6 +33,7 @@ async function getAdminByID(id){
         return err.stack;
       }
 }
+
 
 const loginAdmin = async (email, password) => {
   try{
@@ -72,6 +73,7 @@ const getPasswordToken = async (email) => {
   }catch(err){
       return err;
   }
+
 
 }
 const changePassword = async (email, password) => {

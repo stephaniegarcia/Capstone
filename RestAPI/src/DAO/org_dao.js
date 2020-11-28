@@ -12,10 +12,11 @@ const pool = new Pool({
 async function getOrganizations(){
     try {
         const res = await pool.query(
-          `SELECT *
-          FROM public.organization
+          `SELECT O.org_id, O.name, O.description, O.email, O.phone_number, O.bt_id as Type, O.bs_id as Step, B.bstage_id as Stage, O.org_link
+          FROM public.organization as O INNER JOIN public.business_step as B ON O.bs_id = B.bs_id
           where is_active = true
           ORDER BY org_id ASC`
+
         );
         console.log(res.rows)
         return res.rows;
@@ -27,7 +28,10 @@ async function getOrganizations(){
 async function getOrganizationByID(id){
     try {
         const res = await pool.query(
-            'SELECT * FROM organization WHERE org_id = $1', [id]
+            `SELECT O.org_id, O.name, O.description, O.email, O.phone_number, O.bt_id as Type, O.bs_id as Step, B.bstage_id as Stage, O.org_link 
+            FROM public.organization as O INNER JOIN public.business_step as B ON O.bs_id = B.bs_id
+            where is_active = true AND org_id = $1
+            ORDER BY org_id ASC`, [id]
         );
         console.log(res.rows)
         return res.rows;

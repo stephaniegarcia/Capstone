@@ -12,7 +12,7 @@ const pool = new Pool({
 async function getAverageEvaluations(){
     try {
         const res = await pool.query(
-          `SELECT ROUND(AVG(R.rating)), O.name
+          `SELECT ROUND(AVG(R.rating)) as rating, O.name
           FROM organization_rating as R INNER JOIN organization as O ON O.org_id = R.organization_id
           GROUP BY O.name;`
         );
@@ -35,7 +35,7 @@ async function getTopTenBT(btID){
           select O.name, bt_id, rating, row_number() over (partition by bt_id order by rating desc) rank
           from average_rating r
             join organization o on o.org_id = r.organization_id
-          where bt_id = 1
+          where bt_id = $1
           order by O.name, rating desc 
         )
         select  name, bt_id, rating
@@ -83,11 +83,11 @@ async function getTopTenBS(bstage_id){
 async function getOrgPerformingPoorly(){
     try {
         const res = await pool.query(
-        `SELECT O.name as Organization, R.rating as Average_rating
-        FROM public.organization as O
-        INNER JOIN public.organization_rating as R ON O.org_id = R.organization_id
-        GROUP BY name, rating
-        ORDER BY ROUND(AVG(rating)) asc LIMIT 10;
+        `SELECT O.name, ROUND(AVG(rating)) as Rating
+        FROM organization_rating as R INNER JOIN Organization as O on O.org_id = R.organization_id
+        GROUP BY O.name
+        order by rating asc
+        Limit 10
         `,
         );
         console.log(res.rows)

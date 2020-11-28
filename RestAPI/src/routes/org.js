@@ -20,14 +20,12 @@ router.get('/organization/:orgId', async (req,res) => {
 router.post('/organization', (req, res) => {
 
   const {name, description, email, phone_number, bt_id, bs_id, is_active, org_link} = req.body;
-  if(name && email && phone_number && bt_id && bs_id && org_link){
-      if(validEmail(email) && validPhone(phone)){
+  if(name && description && email && phone_number && bt_id && bs_id && is_active && org_link){
           dao.createOrg(name, description, email, phone_number, bt_id, bs_id, is_active, org_link)
-      }
-      res.status(200).send("Organization registered");
+          res.status(200).send("Organization registered");
   }
   else{
-      res.status(404).send("Error")
+      res.status(404).send("Error: Some parameters are missing")
   }
 });
 
