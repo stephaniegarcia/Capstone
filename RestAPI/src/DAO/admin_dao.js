@@ -25,7 +25,7 @@ async function getAdmins(){
 async function getAdminByID(id){
     try {
         const res = await pool.query(
-            'SELECT * FROM admin WHERE admin_id = $1', [id]
+            'SELECT A.admin_id, U.first_name from admin as A inner join users as U ON A.user_id = U.user_id WHERE admin_id = $1', [id]
         );
         console.log(res.rows)
         return res.rows;
@@ -35,7 +35,6 @@ async function getAdminByID(id){
 }
 
 async function createAdmin (user_id) {
-
     try {
         const res = await pool.query(
             'INSERT INTO public.admin2(user_id) VALUES ($1);', [user_id]
