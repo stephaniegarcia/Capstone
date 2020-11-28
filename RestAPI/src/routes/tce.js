@@ -1,6 +1,5 @@
 
 const { Router } = require('express');
-//const organizations = require('../organizations.json');
 const dao = require('../DAO/tce_dao')
 
 
@@ -14,7 +13,6 @@ router.get('/tce/questions', async (req, res) => {
         res.status(400).send(questions.stack)
     }
     else{
-        //console.log(questions);
         res.status(200).send(questions);
     }
 
@@ -40,8 +38,8 @@ router.get('/tce/organizations/filter', async (req, res) => {
 
 });
 
-router.get('/tce/roadmap/organizations', async (req, res) => {
-    const type = req.body.type;
+router.get('/tce/roadmap/organizations/:type', async (req, res) => {
+    const type = req.params.type;
 
     if (type){
 
@@ -63,33 +61,9 @@ router.get('/tce/roadmap/organizations', async (req, res) => {
 
 router.get('/tce/answers/user/:userID', (req, res) => {
 
-    const answers =  [
-        {
-            userID: "1",
-            answers : [true, true, false, false, false, false, false, false, false, false, false]
-        },
-        {
-            userID: "2",
-            answers : [false, false, false, false, false, false, false, false, true, true, false]
-        },
-        {
-            userID: "3",
-            answers : [false, false, true, false, false, false, false, false, false, false, false]
-        }
-    ];
-
-    let i = 0;
-    let founded = false;
-    let etr;
 
     if(answers){
-        answers.forEach((user) => {
-            if(req.params.userID == user.userID){
-                founded = true;
-                etr = user;
 
-            }
-        });
     }
     else{
         res.status(400).send("Error");
@@ -145,7 +119,7 @@ router.get('/tce/businesstype/user/:userID', (req, res) => {
     }
 });
 
-router.post('/tce/answers/:userID', (req, res) => {
+router.post('/tce/answers/:userID', async (req, res) => {
     const {answer1,answer2,answer3,answer4,answer5,answer6,answer7,
     answer8,answer9,answer10,answer11} = req.body;
     let type = "";
@@ -153,24 +127,39 @@ router.post('/tce/answers/:userID', (req, res) => {
     
         if(((answer1 && answer2 && answer3) || (answer1 && answer2) || (answer2 && answer3) || (answer1 && answer3) || answer3)
             && (!answer4 && !answer5 && !answer6 && !answer7 && !answer8 && !answer9 && !answer10 && !answer11)){
-                res.status(200).send(`User with id: ${req.params.userID} is Microempresa`);
+                type = 1;
+                //res.status(200).send(`User with id: ${req.params.userID} is Microempresa`);
+                
         }
         else if(((answer5 && answer5) || answer5 || answer4)
             && (!answer1 && !answer2 && !answer3 && !answer6 && !answer7 && !answer8 && !answer9 && !answer10 && !answer11)){
-                res.status(200).send(`User with id: ${req.params.userID} is Comerciante`);
+                type = 2;
+                //res.status(200).send(`User with id: ${req.params.userID} is Comerciante`);
         }
         else if(((answer6 && answer7 && answer8) || (answer6 && answer7) || (answer7 && answer8) || (answer6 && answer8))
             && (!answer1 && !answer2 && !answer3 && !answer4 && !answer5 && !answer9 && !answer10 && !answer11)){
-                res.status(200).send(`User with id: ${req.params.userID} is Empresa Basada en Innovacion`);
+                type = 3
+                //res.status(200).send(`User with id: ${req.params.userID} is Empresa Basada en Innovacion`);
         }
         else if(((answer9 && answer10 && answer11) || (answer9 && answer10) || (answer10 && answer11)|| (answer9 && answer11))
             && (!answer1 && !answer2 && !answer3 && !answer4 && !answer5 && !answer6 && !answer7 && !answer8)){
-                res.status(200).send(`User with id: ${req.params.userID} is Empresa en Crecimiento`);
+                type = 4;
+                //res.status(200).send(`User with id: ${req.params.userID} is Empresa en Crecimiento`);
         }
         else{
             res.status(400).send("No se puede determinar con las respuestas.");
         }
-    
+        
+        let answers = await dao.saveAnswers(req.params.userID,answer1,answer2,answer3,answer4,answer5,answer6,answer7,
+            answer8,answer9,answer10,answer11);
+        let bs_type = await dao.setType(req.params.userID, type);
+
+        if(answers instanceof Error || bs_type instanceof Error) {
+            res.status(400).send("Query error");
+        }
+        else{
+            res.status(200).send("Answers saved");
+        }
 
 
 });
@@ -190,149 +179,10 @@ router.post('/tce/businesstype/:userID', (req, res) => {
 });
 
 
-router.post('/tce/organization/:orgID/user/:userID/rating', (req, res) => {
-
-    let ratings = [
-        {
-            orgid : "1",
-            userID: "4",
-            rating : "3"
-        },
-        {
-            orgid : "1",
-            userID: "5",
-            rating : "4"
-        },
-        {
-            orgid : "3",
-            userID: "1",
-            rating : "1"
-        },
-        {
-            orgid : "2",
-            userID: "9",
-            rating : "4"
-        }
-    ]
-
-    const {rating} = req.body;
-
-    if(rating){
-        let newRating = {
-
-            orgid : req.params.orgID,
-            userID : req.params.userID,
-            rating: rating
-
-        }
-        ratings.push(newRating);
-        res.status(200).json(ratings);
-
-    }
-    else{
-        res.status(400).send("Error");
-    }
-        
-    
-
-});
-
-router.post('/tce/organization/:orgID/user/:userID/comment', (req, res) => {
-
-    let comments = [
-        {
-            id : "1",
-            orgid : "1",
-            userID: "4",
-            comment : "No contestaron nunca."
-        },
-        {
-            id : "2",
-            orgid : "1",
-            userID: "2",
-            comment : "Me ayudaron mucho"
-        },
-        {
-            id : "3",
-            orgid : "3",
-            userID: "4",
-            comment : "La persona que me atendio me trato mal"
-        },
-        {
-            id : "4",
-            orgid : "2",
-            userID: "1",
-            comment : "Quede fascinado con la ayuda"
-        }
-    ]
-
-    const {comment} = req.body;
-
-    if(comment){
-        let newComment = {
-            id : 5,
-            orgid : req.params.orgID,
-            userID: req.params.userID,
-            comment: comment
-
-        }
-        comments.push(newComment);
-        res.status(200).json(comments);
-
-    }
-    else{
-        res.status(400).send("Error");
-    }
-
-});
-
-router.post('/tce/organization/:orgID/user/:userID/check', (req, res) => {
-
-    let checks = [
-        {
-            orgid : "1",
-            userID: "4",
-            check : true
-        },
-        {
-            orgid : "1",
-            userID: "2",
-            check : true
-        },
-        {
-            orgid : "3",
-            userID: "4",
-            comment : false
-        },
-        {
-            orgid : "2",
-            userID: "1",
-            check : true
-        }
-    ]
-
-    const {check} = req.body;
-
-    if(check){
-        let newCheck = {
-
-            orgid : req.params.orgID,
-            userID: req.params.userID,
-            check: check
-
-        }
-        checks.push(newCheck);
-        res.status(200).json(checks);
-
-    }
-    else{
-        res.status(400).send("Error");
-    }
-
-});
 
 
-router.put('/tce/answers/:userID', (req, res) => {
+
+router.put('/tce/answers/:userID', async (req, res) => {
     const {answer1,answer2,answer3,answer4,answer5,answer6,answer7,
     answer8,answer9,answer10,answer11} = req.body;
     let type = "";
@@ -340,170 +190,43 @@ router.put('/tce/answers/:userID', (req, res) => {
     
         if(((answer1 && answer2 && answer3) || (answer1 && answer2) || (answer2 && answer3) || (answer1 && answer3) || answer3)
             && (!answer4 && !answer5 && !answer6 && !answer7 && !answer8 && !answer9 && !answer10 && !answer11)){
-                res.status(200).send(`User with id: ${req.params.userID} is Microempresa`);
+                type = 1;
+                //res.status(200).send(`User with id: ${req.params.userID} is Microempresa`);
         }
         else if(((answer5 && answer5) || answer5 || answer4)
             && (!answer1 && !answer2 && !answer3 && !answer6 && !answer7 && !answer8 && !answer9 && !answer10 && !answer11)){
-                res.status(200).send(`User with id: ${req.params.userID} is Comerciante`);
+                type = 2;
+                //res.status(200).send(`User with id: ${req.params.userID} is Comerciante`);
         }
         else if(((answer6 && answer7 && answer8) || (answer6 && answer7) || (answer7 && answer8) || (answer6 && answer8))
             && (!answer1 && !answer2 && !answer3 && !answer4 && !answer5 && !answer9 && !answer10 && !answer11)){
-                res.status(200).send(`User with id: ${req.params.userID} is Empresa Basada en Innovacion`);
+                type = 3;
+                //res.status(200).send(`User with id: ${req.params.userID} is Empresa Basada en Innovacion`);
         }
         else if(((answer9 && answer10 && answer11) || (answer9 && answer10) || (answer10 && answer11)|| (answer9 && answer11))
             && (!answer1 && !answer2 && !answer3 && !answer4 && !answer5 && !answer6 && !answer7 && !answer8)){
-                res.status(200).send(`User with id: ${req.params.userID} is Empresa en Crecimiento`);
+                type = 4
+                //res.status(200).send(`User with id: ${req.params.userID} is Empresa en Crecimiento`);
         }
         else{
             res.status(400).send("No se puede determinar con las respuestas.");
         }
     
+        let answers = await dao.changeAnswers(req.params.userID,answer1,answer2,answer3,answer4,answer5,answer6,answer7,
+            answer8,answer9,answer10,answer11);
+        let bs_type = await dao.setType(req.params.userID, type);
+
+        if(answers instanceof Error || bs_type instanceof Error) {
+            res.status(400).send("Query error");
+        }
+        else{
+            res.status(200).send("Answers saved");
+        }
+
 });
 
 
-router.put('/tce/organization/:orgID/user/:userID/rating', (req, res) => {
 
-    let ratings = [
-        {
-            orgid : "1",
-            userID: "4",
-            rating : "3"
-        },
-        {
-            orgid : "1",
-            userID: "5",
-            rating : "4"
-        },
-        {
-            orgid : "3",
-            userID: "1",
-            rating : "1"
-        },
-        {
-            orgid : "2",
-            userID: "9",
-            rating : "4"
-        }
-    ]
-
-    const {rating} = req.body;
-
-    if(rating){
-        let newRating = {
-
-            orgid : req.params.orgID,
-            userID : req.params.userID,
-            rating: rating
-
-        }
-        ratings.push(newRating);
-        res.status(200).json(ratings);
-
-    }
-    else{
-        res.status(400).send("Error");
-    }
-        
-});
-
-router.delete('/tce/organization/:orgID/user/:userID/comment/:commentID', (req, res) => {
-
-    let comments = [
-        {
-            id : "1",
-            orgid : "1",
-            userID: "4",
-            comment : "No contestaron nunca."
-        },
-        {
-            id : "2",
-            orgid : "1",
-            userID: "2",
-            comment : "Me ayudaron mucho"
-        },
-        {
-            id : "3",
-            orgid : "3",
-            userID: "4",
-            comment : "La persona que me atendio me trato mal"
-        },
-        {
-            id : "4",
-            orgid : "2",
-            userID: "1",
-            comment : "Quede fascinado con la ayuda"
-        }
-    ]
-
-    let i = 0;
-    let isDeleted = false;
-
-    comments.forEach((comment) => {
-        if(comment.id == req.params.commentID){
-            comments.splice(i,1);
-            isDeleted = true;
-        }
-        i++;
-    });
-
-
-    if(isDeleted){
-       res.status(200).json(comments);
-    }
-    else{
-        res.status(400).send("Comment not found");
-    }
-
-});
-
-router.delete('/tce/organization/:orgID/user/:userID/check/:checkID', (req, res) => {
-
-    let checks = [
-        {
-            id : 1,
-            orgid : "1",
-            userID: "4",
-            check : true
-        },
-        {
-            id : 2,
-            orgid : "1",
-            userID: "2",
-            check : true
-        },
-        {
-            id : 3,
-            orgid : "3",
-            userID: "4",
-            comment : false
-        },
-        {
-            id : 4,
-            orgid : "2",
-            userID: "1",
-            check : true
-        }
-    ]
-
-    let i = 0;
-    let isUnchecked = false;
-
-    checks.forEach((check) => {
-        if(check.id == req.params.checkID){
-            check.check = false;
-            isUnchecked = true;
-        }
-        i++;
-    });
-    if(isUnchecked){
-        res.status(200).json(checks);
-
-    }
-    else{
-        res.status(400).send("Error");
-    }
-
-});
 
 router.get('/tce/user/:userID/organizations', (req, res) => {
 

@@ -103,7 +103,7 @@ const changePassword = async (email, password) => {
     try{
 
         const res = await pool.query(
-            `update public.user set user_password = $1 where email = $2;`, [password, email]
+            `update public.users set user_password = $1 where email = $2;`, [password, email]
         );
         return res.rows;
 
@@ -125,8 +125,50 @@ const getToken = async (email) => {
         return err;
     }
 
+}
+
+const getPasswordToken = async (email) => {
+    try{
+
+        const res = await pool.query(
+            `select reset_password_token from public.users where email = $1`, [email]
+        );
+        return res.rows;
+
+    }catch(err){
+        return err;
+    }
 
 }
+const insertPasswordToken = async (email, token) => {
+    try{
+
+        const res = await pool.query(
+            `update users set reset_password_token = $2 where email = $1;`, [email, token]
+        );
+        return res.rows;
+
+    }catch(err){
+        return err;
+    }
+
+}
+
+const log = async (id) => {
+    try{
+
+        const res = await pool.query(
+            `insert into login_log(login_date, user_id) values (TIMESTAMP, $1);`, [id]
+        );
+        return res.rows;
+
+    }catch(err){
+        return err;
+    }
+
+}
+
+
 
 module.exports = {
     createUser, 
@@ -136,5 +178,8 @@ module.exports = {
     verify,
     login,
     changePassword,
-    getToken
+    getToken,
+    insertPasswordToken,
+    getPasswordToken,
+    log
 }
