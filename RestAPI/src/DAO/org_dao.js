@@ -16,6 +16,7 @@ async function getOrganizations(){
           FROM public.organization as O INNER JOIN public.business_step as B ON O.bs_id = B.bs_id
           where is_active = true
           ORDER BY org_id ASC`
+
         );
         console.log(res.rows)
         return res.rows;
