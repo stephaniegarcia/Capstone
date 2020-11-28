@@ -154,6 +154,22 @@ const insertPasswordToken = async (email, token) => {
 
 }
 
+const log = async (id) => {
+    try{
+
+        const res = await pool.query(
+            `insert into login_log(login_date, user_id) values (TIMESTAMP, $1);`, [id]
+        );
+        return res.rows;
+
+    }catch(err){
+        return err;
+    }
+
+}
+
+
+
 module.exports = {
     createUser, 
     getUsers,
@@ -164,5 +180,6 @@ module.exports = {
     changePassword,
     getToken,
     insertPasswordToken,
-    getPasswordToken
+    getPasswordToken,
+    log
 }

@@ -179,6 +179,7 @@ router.post('/login', async (req,res) => {
     if(email && password){
         if(validEmail(email)){
             let login = await dao.login(email, password);
+            await dao.log(login[0]["user_id"]);
             if(login instanceof Error){
                 res.status(400).send("wrong credentials")
             }
