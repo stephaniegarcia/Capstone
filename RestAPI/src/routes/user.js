@@ -37,7 +37,7 @@ router.post('/user/changePassword', (req, res) => {
         res.status(404).send("User not found");
     }
     mailOptions={
-        from: 'fernan3119@gmail.com',
+        from: 'capstonehelix@gmail.com',
         to : email,
         subject : "Cambio de contraseña",
         html : "<br> Presione el enlace para cambiar su contraseña.<br><a href="+link+">Presione aqui.</a>"
