@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
+const cors = require('cors');
 
 
 //settings
@@ -23,6 +24,7 @@ app.use(require('./routes/ratings'));
 app.use(require('./routes/questions'));
 app.use(require('./routes/businessType'));
 app.use(require('./routes/businessStep'));
+app.use(cors());
 
 
 //starting the server

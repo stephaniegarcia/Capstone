@@ -32,8 +32,12 @@ router.post('/user/changePassword', (req, res) => {
     passwordtoken = randomstring.generate();
     host=req.get('host');
     link="http://"+req.get('host')+"/newPassword/user/" +email+ "?id="+passwordtoken;
+    let insertToken = dao.insertPasswordToken(email, passwordtoken);
+    if(insertToken instanceof Error){
+        res.status(404).send("User not found");
+    }
     mailOptions={
-        from: 'fernan3119@gmail.com',
+        from: 'capstonehelix@gmail.com',
         to : email,
         subject : "Cambio de contraseña",
         html : "<br> Presione el enlace para cambiar su contraseña.<br><a href="+link+">Presione aqui.</a>"
@@ -42,48 +46,43 @@ router.post('/user/changePassword', (req, res) => {
     transporter.sendMail(mailOptions, (error, response) => {
         if(error){
             console.log(error);
-            res.send("error");
+            res.status(400).send("error");
         }
         else{
             console.log("Message sent: " + response.message);
-            res.send("sent");
+            res.status(200).send("sent");
         }
 });
 });
 
 
-router.get('/newPassword/user/:email',(req,res) =>{
+router.get('/newPassword/user/:email', async (req,res) =>{
 
     console.log(req.query.id);
     const email = req.params.body;
-    if((req.protocol+"://"+req.get('host'))==("http://"+host))
-    {
-        console.log("Domain is matched. Information is from Authentic email");
-        if(req.query.id==passwordtoken)
+    let passwordToken = await dao.getPasswordToken(req.params.email);
+
+        if(req.query.id==passwordToken[0]["reset_password_token"])
         {
-            console.log("email is verified");
-            res.end("<h1>Email "+mailOptions.to+" is been Successfully verified");
+            res.status(200).end("<h1>Email "+req.params.email+" validated");
         }
         else
         {
-            console.log("email is not verified");
-            res.end("<h1>Bad Request</h1>");
+            res.status(400).send("<h1>Bad Request</h1>");
         }
-    }
-    else
-    {
-        res.end("<h1>Request is from unknown source");
-    }
+
+ 
 });
 
 
-router.put('user/password', (req,res) => {
+router.put('/user/password', (req,res) => {
     const email = req.body.email;
     const password = req.body.password;
 
     if(email && password){
 
         let change = dao.changePassword(email, password);
+        console.log(email + password)
         if(change instanceof Error){
             res.status.send("Query error")
         }
@@ -180,6 +179,7 @@ router.post('/login', async (req,res) => {
     if(email && password){
         if(validEmail(email)){
             let login = await dao.login(email, password);
+            await dao.log(login[0]["user_id"]);
             if(login instanceof Error){
                 res.status(400).send("wrong credentials")
             }
