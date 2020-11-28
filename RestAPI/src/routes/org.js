@@ -2,7 +2,6 @@
 const { Router } = require('express');
 const router = Router();
 const { _ } = require('underscore');
-const organizations = require('../organizations.json');
 const dao  = require('../DAO/org_dao');
 
 //Function to get all the organizations in the system

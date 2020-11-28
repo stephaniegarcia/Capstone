@@ -1,9 +1,64 @@
 
 const { Router } = require('express');
-const organizations = require('../organizations.json');
+//const organizations = require('../organizations.json');
+const dao = require('../DAO/tce_dao')
 
 
 const router = Router();
+
+router.get('/tce/questions', async (req, res) => {
+
+    let questions = await dao.getQuestions();
+
+    if(questions instanceof Error){
+        res.status(400).send(questions.stack)
+    }
+    else{
+        //console.log(questions);
+        res.status(200).send(questions);
+    }
+
+});
+
+//aun falta definir bien como se va a filtrar
+router.get('/tce/organizations/filter', async (req, res) => {
+
+    const {stage, type} = req.body;
+
+    if(stage || type){
+        let organizations = await dao.getOrganizationsFiltered(2,2);
+        if(organizations instanceof Error){
+            res.status(400).send("Error");
+        }
+        else{
+            res.status(200).send(organizations);
+        }
+    }
+    else{
+        res.status(404).send("Error")
+    }
+
+});
+
+router.get('/tce/roadmap/organizations', async (req, res) => {
+    const type = req.body.type;
+
+    if (type){
+
+        let organizations = await dao.getOrganizationsByType(type);
+        if(organizations instanceof Error){
+            res.status(400).send(organizations.stack)
+        }
+        else{
+            res.status(200).send(organizations);
+        }
+
+    }
+    else {
+        res.status(400).send("Error");
+    }
+
+});
 
 
 router.get('/tce/answers/user/:userID', (req, res) => {

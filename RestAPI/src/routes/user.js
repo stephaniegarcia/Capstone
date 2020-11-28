@@ -1,10 +1,6 @@
 
 const { Router } = require('express');
 var nodemailer  = require('nodemailer');
-const users = require('../users.json');
-var crypto = require('crypto');
-var bcrypt = require('bcrypt');
-const saltRounds = 10;
 const randomstring = require('randomstring');
 const dao  = require('../DAO/user_dao');
 
@@ -15,7 +11,7 @@ const pool = new Pool({
     host: 'tucaminoempresarial2.postgres.database.azure.com',
     database: 'capstone',
     password: '6rrz9afwZ1994!@',
-    port: 5432,
+    port: 5432
 })
 
 const router = Router();
@@ -24,8 +20,8 @@ const router = Router();
 let transporter = nodemailer.createTransport({
     service: 'gmail',
  auth: {
-        user: '',
-        pass: ''
+        user: 'capstonehelix@gmail.com',
+        pass: 'zybcev-reRfac-0vikpo'
     }
 });
 
@@ -57,8 +53,7 @@ router.post('/user/changePassword', (req, res) => {
 
 
 router.get('/newPassword/user/:email',(req,res) =>{
-    //console.log(email)
-    //console.log(req);
+
     console.log(req.query.id);
     const email = req.params.body;
     if((req.protocol+"://"+req.get('host'))==("http://"+host))
@@ -83,54 +78,50 @@ router.get('/newPassword/user/:email',(req,res) =>{
 
 
 router.put('user/password', (req,res) => {
+    const email = req.body.email;
+    const password = req.body.password;
 
-});
+    if(email && password){
 
-router.get('/verifyEmail',function(req,res){
-
-    token = randomstring.generate();
-    host=req.get('host');
-    link="http://"+req.get('host')+"/verify?id="+token;
-    mailOptions={
-        from: 'fernan3119@gmail.com',
-        to : 'fernando.guzman2@upr.edu',
-        subject : "Favor de confirmar su correo electronico",
-        html : "<br> Presione el enalce para confirmar su cuenta.<br><a href="+link+">Click here to verify</a>" 
-    }
-    console.log(mailOptions);
-    transporter.sendMail(mailOptions, function(error, response){
-        if(error){
-            console.log(error);
-            res.send("error");
+        let change = dao.changePassword(email, password);
+        if(change instanceof Error){
+            res.status.send("Query error")
         }
         else{
-            console.log("Message sent: " + response.message);
-            res.send("sent");
+            res.status(200).send(change)
         }
-    });
+
+    }
+    else{
+        res.status(400).send("Error");
+    }
 });
 
-router.get('/verify',function(req,res){
+
+
+router.get('/verify/:email', async (req,res) => {
     console.log(req.protocol+":/"+req.get('host'));
-    if((req.protocol+"://"+req.get('host'))==("http://"+host))
-    {
-        console.log("Domain is matched. Information is from Authentic email");
-        if(req.query.id==token)
-        {
-            dao.verify(true);
-            //console.log("email is verified");
-            //res.end("<h1>Email "+mailOptions.to+" is been Successfully verified");
+    let userToken = await dao.getToken(req.params.email);
+    console.log(userToken[0]["verify_token"])
+    console.log(req.params.email)
+
+    console.log("Domain is matched. Information is from Authentic email");
+    if(req.query.id==userToken[0]["verify_token"]) {
+        const ver = dao.verify(req.params.email);
+        if(ver instanceof Error){
+            res.status(400).send("error")
         }
-        else
-        {
-            console.log("email is not verified");
-            res.end("<h1>Bad Request</h1>");
+        else{
+        console.log("email is verified");
+        res.send("<h1>Email "+req.params.email+" is been Successfully verified");
         }
     }
     else
     {
-        res.end("<h1>Request is from unknown source");
+        console.log("email is not verified");
+        res.send("<h1>Bad Request</h1>");
     }
+    
 });
 
 router.post('/register', (req, res) => {
@@ -141,12 +132,13 @@ router.post('/register', (req, res) => {
         //insert query should be here
         if(phone_number){
             if(validName(firstname) && validName(lastname) && validEmail(email) && validPhone(phone_number)){
-                dao.createUser(firstname,lastname,email,password, true, phone_number, null, null, 1, 1);
+                
                 token = randomstring.generate();
+                dao.createUser(firstname,lastname,email,password, true, phone_number, null, null, 1, 0, token);
                 host=req.get('host');
-                link="http://"+req.get('host')+"/verify?id="+token;
+                link="http://"+req.get('host')+"/verify/" + email + "?id="+token;
                 mailOptions={
-                    from: 'fernan3119@gmail.com',
+                    from: 'capstonehelix@gmail.com',
                     to : email,
                     subject : "Favor de confirmar su correo electronico",
                     html : "<br> Presione el enalce para confirmar su cuenta.<br><a href="+link+">Click here to verify</a>" 
@@ -181,14 +173,19 @@ router.get('/users', async (req,res) =>{
    res.send(users)
 });
 
-router.post('/login', (req,res) => {
+router.post('/login', async (req,res) => {
 
-    console.log(req.body);
     const {email, password} = req.body;
 
     if(email && password){
         if(validEmail(email)){
-            res.status(200).send(users[0]);
+            let login = await dao.login(email, password);
+            if(login instanceof Error){
+                res.status(400).send("wrong credentials")
+            }
+            else{
+                res.status(200).send(login);
+            }
         }
         else{
             res.status(400).send("error");
@@ -200,67 +197,53 @@ router.post('/login', (req,res) => {
 });
 
 router.get('/user/:userId', async (req,res) => {
-    const users = await dao.getUserById(req.params.userId)
-    console.log(users)
-    res.send(users)
+    const id = parseInt(req.params.userId)
+
+    let user = await dao.getUserById(id);
+    if(user instanceof Error){
+        res.status(404).send("User not found");
+    }
+    else{
+        res.status(200).send(user);
+    }
+    
+
 });
 
-router.put('/user/:userId', (req, res) => {
-    const {firstname, lastname, business_status, phone_number} = req.body;
-    let founded = false;
-    if (firstname && lastname && business_status ){
-        if(phone_number){
+router.put('/user/:userId', async (req, res) => {
+    
+    const {firstname, lastname, business_status, phone_number, business_stage} = req.body;
+    
+    
+    if (firstname && lastname && business_status){
+        if(phone_number){  
             if(validName(firstname) && validName(lastname) && validPhone(phone_number)){
-                users.forEach((user) => {
-                    if(user.id == req.params.userId){
-                        founded = true;
-                        user.firstname = firstname;
-                        user.lastname = lastname;
-                        user.business_status = business_status;
-                        user.phone_number = phone_number;
-                        console.log("Update user: " + req.params.userId);
-                        res.status(200).json(users);
-                    }
-                });
                 
+                let value = await dao.updateUser(req.params.userId, firstname, lastname, business_status, phone_number, business_stage);
+                console.log(value)
+                if(value instanceof Error){
+                    
+                    res.status(400).send("Error in query");
+                }
+                else{
+                    res.status(200).send(value);
+                }    
             }
             else{
-                res.status(400).send("Error");
+                res.status(400).send("Error in validation");
             }
         }
         
     }
     else{
-        res.status(400).send("Error");
+        res.status(400).send("Error in values");
     }
 
-    if(!founded){
-        res.status(404).send("User not found");
-    }
 });
 
 
 
-router.delete('/user/:userId', (req,res) => {
-    let isDeleted = false;
-    
-    let i = 0;
-    users.forEach((user) => {
-        console.log(user);
-        if(user.id == req.params.userId){
-            users.splice(i,1);
-            isDeleted = true;
-        }
-    });
 
-    if(isDeleted){
-        res.status(200).json(users);
-    }
-    else {
-        res.status(404).send('User not found.');
-    }
-    
-});
 
 // Validates email address of course.
 function validEmail(email) {
