@@ -212,14 +212,14 @@ router.get('/user/:userId', async (req,res) => {
 
 router.put('/user/:userId', async (req, res) => {
     
-    const {firstname, lastname, business_status, phone_number, business_stage} = req.body;
+    const {firstname, lastname, business_status, phone_number, bstage_id, requested_assistance} = req.body;
     
     
-    if (firstname && lastname && business_status){
+    if (firstname && lastname && business_status && bstage_id && requested_assistance){
         if(phone_number){  
             if(validName(firstname) && validName(lastname) && validPhone(phone_number)){
                 
-                let value = await dao.updateUser(req.params.userId, firstname, lastname, business_status, phone_number, business_stage);
+                let value = await dao.updateUser(req.params.userId, firstname, lastname, business_status, phone_number, bstage_id, requested_assistance);
                 console.log(value)
                 if(value instanceof Error){
                     

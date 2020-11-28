@@ -40,12 +40,12 @@ const verify =  async (email) => {
 
 }
 
-const updateUser = async (id, first_name, last_name, business_status, phone_number, business_stage) => {
+const updateUser = async (id, first_name, last_name, business_status, phone_number, business_stage, required_assitance) => {
     
         try {
             const res = await pool.query(
-                `UPDATE public.users SET first_name=$1, last_name=$2, business_status=$3, phone_number=$4, bs_id=$5 WHERE user_id=$6;`,
-                [first_name, last_name, business_status, phone_number,business_stage, id]
+                `UPDATE public.users SET first_name=$1, last_name=$2, business_status=$3, phone_number=$4, bstage_id=$5, assistance_required = $6 WHERE user_id=$7;`,
+                [first_name, last_name, business_status, phone_number,business_stage,required_assitance, id]
             );
             console.log(res.rows)
             return res;
