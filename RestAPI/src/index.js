@@ -23,6 +23,7 @@ app.use(require('./routes/ratings'));
 app.use(require('./routes/questions'));
 app.use(require('./routes/businessType'));
 app.use(require('./routes/businessStep'));
+app.use(require('./routes/businessStage'));
 
 
 //starting the server
