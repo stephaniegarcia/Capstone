@@ -12,7 +12,7 @@ const pool = new Pool({
 async function getOrganizations(){
     try {
         const res = await pool.query(
-          `SELECT O.org_id, O.name, O.description, O.email, O.phone_number, O.bt_id, O.bs_id, B.bstage_id, O.org_link
+          `SELECT O.org_id, O.name, O.description, O.email, O.phone_number, O.bt_id, O.bs_id, B.bstage_id, O.org_link, O.is_active
           FROM public.organization as O INNER JOIN public.business_step as B ON O.bs_id = B.bs_id
           where is_active = true
           ORDER BY org_id ASC`
