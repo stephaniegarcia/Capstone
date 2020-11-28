@@ -28,7 +28,7 @@ const getOrganizationsFiltered = async (stage, type) => {
     try {
         const res = await pool.query(
           `select O.name as Org_name, T.description as Org_Type, S.description as Org_stage
-          from organization as O inner join business_type 
+          from organization as O inner join business_type
           as T on O.bt_id = T.bt_id
           inner join business_step as S on O.bs_id = S.bs_id
             where T.bt_id = $1 AND S.bs_id= $2
@@ -45,7 +45,9 @@ const getOrganizationsFiltered = async (stage, type) => {
 const getOrganizationsByType = async (type) => {
     try {
         const res = await pool.query(
-          `select * from organization where bt_id = $1 and is_active = true;`, [type]
+          `select O.org_id, O.name, O.description, O.email, O.phone_number, O.bt_id, O.bs_id, B.bstage_id, O.org_link
+          FROM public.organization as O INNER JOIN public.business_step as B ON O.bs_id = B.bs_id
+          where O.bt_id = $1 and is_active = true;`, [type]
         );
         console.log(res.rows)
         return res.rows;
