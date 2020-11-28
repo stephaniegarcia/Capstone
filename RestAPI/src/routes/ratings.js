@@ -19,8 +19,8 @@ router.get('/topTenPerBT/:btID', async (req,res) =>{
 });
 
 //Top 10 Organizations per business stage
-router.get('/topTenPerBS/:btID/:bsID', async (req,res) =>{
-    const ratings = await dao.getTopTenBS(req.params.btID, req.params.bsID)
+router.get('/topTenPerBS/:bstageID', async (req,res) =>{
+    const ratings = await dao.getTopTenBS(req.params.bstageID)
     console.log(ratings)
    res.send(ratings)
 });

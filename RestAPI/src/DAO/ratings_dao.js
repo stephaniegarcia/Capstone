@@ -28,17 +28,17 @@ async function getTopTenBT(btID){
         const res = await pool.query(
           `with average_rating as (
             SELECT organization_id as Organization_ID, ROUND(AVG(rating)) as Rating
-            FROM organization_rating
-            GROUP BY organization_id
+          FROM organization_rating
+          GROUP BY organization_id
         ),
         ordered_data as (
-          select org_id, bt_id, rating, row_number() over (partition by bt_id order by rating desc) rank
+          select O.name, bt_id, rating, row_number() over (partition by bt_id order by rating desc) rank
           from average_rating r
             join organization o on o.org_id = r.organization_id
-            where bt_id = $1
-          order by bt_id, rating desc 
+          where bt_id = 1
+          order by O.name, rating desc 
         )
-        select  org_id, bt_id, rating
+        select  name, bt_id, rating
         from ordered_data
         where rank <= 10
         `, [btID]
@@ -50,7 +50,7 @@ async function getTopTenBT(btID){
       }
 }
 
-async function getTopTenBS(btID, bs_id){
+async function getTopTenBS(bstage_id){
     try {
         const res = await pool.query(
           `with average_rating as (
@@ -60,16 +60,18 @@ async function getTopTenBS(btID, bs_id){
             order by rating desc
         ),
         ordered_data as (
-          select org_id, bt_id, rating, row_number() over (partition by bt_id) rank
+          select o.name, s.description, rating, row_number() over (partition by b.bstage_id) rank
           from average_rating r
             join organization o on o.org_id = r.organization_id
-            where bt_id = $1 AND bs_id=$2
-          order by bt_id, rating desc 
+			join business_step b on o.bs_id = b.bs_id
+			join business_stage s on b.bstage_id = s.bstage_id
+            where b.bstage_id=$1
+          order by s.description, rating desc 
         )
-        select  org_id, bt_id, rating
+        select  name, description, rating
         from ordered_data
         where rank <= 10
-        `, [btID, bs_id]
+        `, [bstage_id]
         );
         console.log(res.rows)
         return res.rows;

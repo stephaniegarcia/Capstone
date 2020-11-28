@@ -14,7 +14,8 @@ async function getOrganizations(){
         const res = await pool.query(
           `SELECT *
           FROM public.organization
-          where is_active = true;`
+          where is_active = true
+          ORDER BY org_id ASC`
         );
         console.log(res.rows)
         return res.rows;
@@ -36,7 +37,7 @@ async function getOrganizationByID(id){
 }
 
 const createOrg =  (name, description, email, phone_number, bt_id, bs_id, is_active, org_link) => {
-    pool.query('INSERT INTO public.users(name, description, email, phone_number, bt_id, bs_id, is_active, org_link) VALUES($1, $2, $3, $4, $5, $6, $7, $8)', [name, description, email, phone_number, bt_id, bs_id, is_active, org_link], (error, results) => {
+    pool.query('INSERT INTO public.organization(name, description, email, phone_number, bt_id, bs_id, is_active, org_link) VALUES($1, $2, $3, $4, $5, $6, $7, $8)', [name, description, email, phone_number, bt_id, bs_id, is_active, org_link], (error, results) => {
         if (error) {
             throw error
         }
@@ -46,10 +47,10 @@ const createOrg =  (name, description, email, phone_number, bt_id, bs_id, is_act
     })
 }
 
-const updateOrganization = (org_id, name, description, email, phone, bt_id, bs_id, is_active, org_link) => {
+const updateOrganization = (name, description, email, phone, bt_id, bs_id, org_link, org_id) => {
     pool.query(
-        'UPDATE public.organization	SET org_id =$1, name =$2, description=$3, email =$4, phone_number =$5, bt_id=$6, bs_id=$7, is_active =$8, is_verified=$9 WHERE org_id =$1',
-        [org_id, name, description, email, phone, bt_id, bs_id, is_active, org_link],
+        'UPDATE public.organization	SET name =$1, description=$2, email =$3, phone_number =$4, bt_id=$5, bs_id=$6, org_link=$7 WHERE org_id =$8',
+        [name, description, email, phone, bt_id, bs_id, org_link, org_id],
         (error, results) => {
         if (error)
             throw error
@@ -59,10 +60,10 @@ const updateOrganization = (org_id, name, description, email, phone, bt_id, bs_i
     )
 }
 
-const inactivateOrganization = (org_id, is_active) => {
+const inactivateOrganization = (is_active, org_id) => {
     pool.query(
-        'UPDATE public.organization	SET org_id =$1, is_active =$2, WHERE org_id =$1',
-        [org_id, is_active],
+        'UPDATE public.organization	SET is_active=$1 WHERE org_id =$2',
+        [is_active,org_id],
         (error, results) => {
         if (error)
             throw error

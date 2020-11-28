@@ -3,6 +3,7 @@ const router = Router();
 const { _ } = require('underscore');
 //const organizations = require('../organizations.json');
 const dao  = require('../DAO/admin_dao');
+const bodyParser = require('body-parser');
 
 router.get('/admins', async (req,res) =>{
   const admins = await dao.getAdmins()
@@ -16,9 +17,10 @@ router.get('/admin/:adminID', async (req,res) => {
   res.send(admin)
 });
 
-router.post('/admin', (req, res) => {
+router.post('/admin', async (req, res) => {
   const {user_id} = req.body;
   dao.createAdmin(user_id)
+  res.send(user_id)
 });
 
 module.exports = router;
