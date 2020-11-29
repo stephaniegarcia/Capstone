@@ -70,8 +70,6 @@ router.get('/newPassword/user/:email', async (req,res) =>{
         {
             res.status(400).send("<h1>Bad Request</h1>");
         }
-
- 
 });
 
 
@@ -89,7 +87,6 @@ router.put('/user/password', (req,res) => {
         else{
             res.status(200).send(change)
         }
-
     }
     else{
         res.status(400).send("Error");
@@ -120,7 +117,6 @@ router.get('/verify/:email', async (req,res) => {
         console.log("email is not verified");
         res.send("<h1>Bad Request</h1>");
     }
-    
 });
 
 router.post('/register', (req, res) => {
@@ -131,7 +127,6 @@ router.post('/register', (req, res) => {
         //insert query should be here
         if(phone_number){
             if(validName(firstname) && validName(lastname) && validEmail(email) && validPhone(phone_number)){
-                
                 token = randomstring.generate();
                 dao.createUser(firstname,lastname,email,password, true, phone_number, null, null, 1, 0, token);
                 host=req.get('host');
@@ -173,26 +168,24 @@ router.get('/users', async (req,res) =>{
 });
 
 router.post('/login', async (req,res) => {
-
     const {email, password} = req.body;
-
     if(email && password){
         if(validEmail(email)){
             let login = await dao.login(email, password);
-            await dao.log(login[0]["user_id"]);
-            if(login instanceof Error){
-                res.status(400).send("wrong credentials")
+            if(login[0]["match"]){
+                await dao.log(login[0]["user_id"]);
+                res.status(200).send(login);
             }
             else{
-                res.status(200).send(login);
+                res.status(400).send("Error: Wrong credentials!")
             }
         }
         else{
-            res.status(400).send("error");
+            res.status(400).send("Error: Email provided not valid!");
         }
     }
     else{
-        res.status(400).send("error");
+        res.status(400).send("Error: Missing parameters!");
     }
 });
 
