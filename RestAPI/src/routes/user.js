@@ -4,6 +4,7 @@ var nodemailer  = require('nodemailer');
 const randomstring = require('randomstring');
 const dao  = require('../DAO/user_dao');
 
+
 //Authentication with Database
 const Pool = require('pg').Pool
 const pool = new Pool({
@@ -87,6 +88,7 @@ router.put('/user/password', (req,res) => {
         else{
             res.status(200).send(change)
         }
+
     }
     else{
         res.status(400).send("Error");
@@ -168,20 +170,22 @@ router.get('/users', async (req,res) =>{
 });
 
 router.post('/login', async (req,res) => {
+
     const {email, password} = req.body;
+
     if(email && password){
         if(validEmail(email)){
             let login = await dao.login(email, password);
-            if(login[0]["match"]){
-                await dao.log(login[0]["user_id"]);
-                res.status(200).send(login);
+            await dao.log(login[0]["user_id"]);
+            if(login instanceof Error){
+                res.status(400).send("Error: Wrong credentials")
             }
             else{
-                res.status(400).send("Error: Wrong credentials!")
+                res.status(200).send(login);
             }
         }
         else{
-            res.status(400).send("Error: Email provided not valid!");
+            res.status(400).send("Error: Invalid Email!");
         }
     }
     else{
@@ -199,34 +203,26 @@ router.get('/user/:userId', async (req,res) => {
     else{
         res.status(200).send(user);
     }
-    
-
 });
 
 router.put('/user/:userId', async (req, res) => {
-    
     const {firstname, lastname, business_status, phone_number, business_stage} = req.body;
-    
-    
     if (firstname && lastname && business_status){
-        if(phone_number){  
+        if(phone_number){
             if(validName(firstname) && validName(lastname) && validPhone(phone_number)){
-                
                 let value = await dao.updateUser(req.params.userId, firstname, lastname, business_status, phone_number, business_stage);
                 console.log(value)
                 if(value instanceof Error){
-                    
                     res.status(400).send("Error in query");
                 }
                 else{
                     res.status(200).send(value);
-                }    
+                }
             }
             else{
                 res.status(400).send("Error in validation");
             }
         }
-        
     }
     else{
         res.status(400).send("Error in values");
