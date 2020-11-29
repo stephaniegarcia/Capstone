@@ -30,7 +30,7 @@ router.post('/user/changePassword', (req, res) => {
     const email = req.body.email;
     console.log(email);
     passwordtoken = randomstring.generate();
-    host=req.get('host');
+    host =  process.env.WebsiteUrl || req.get('host');
     link="http://"+req.get('host')+"/newPassword/user/" +email+ "?id="+passwordtoken;
     let insertToken = dao.insertPasswordToken(email, passwordtoken);
     if(insertToken instanceof Error){
@@ -219,7 +219,7 @@ router.put('/user/:userId', async (req, res) => {
         if(phone_number){  
             if(validName(firstname) && validName(lastname) && validPhone(phone_number)){
                 
-                let value = await dao.updateUser(req.params.userId, firstname, lastname, business_status, phone_number, bstage_id, requested_assistance);
+                let value = await dao.updateUser(req.params.userId, firstname, lastname, business_status, phone_number, business_stage, requested_assistance);
                 console.log(value)
                 if(value instanceof Error){
                     
