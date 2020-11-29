@@ -31,7 +31,7 @@ router.post('/user/changePassword', (req, res) => {
     console.log(email);
     passwordtoken = randomstring.generate();
     host =  process.env.WebsiteUrl || req.get('host');
-    link="http://"+req.get('host')+"/newPassword/user/" +email+ "?id="+passwordtoken;
+    link="http://"+host+"/newPassword/user/" +email+ "?id="+passwordtoken;
     let insertToken = dao.insertPasswordToken(email, passwordtoken);
     if(insertToken instanceof Error){
         res.status(404).send("User not found");
