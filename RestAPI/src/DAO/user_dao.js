@@ -172,7 +172,7 @@ const getPassword = async (email) => {
     try{
 
         const res = await pool.query(
-            `select user_password, user_id from users where email = $1;`, [email]
+            `select user_password, user_id from users where email = $1 and is_verified = true;`, [email]
         );
         return res.rows;
 

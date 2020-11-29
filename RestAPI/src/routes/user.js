@@ -183,13 +183,20 @@ router.post('/login', async (req,res) => {
         if(validEmail(email)){
 
             hashedPassword = await dao.getPassword(email);
-            const isMatchingPassword = bcrypt.compareSync(password, hashedPassword[0].user_password)
-            await dao.log(hashedPassword[0].user_id);
-            login = {
-                "Match" : isMatchingPassword,
-                "user_id": hashedPassword[0].user_id
-            } 
-            res.status(200).send(login);
+            
+            if(hashedPassword[0]){
+                console.log(1)
+                const isMatchingPassword = bcrypt.compareSync(password, hashedPassword[0].user_password)
+                await dao.log(hashedPassword[0].user_id);
+                login = {
+                    "Match" : isMatchingPassword,
+                    "user_id": hashedPassword[0].user_id
+                } 
+                res.status(200).send(login);
+            }
+            else{
+                res.status(400).send("Account does not exist o is not verified");
+            }
         }
         else{
             res.status(400).send("error");
