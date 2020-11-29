@@ -189,16 +189,11 @@ router.post('/login', async (req,res) => {
             console.log(hashedPassword[0].user_password);
             const isMatchingPassword = bcrypt.compareSync(password, hashedPassword[0].user_password)
             await dao.log(hashedPassword[0].user_id);
-            if(!isMatchingPassword){
-                res.status(400).send("wrong credentials")
-            }
-            else{
-                login = {
-                    "Match" : isMatchingPassword,
-                    "user_id": hashedPassword[0].user_id
-                }
-                res.status(200).send(login);
-            }
+            login = {
+                "Match" : isMatchingPassword,
+                "user_id": hashedPassword[0].user_id
+            } 
+            res.status(200).send(login);
         }
         else{
             res.status(400).send("error");
