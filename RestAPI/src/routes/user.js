@@ -4,7 +4,6 @@ var nodemailer  = require('nodemailer');
 const randomstring = require('randomstring');
 const dao  = require('../DAO/user_dao');
 const bcrypt = require('bcrypt');
-const { getPasswordToken } = require('../DAO/user_dao');
 saltRounds = 10;
 
 //Authentication with Database
@@ -133,7 +132,6 @@ router.post('/register', (req, res) => {
 
     if (firstname && lastname && business_status && email && password){
         //insert query should be here
-        if(phone_number){
             if(validName(firstname) && validName(lastname) && validEmail(email) && validPhone(phone_number)){
                 
                 token = randomstring.generate();
@@ -164,7 +162,6 @@ router.post('/register', (req, res) => {
             else{
                 res.status(400).send("Error");
             }
-        }
 
     }
     else{
@@ -186,7 +183,6 @@ router.post('/login', async (req,res) => {
         if(validEmail(email)){
 
             hashedPassword = await dao.getPassword(email);
-            console.log(hashedPassword[0].user_password);
             const isMatchingPassword = bcrypt.compareSync(password, hashedPassword[0].user_password)
             await dao.log(hashedPassword[0].user_id);
             login = {
@@ -260,8 +256,14 @@ function validEmail(email) {
 }
 
 function validPhone(phone) {
-    var filter = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/im;
-    return String(phone).search (filter) != -1;
+    if(phone){
+        var filter = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/im;
+        return String(phone).search (filter) != -1;
+    }
+    else{
+        return " "
+    }
+    
 }
 
 function validName(name) {
