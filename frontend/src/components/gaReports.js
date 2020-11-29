@@ -12,8 +12,8 @@ import {
     useViewSelector,
   } from 'react-use-analytics-api'
 import '../index.css';
-import apiService from "./mockApiService";
-//import apiService from "./apiService";
+//import apiService from "./mockApiService";
+import apiService from "./apiService";
 //The chart type. Possible options are: LINE, COLUMN, BAR, TABLE, and GEO.
 
 

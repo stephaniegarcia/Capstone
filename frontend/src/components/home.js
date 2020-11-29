@@ -11,6 +11,7 @@ import { Link } from 'react-router-dom';
 
 function Home(props)
 {
+    //Tutorial 
     var items = [
         {
             name: "Crea Tu Cuenta",
@@ -44,22 +45,6 @@ function Home(props)
                     <Grid item xs={12}>
                         <h4>Tu Camino Empresarial</h4>
                         <iframe src="https://www.youtube.com/embed/videoseries?list=PLpc-BRL4RhWChZwVywGethXrgUCMFtxkd" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>   
-                    </Grid>
-                    <Grid item xs={12} sm={6} md={6} lg={3}>
-                        <h4>¿Tu negocio es una microempresa?</h4>
-                        <iframe src="https://www.youtube.com/embed/I4jjKZin69M" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-                    </Grid>
-                    <Grid item xs={12} sm={6} md={6} lg={3}>
-                        <h4>¿Eres un comerciante?</h4>
-                        <iframe src="https://www.youtube.com/embed/fLpi3y4hCx8" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-                    </Grid>
-                    <Grid item xs={12} sm={6} md={6} lg={3}>
-                        <h4>¿Tu empresa es una basada en innovación?</h4>
-                        <iframe src="https://www.youtube.com/embed/E2pHNYr7Aho" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-                    </Grid>
-                    <Grid item xs={12} sm={6} md={6} lg={3}>
-                        <h4>¿Tu empresa está establecida y en crecimiento?</h4>
-                        <iframe src="https://www.youtube.com/embed/g-j-XLl1mb8" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                     </Grid>
                 </Grid>
             </Paper>

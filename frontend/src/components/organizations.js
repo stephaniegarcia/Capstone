@@ -19,12 +19,14 @@ import Button from '@material-ui/core/Button';
 import { Redirect } from 'react-router-dom';
 import Spinner from './loading'
 import Alert from './alert'
-import apiService from "./mockApiService";
-import { string } from 'yup';
-//import apiService from "./apiService";
+//import apiService from "./mockApiService";
+import apiService from "./apiService";
 
 export default function Organizations() {
+  const [fullOrganizationList, setFullOrganizationList] = useState([]);
   const [organizationData, setOrganizationData] = useState([]);
+  const [orgTypes, setOrgTypes] = useState([]);
+  const [orgStages, setOrgStages] = useState([]);
   const [orgType, setOrgType] = useState('');
   const [orgStage, setOrgStage] = useState('');
   const [searchString, setsearchString] = useState('');
@@ -48,25 +50,60 @@ export default function Organizations() {
     setsearchString(event.target.value);
   };
 
-  //populate organizations table 
-  function searchOrganizations() {
-    setShowLoading(true);
-    apiService.getRequest("organizations?type="+orgType+"&stage="+orgStage).then((organizationsResponse) => {
-      var finalData = [];
-      for(var i = 0; i < organizationsResponse.length; i++) {
-        var org = organizationsResponse[i];
-        if(org && (org.name && String(org.name).includes(searchString)) || (org.phone && String(org.phone).includes(searchString)) || (org.email && String(org.email).includes(searchString))) {
+  function filterOrganizations(orgs) {
+    var finalData = [];
+    var tempData = [];
+    for(var i = 0; i < orgs.length; i++) {
+      var org = orgs[i];
+      if(org && searchString && searchString.length>0 && (org.name && String(org.name).toUpperCase().includes(searchString.toUpperCase())) || (org.phone && String(org.phone).includes(searchString)) || (org.email && String(org.email).toUpperCase().includes(searchString.toUpperCase()))) {
+        finalData.push(org);
+      }
+    }
+
+    if(orgType && String(orgType).length>0) {
+      tempData = [...finalData];
+      finalData = [];
+      for(var i = 0; i < tempData.length; i++) {
+        var org = tempData[i];
+        if(org && String(org.bt_id) == String(orgType)) {
           finalData.push(org);
         }
       }
+    }
+    
+    if(orgStage && String(orgStage).length>0) {
+      tempData = [...finalData];
+      finalData = [];
+      for(var i = 0; i < tempData.length; i++) {
+        var org = tempData[i];
+        if(org && String(org.bstage_id) == String(orgStage)) {
+          finalData.push(org);
+        }
+      }
+    }
+
+    setOrganizationData(finalData)
+  }
+
+  //populate organizations table 
+  function searchOrganizations() {
+    setShowLoading(true);
+    if(fullOrganizationList.length == 0) {
+      apiService.getRequest("organizations").then((organizationsResponse) => {
+        setFullOrganizationList(organizationsResponse.data);
+        filterOrganizations(organizationsResponse.data);
+        setShowLoading(false);
+        
+      }).catch(err =>{
+        setShowLoading(false);
+        setErrorMessage(err ? (err.response ? (err.response.data? String(err.response.data) : String(err.response)) : String(err)) : 'Ocurrio un error');
+        setShowErrorAlert(true);
+      });
+    }
+    else {
+      filterOrganizations(fullOrganizationList);
       setShowLoading(false);
-      setOrganizationData(finalData)
-    }).catch(err =>{
-      console.log(err)
-      setShowLoading(false);
-      setErrorMessage(err.response.data);
-      setShowErrorAlert(true);
-    });
+    }
   }
 
   /*Table logic */
@@ -95,20 +132,18 @@ export default function Organizations() {
           <TableCell component="th" scope="row">
             {row.name}
           </TableCell>
-          <TableCell align="right">{row.phone}</TableCell>
+          <TableCell align="right">{row.phone_number}</TableCell>
           <TableCell align="right">{row.email}</TableCell>
-          <TableCell align="right">{row.bs_id}</TableCell>
-          <TableCell align="right">{row.bt_id}</TableCell>
+          <TableCell align="right">{apiService.getOrgStage(row.bstage_id)}</TableCell>
+          <TableCell align="right">{apiService.getOrgType(row.bt_id)}</TableCell>
         </TableRow>
         <TableRow>
             <TableCell colSpan="6" style={{padding: "0 80px 30px 80px"}}>
-              <Typography gutterBottom component="div">
-                Descripción:
-              </Typography>
+              <p style={{fontStyle:"italic", fontWeight: "bold"}}>Descripción:</p>
               <p>
                 {row.description}
               </p>
-              <Link href={row.link} target='_blank'>Ver más información</Link>
+              {row.org_link && row.org_link.length>0 && (<Link href={row.org_link} target='_blank'>Ver más información</Link>)}
             </TableCell>
         </TableRow>
       </React.Fragment>
@@ -116,6 +151,19 @@ export default function Organizations() {
   }
   
   useEffect(()=>{
+    apiService.refreshOrgTypes().then(response => {
+      var temp = response.data;
+      apiService.orgTypes(temp);
+      setOrgTypes(temp);
+    }).catch(err =>{
+    });
+    apiService.refreshOrgStages().then(response => {
+      var temp = response.data;
+      apiService.orgStages(temp);
+      setOrgStages(temp);
+    }).catch(err =>{
+    });
+
     searchOrganizations();
   },[initialLoad])
 
@@ -145,12 +193,8 @@ export default function Organizations() {
                 style={{'width':'150px'}}
                 value={orgType}
                 onChange={handleOrgTypeChange}>
-                <MenuItem value=''>Todos</MenuItem>
-                <MenuItem value='Microempresa'>Microempresa</MenuItem>
-                <MenuItem value='Comerciante'>Comerciante</MenuItem>
-                <MenuItem value='Empresa Basada en Innovación'>Empresa Basada en Innovación</MenuItem>
-                <MenuItem value='Empresa en Crecimiento'>Empresa en Crecimiento</MenuItem>
-                <MenuItem value='Acceso a Capital'>Acceso a Capital</MenuItem>
+                  <MenuItem value=''>Todos</MenuItem>
+                  {orgTypes.map((type) => ( <MenuItem key={type.bt_id} value={type.bt_id}>{type.description}</MenuItem> ))}
               </Select>
             </FormControl>
             <FormControl className={classes.formControl} style={{'margin':'15px'}}>
@@ -160,10 +204,7 @@ export default function Organizations() {
                 value={orgStage}
                 onChange={handleOrgStageChange}>
                 <MenuItem value=''>Todos</MenuItem>
-                <MenuItem value='Idea'>Idea</MenuItem>
-                <MenuItem value='Prototipo'>Prototipo</MenuItem>
-                <MenuItem value='Expansión'>Expansión</MenuItem>
-                <MenuItem value='Lanzamiento'>Lanzamiento</MenuItem>
+                {orgStages.map((stage) => ( <MenuItem key={stage.bstage_id} value={stage.bstage_id}>{stage.description}</MenuItem> ))}
               </Select>
             </FormControl>
             <Button style={{'margin':'15px'}} variant="contained" color="primary" onClick={()=>{ searchOrganizations(); }}>

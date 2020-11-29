@@ -1,6 +1,7 @@
 import React from 'react'
 import CircularProgress from '@material-ui/core/CircularProgress'
 
+//Smaller Loading logic
 export default function SmallLoading({isShown = true}) {
     var display = isShown ? 'flex' : 'none'
     return (

@@ -6,8 +6,8 @@ import Button from '@material-ui/core/Button';
 import Spinner from './loading'
 import Alert from './alert'
 import '../index.css';
-import apiService from "./mockApiService";
-//import apiService from "./apiService";
+//import apiService from "./mockApiService";
+import apiService from "./apiService";
 
 function Login() {
     //State Variables getters & setters
@@ -20,6 +20,8 @@ function Login() {
     const [showLoading, setShowLoading] = useState(false);
 
     //email validation helper function
+    //@param email - user email
+    //@return if it's valid or not
     function isValidEmail(email) {
         if(email && email.length == 0) {
             return true;
@@ -29,12 +31,16 @@ function Login() {
     }
 
     //password validation helper function
+    //@param text - user password
+    //@return if it's valid or not
     function isValidPass(text) {
         if(text && text.length == 0) {
             return true;
         }
         return text.length > 6
     }
+    
+    //Event Handlers 
 
     //email change event callback
     const handleEmailChange = (event) => {
@@ -59,15 +65,42 @@ function Login() {
         setShowLoading(true);
 
         //Perform login request
-        apiService.postRequest("login", { email: email, password: password }).then(response => {
+        apiService.postRequest("login", { email: email, password: password }).then(loginResponse => {
             //Handle login
-            apiService.profile(response);
-            setShowLoading(false);
-            window.location.href = "/";
+            if(loginResponse.data[0].match) {
+                apiService.getRequest("user/"+loginResponse.data[0].user_id).then(response => {
+                    //Handle user profile get
+                    if(!response.data[0].is_verified) {
+                        setShowLoading(false);
+                        setErrorMessage('Verifique su cuenta antes de iniciar sesión');
+                        setShowErrorAlert(true);
+                    }
+                    else {
+                        apiService.profile(response.data[0]);
+                        setShowLoading(false);
+                        if(response.data[0].bt_id && response.data[0].bt_id > 0) {
+                            window.location.href = "/";    
+                        }
+                        else {
+                            window.location.href = "/tce";
+                        }   
+                    }
+                }).catch(err =>{
+                    //Handle error
+                    setShowLoading(false);
+                    setErrorMessage(err ? (err.response ? (err.response.data? String(err.response.data) : String(err.response)) : String(err)) : 'Ocurrio un error');
+                    setShowErrorAlert(true);
+                });
+            }
+            else {
+                setShowLoading(false);
+                setErrorMessage('Credenciales no válidas');
+                setShowErrorAlert(true);
+            }
         }).catch(err =>{
             //Handle error
             setShowLoading(false);
-            setErrorMessage(err.response.data);
+            setErrorMessage(err ? (err.response ? (err.response.data? String(err.response.data) : String(err.response)) : String(err)) : 'Ocurrio un error');
             setShowErrorAlert(true);
         });
     };

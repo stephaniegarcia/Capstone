@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-
+import { Redirect } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
 import TextField from '@material-ui/core/TextField';
@@ -17,28 +17,28 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
-import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
-import Select from '@material-ui/core/Select';
 import Button from '@material-ui/core/Button';
-import { Redirect } from 'react-router-dom';
 import Spinner from './loading'
 import Alert from './alert'
-import apiService from "./mockApiService";
-//import apiService from "./apiService";
+//import apiService from "./mockApiService";
+import apiService from "./apiService";
+import { Step } from '@material-ui/core';
 
 export default function Organizations() {
   const newOrgModel = {
     name: '',
     email: '',
-    phone: '',
-    stage: 'Idea',
-    type: 'Microempresa',
+    phone_number: '',
+    type: '',
+    step: '',
     link: '',
-    description: ''
+    description: '',
+    isActive: false
   };
-
+  //State variables getters and setters
+  const [fullOrganizationList, setFullOrganizationList] = useState([]);
   const [organizationData, setOrganizationData] = useState([]);
   const [searchString, setsearchString] = useState('');
   const [initialLoad, setInitialLoad] = useState(true);
@@ -56,10 +56,15 @@ export default function Organizations() {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
-  const [stage, setStage] = useState('');
+  const [step, setStep] = useState('');
   const [type, setType] = useState('');
   const [link, setLink] = useState('');
   const [description, setDescription] = useState('');
+  const [isActive, setIsActive] = useState(false);
+  
+  const [orgTypes, setOrgTypes] = useState([]);
+  const [orgStages, setOrgStages] = useState([]);
+  const [orgSteps, setOrgSteps] = useState([]);
 
   const [validPhone, setValidPhone] = useState(true);
   const [validEmail, setValidEmail] = useState(true);
@@ -68,7 +73,12 @@ export default function Organizations() {
   const [validDescription, setValidDescription] = useState(true);
   
   //email validation helper function
+  //@param email - user email
+  //@return if it's valid or not
   function isValidEmail(email) {
+    if(!email || email == null) {
+      return false;
+    }
     if(email && email.length == 0) {
         return true;
     }
@@ -77,22 +87,42 @@ export default function Organizations() {
   }
 
   //phone validation helper function
+  //@param email - organization email
+  //@return if it's valid or not
   function isValidPhone(phone) {
+    if(!phone || phone == null) {
+      return false;
+    }
     const re = /^[+]*[(]{0,1}[0-9]{1,3}[)]{0,1}[-\s\./0-9]*$/g;
     return re.test(String(phone));
   }
-
+//link validation helper function
+//@param link - url link
+//@return if it's valid or not
   function isValidLink(link) {
+    if(!link || link == null) {
+      return false;
+    }
     const re = /\b((http|https):\/\/?)[^\s()<>]+(?:\([\w\d]+\)|([^[:punct:]\s]|\/?))/g;
     return re.test(String(link));
   }
 
   //name validation helper function
+  //@param name - organization name 
+    //@return if it's valid or not
   function isValidName(text) {
+    if(!text || text == null) {
+      return false;
+    }
     return text.length >= 2;
   }
-
+ //drescription validation helper function
+  //@param text - organization description
+    //@return if it's valid or not
   function isValidDescription(text) {
+    if(!text || text == null) {
+      return false;
+    }
     return text.length >= 2;
   }
 
@@ -102,14 +132,17 @@ export default function Organizations() {
 
   const saveLastOrgSelected = (org) => {
     setLastSelectedOrg(org);
-    setName(org.name);
-    setPhone(org.phone);
-    setEmail(org.email);
-    setType(org.type);
-    setStage(org.stage);
-    setLink(org.link);
+    setName(!org.name || org.name == null ? '' : org.name);
+    setPhone(!org.phone_number || org.phone_number == '' ? undefined : org.phone_number);
+    setEmail(!org.email || org.email == null ? '' : org.email);
+    setType(org.bt_id);
+    setStep(org.bs_id);
+    setDescription(!org.description || org.description == null ? '' : org.description);
+    setLink(!org.org_link || org.org_link == null ? '' : org.org_link);
   };
-  
+
+  //Event Handlers
+
   const handleNameTextChange = (event) => {
     setValidName(isValidName(event.target.value));
     setName(event.target.value);
@@ -122,12 +155,18 @@ export default function Organizations() {
     setValidPhone(isValidPhone(event.target.value));
     setPhone(event.target.value);
   };
-  const handleStageTextChange = (event) => {
-    setStage(event.target.value);
-  };
   const handleTypeTextChange = (event) => {
     setType(event.target.value);
+    var steps = apiService.getRoadmapSteps(event.target.value)
+    if(steps && steps.length>0) {
+      setOrgSteps(steps);
+      setStep(steps[0])
+    }
   };
+  const handleStepTextChange = (event) => {
+    setStep(event.target.value);
+  };
+  
   const handleLinkTextChange = (event) => {
     setValidLink(isValidLink(event.target.value));
     setLink(event.target.value);
@@ -147,6 +186,15 @@ export default function Organizations() {
   };
   
   const handleOpenAddOrgModalClickOpen = () => {
+    if(orgTypes && orgTypes.length>0) {
+      newOrgModel.bt_id = orgTypes[0].bt_id;
+      if(orgSteps && orgSteps.length>0) {
+        newOrgModel.bs_id = orgSteps[0].bs_id;
+      }
+    }
+    if(orgStages && orgStages.length>0) {
+      newOrgModel.bstage_id = orgStages[0].bstage_id;
+    }
     saveLastOrgSelected(newOrgModel);
     setOpenAddOrgModal(true);
   };
@@ -169,91 +217,134 @@ export default function Organizations() {
   const handleSearchStringChange = (event) => {
     setsearchString(event.target.value);
   };
-
-  function filterOrganizations(organizations) {
+  //organizations filter
+   //@param orgs - organizations
+  function filterOrganizations(orgs) {
     var finalData = [];
-    for(var i = 0; i < organizations.length; i++) {
-      var org = organizations[i];
-      if(org && (org.name && String(org.name).includes(searchString)) || (org.phone && String(org.phone).includes(searchString)) || (org.email && String(org.email).includes(searchString))) {
+    for(var i = 0; i < orgs.length; i++) {
+      var org = orgs[i];
+      if(org && searchString && searchString.length>0 && (org.name && String(org.name).toUpperCase().includes(searchString.toUpperCase())) || (org.phone && String(org.phone).includes(searchString)) || (org.email && String(org.email).toUpperCase().includes(searchString.toUpperCase()))) {
         finalData.push(org);
       }
     }
-    return finalData;
+    setOrganizationData(finalData)
   }
 
   //populate organizations table 
   function searchOrganizations() {
     setShowLoading(true);
-    apiService.getRequest("admin/organizations").then((organizationsResponse) => {
-      var finalData = filterOrganizations(organizationsResponse);
+    if(fullOrganizationList.length == 0) {
+      apiService.getRequest("organizations").then((organizationsResponse) => {
+        setFullOrganizationList(organizationsResponse.data);
+        filterOrganizations(organizationsResponse.data);
+        setShowLoading(false);
+        
+      }).catch(err =>{
+        setShowLoading(false);
+        setErrorMessage(err ? (err.response ? (err.response.data? String(err.response.data) : String(err.response)) : String(err)) : 'Ocurrio un error');
+        setShowErrorAlert(true);
+      });
+    }
+    else {
+      filterOrganizations(fullOrganizationList);
       setShowLoading(false);
-      setOrganizationData(finalData);
-    }).catch(err =>{
-      setShowLoading(false);
-      setErrorMessage(err.response.data);
-      setShowErrorAlert(true);
-    });
+    }
   }
-
+  //adding an organization
   function addOrganization() {
     setShowLoading(true);
     var data = {
       name: name,
       email: email,
-      phone: phone,
-      stage: stage,
-      type: type,
-      link: link,
+      phone_number: phone,
+      bs_id: step,
+      bt_id: type,
+      org_link: link,
+      is_active: true,
       description: description
     };
     handleOpenAddOrgModalClose();
-    apiService.postRequest("admin/organization", data).then((organizationsResponse) => {
-      setShowLoading(false);
-      setOrganizationData(organizationsResponse)
+    apiService.postRequest("organization", data).then((addResponse) => {
+      apiService.getRequest("organizations").then((organizationsResponse) => {
+        setFullOrganizationList(organizationsResponse.data);
+        filterOrganizations(organizationsResponse.data);
+        setShowLoading(false);
+        
+      }).catch(err =>{
+        setShowLoading(false);
+        setErrorMessage(err ? (err.response ? (err.response.data? String(err.response.data) : String(err.response)) : String(err)) : 'Ocurrio un error');
+        setShowErrorAlert(true);
+      });
     }).catch(err =>{
       setShowLoading(false);
-      setErrorMessage(err.response.data);
+      setErrorMessage(err ? (err.response ? (err.response.data? String(err.response.data) : String(err.response)) : String(err)) : 'Ocurrio un error');
       setShowErrorAlert(true);
     });
     saveLastOrgSelected(newOrgModel);
   }
 
+  //editing an organization
   function editOrganization() {
     setShowLoading(true);
-    var id = lastSelectedOrg.id
+    var id = lastSelectedOrg.org_id
     var data = {
+      org_id: id,
       name: name,
       email: email,
-      phone: phone,
-      stage: stage,
-      type: type,
-      link: link,
+      phone_number: phone,
+      bs_id: step,
+      bt_id: type,
+      org_link: link,
+      is_active: isActive,
       description: description
     };
     handleOpenEditOrgModalClose();
-    apiService.putRequest("admin/organization?id=" + id, data).then((organizationsResponse) => {
-      setShowLoading(false);
-      setOrganizationData(organizationsResponse)
+    apiService.putRequest("organization", data).then((editResponse) => {
+      apiService.getRequest("organizations").then((organizationsResponse) => {
+        setFullOrganizationList(organizationsResponse.data);
+        filterOrganizations(organizationsResponse.data);
+        setShowLoading(false);
+      }).catch(err =>{
+        setShowLoading(false);
+        setErrorMessage(err ? (err.response ? (err.response.data? String(err.response.data) : String(err.response)) : String(err)) : 'Ocurrio un error');
+        setShowErrorAlert(true);
+      });
     }).catch(err =>{
       setShowLoading(false);
-      setErrorMessage(err.response.data);
+      setErrorMessage(err ? (err.response ? (err.response.data? String(err.response.data) : String(err.response)) : String(err)) : 'Ocurrio un error');
       setShowErrorAlert(true);
     });
     saveLastOrgSelected(newOrgModel);
   }
 
+  //deleting an organization
   function deleteOrganization() {
     setOpenDeleteAlert(false);
     setShowLoading(true);
-    apiService.deleteRequest("admin/organization?orgId="+lastSelectedOrg.id).then((organizationsResponse) => {
-      var finalData = filterOrganizations(organizationsResponse);
-      setShowLoading(false);
-      setOrganizationData(finalData);
+    lastSelectedOrg.is_active = !lastSelectedOrg.is_active;
+    var data = { is_active: String(lastSelectedOrg.is_active), org_id: lastSelectedOrg.org_id };
+    apiService.putRequest("inactiveOrganization", data).then((organizationsResponse) => {
+      apiService.getRequest("organizations").then((organizationsResponse) => {
+        setFullOrganizationList(organizationsResponse.data);
+        filterOrganizations(organizationsResponse.data);
+        setShowLoading(false);
+      }).catch(err =>{
+        setShowLoading(false);
+        setErrorMessage(err ? (err.response ? (err.response.data? String(err.response.data) : String(err.response)) : String(err)) : 'Ocurrio un error');
+        setShowErrorAlert(true);
+      });
     }).catch(err =>{
       setShowLoading(false);
-      setErrorMessage(err.response.data);
+      setErrorMessage(err ? (err.response ? (err.response.data? String(err.response.data) : String(err.response)) : String(err)) : 'Ocurrio un error');
       setShowErrorAlert(true);
     });
+    for(var i = 0; i< fullOrganizationList.length; i++) {
+      if(fullOrganizationList[i].org_id == lastSelectedOrg.org_id) {
+        fullOrganizationList[i].is_active = lastSelectedOrg.is_active;
+      }
+      setFullOrganizationList(fullOrganizationList);
+      filterOrganizations(fullOrganizationList);
+    }
     saveLastOrgSelected(newOrgModel);
   }
 
@@ -271,7 +362,7 @@ export default function Organizations() {
   function OrganizationRow(props) {
     const { row } = props;
     //const [open, setOpen] = useState(false);
-    
+    console.log(row.is_active);
     return (
       <React.Fragment>
         <TableRow>
@@ -279,29 +370,34 @@ export default function Organizations() {
             <Button style={{'margin':'15px'}} variant="contained" color="primary" onClick={()=>{ handleOpenEditOrgModalClickOpen(row); }}>
               Editar
             </Button>
-            <Button style={{'margin':'15px'}} variant="contained" color="secondary" onClick={()=>{ handleOpenDeleteAlertClickOpen(row); }}>
-              Remover
-            </Button>
+            {row.is_active && row.is_active == true && 
+              <Button style={{'margin':'15px'}} variant="contained" color="secondary" onClick={()=>{ handleOpenDeleteAlertClickOpen(row); }}>
+                Remover
+              </Button>
+            }
+            {row.is_active && row.is_active == false && 
+              <Button style={{'margin':'15px'}} variant="contained" className="add-btn" onClick={()=>{ handleOpenDeleteAlertClickOpen(row); }}>
+                Activar
+              </Button>
+            }
           </div>
         </TableRow>
         <TableRow className={classes.root}>
           <TableCell component="th" scope="row">
             {row.name}
           </TableCell>
-          <TableCell align="right">{row.phone}</TableCell>
+          <TableCell align="right">{row.phone_number}</TableCell>
           <TableCell align="right">{row.email}</TableCell>
-          <TableCell align="right">{row.bs_id}</TableCell>
-          <TableCell align="right">{row.bt_id}</TableCell>
+          <TableCell align="right">{apiService.getOrgStage(row.bstage_id)}</TableCell>
+          <TableCell align="right">{apiService.getOrgType(row.bt_id)}</TableCell>
         </TableRow>
         <TableRow>
             <TableCell colSpan="6" style={{padding: "0 80px 30px 80px"}}>
-              <Typography gutterBottom component="div">
-                Descripción:
-              </Typography>
+              <p style={{fontStyle:"italic", fontWeight: "bold"}}>Descripción:</p>
               <p>
                 {row.description}
               </p>
-              <Link href={row.link} target='_blank'>Ver más información</Link>
+              {row.org_link && row.org_link.length > 0 && (<Link href={row.org_link} target='_blank'>Ver más información</Link>)}
             </TableCell>
         </TableRow>
       </React.Fragment>
@@ -309,11 +405,32 @@ export default function Organizations() {
   }
     
   useEffect(()=>{
+    apiService.refreshOrgTypes().then(response => {
+      var temp = response.data;
+      apiService.orgTypes(temp);
+      setOrgTypes(temp);
+    }).catch(err =>{
+    });
+    apiService.refreshOrgStages().then(response => {
+      var temp = response.data;
+      apiService.orgStages(temp);
+      setOrgStages(temp);
+    }).catch(err =>{
+    });
+    apiService.refreshOrgSteps().then(response => {
+      var temp = response.data;
+      apiService.orgSteps(temp);
+      setOrgSteps(temp);
+    }).catch(err =>{
+    });
     searchOrganizations();
   },[initialLoad])
 
   return (
-    // !apiService.isAuthenticated() ? <Redirect to="/login" /> :
+    !apiService.isAdminAuthenticated() ?
+    //If authenticated go to home page
+    <Redirect to="/login" /> :
+    
     <div className="top-margin">
       <Paper className="paper-margin" elevation={10}>
         <h2>Manejo de Organizaciones</h2>
@@ -428,20 +545,7 @@ export default function Organizations() {
                 onChange={handleEmailTextChange}
                 value={email} />
             </div>
-            <div className="margin-25">
-              <TextField
-                  label="Etapa de Negocio"
-                  select
-                  style={{width:'100%', textAlign: "center"}}
-                  className="form-control"
-                  value={stage}
-                  onChange={handleStageTextChange}>
-                  <MenuItem value='Idea'>Idea</MenuItem>
-                  <MenuItem value='Prototipo'>Prototipo</MenuItem>
-                  <MenuItem value='Expansión'>Expansión</MenuItem>
-                  <MenuItem value='Lanzamiento'>Lanzamiento</MenuItem>
-              </TextField>
-            </div>
+            
             <div className="margin-25">
               <TextField
                   label="Tipo de Negocio"
@@ -450,11 +554,18 @@ export default function Organizations() {
                   className="form-control"
                   value={type}
                   onChange={handleTypeTextChange}>
-                  <MenuItem value='Microempresa'>Microempresa</MenuItem>
-                  <MenuItem value='Comerciante'>Comerciante</MenuItem>
-                  <MenuItem value='Empresa Basada en Innovación'>Empresa Basada en Innovación</MenuItem>
-                  <MenuItem value='Empresa en Crecimiento'>Empresa en Crecimiento</MenuItem>
-                  <MenuItem value='Acceso a Capital'>Acceso a Capital</MenuItem>
+                  {orgTypes.map((type) => ( <MenuItem key={type.bt_id} value={type.bt_id}>{type.description}</MenuItem> ))}
+              </TextField>
+            </div>
+            <div className="margin-25">
+              <TextField
+                  label="Paso de Negocio"
+                  select
+                  style={{width:'100%', textAlign: "center"}}
+                  className="form-control"
+                  value={step}
+                  onChange={handleStepTextChange}>
+                  {orgSteps.map((type) => ( <MenuItem key={type.bs_id} value={type.bs_id}>{type.description}</MenuItem> ))}
               </TextField>
             </div>
             <div className="margin-25">
@@ -479,7 +590,7 @@ export default function Organizations() {
                 label="Descripción:"
                 error={!validDescription}
                 onChange={handleDescriptionTextChange}
-                value={link} />
+                value={description} />
             </div>  
 
             
@@ -491,7 +602,13 @@ export default function Organizations() {
           Cancelar
         </Button>
         <Button onClick={addOrganization} color="primary"
-          disabled= {!validEmail || !email.length>0 || !validDescription || !description.length>0 || !validPhone || !phone.length>0 || !validName || !name.length>0 || !validLink || !link.length>0}
+          disabled= {
+            !validEmail || !email || email == null || !email.length>0 || 
+            !validDescription || !description || description == null || !description.length>0 || 
+            !validPhone || !phone || phone == null || !phone.length>0 || 
+            !validName || !name || name == null || !name.length>0 || 
+            !validLink || !link || link == null || !link.length>0
+          }
           autoFocus>
           Guardar
         </Button>
@@ -544,20 +661,7 @@ export default function Organizations() {
                 onChange={handleEmailTextChange}
                 value={email} />
             </div>
-            <div className="margin-25">
-              <TextField
-                  label="Etapa de Negocio"
-                  select
-                  style={{width:'100%', textAlign: "center"}}
-                  className="form-control"
-                  value={stage}
-                  onChange={handleStageTextChange}>
-                  <MenuItem value='Idea'>Idea</MenuItem>
-                  <MenuItem value='Prototipo'>Prototipo</MenuItem>
-                  <MenuItem value='Expansión'>Expansión</MenuItem>
-                  <MenuItem value='Lanzamiento'>Lanzamiento</MenuItem>
-              </TextField>
-            </div>
+
             <div className="margin-25">
               <TextField
                   label="Tipo de Negocio"
@@ -566,11 +670,18 @@ export default function Organizations() {
                   className="form-control"
                   value={type}
                   onChange={handleTypeTextChange}>
-                  <MenuItem value='Microempresa'>Microempresa</MenuItem>
-                  <MenuItem value='Comerciante'>Comerciante</MenuItem>
-                  <MenuItem value='Empresa Basada en Innovación'>Empresa Basada en Innovación</MenuItem>
-                  <MenuItem value='Empresa en Crecimiento'>Empresa en Crecimiento</MenuItem>
-                  <MenuItem value='Acceso a Capital'>Acceso a Capital</MenuItem>
+                  {orgTypes.map((type) => ( <MenuItem key={type.bt_id} value={type.bt_id}>{type.description}</MenuItem> ))}
+              </TextField>
+            </div>
+            <div className="margin-25">
+              <TextField
+                  label="Paso de Negocio"
+                  select
+                  style={{width:'100%', textAlign: "center"}}
+                  className="form-control"
+                  value={step}
+                  onChange={handleStepTextChange}>
+                  {orgSteps.map((type) => ( <MenuItem key={type.bs_id} value={type.bs_id}>{type.description}</MenuItem> ))}
               </TextField>
             </div>
             <div className="margin-25">
@@ -584,6 +695,18 @@ export default function Organizations() {
                 error={!validLink}
                 onChange={handleLinkTextChange}
                 value={link} />
+            </div>  
+            <div className="margin-25">
+              <TextField
+                InputLabelProps={{
+                    shrink: true,
+                }}  
+                style={{width:'100%'}}
+                className="form-control"
+                label="Descripción:"
+                error={!validDescription}
+                onChange={handleDescriptionTextChange}
+                value={description} />
             </div>  
           </Card>
         </DialogContentText>

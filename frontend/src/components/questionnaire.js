@@ -4,10 +4,12 @@ import Ap from './qlogic';
 import { Route, Redirect } from 'react-router-dom';
 import Spinner from './loading'
 import Alert from './alert'
-import apiService from "./mockApiService";
-//import apiService from "./apiService";
+//import apiService from "./mockApiService";
+import apiService from "./apiService";
 
 function Questionnaire() {
+
+  //Getters and Setters
   const [showErrorAlert, setShowErrorAlert] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [showLoading, setShowLoading] = useState(false);
@@ -17,22 +19,24 @@ function Questionnaire() {
     setShowErrorAlert(false);
   };
 
+  //Get Questions call
   async function getQuestions() {
     setShowLoading(true);
-    apiService.getRequest("quiz")
+    apiService.getRequest("tce/questions")
     .then((response)=>{
-      if(response) {
-        for(var i = 0; i < response.length; i++) {
-          response[i].answer = null;
+      if(response.data) {
+        for(var i = 0; i < response.data.length; i++) {
+          response.data[i].answer = null;
+          response.data[i].options = ["Si", "No"]
         }
       }
       setShowLoading(false);
-      setQuizQuestions(response);
+      setQuizQuestions(response.data);
       setInitialLoad(true);
     })
     .catch(err =>{
       setShowLoading(false);
-      setErrorMessage(err.response.data);
+      setErrorMessage(err ? (err.response ? (err.response.data? String(err.response.data) : String(err.response)) : String(err)) : 'Ocurrio un error');
       setShowErrorAlert(true);
     });
   };

@@ -9,8 +9,8 @@ import Button from '@material-ui/core/Button'
 import Paper from '@material-ui/core/Paper'
 import Spinner from './loading'
 import Alert from './alert'
-import apiService from "./mockApiService";
-//import apiService from "./apiService";
+//import apiService from "./mockApiService";
+import apiService from "./apiService";
 
 export default class AdminForgotPassword extends Component {
   state = {
@@ -52,7 +52,7 @@ export default class AdminForgotPassword extends Component {
       this.setState(() => ({
         passChangeSuccess: true,
       }))
-      apiService.postRequest('admin/changePassword', email);
+      apiService.postRequest('admin/changePassword', {email: email});
       resetForm()
     }, 1000)
   }

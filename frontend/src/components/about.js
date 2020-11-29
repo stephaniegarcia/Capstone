@@ -1,6 +1,7 @@
 import * as React from 'react';
 import Paper from '@material-ui/core/Paper';
 
+//Information about Colmena66
 function About() {
   return (
     <div className="top-margin">

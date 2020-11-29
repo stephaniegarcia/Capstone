@@ -30,15 +30,18 @@ function createOrganizationsData(id, name, phone, email, businessStage, business
 
 const mostContacted = [
     {
-        "name": [
-            "Los gapos",
-            "Places787",
-            "Tempis",
-            "OneX",
-            "Bravos Cidra"
-        ]
+      name: "Los gapos",
+      total: 30  
+    },
+    {
+      name: "Tempis",
+      total: 25
+    },
+    {
+      name: "Places787",
+      total: 22
     }
-];
+  ];
 
 const poorPerforming = 
 [
@@ -250,20 +253,20 @@ const organizations = [
 
 const quiz= [
     {
-      question: "¿Comenzaste un negocio en tu área de expertise o talento como por ejemplo, consultoría, diseño o jardinería?",
-      options: ["Si", "No"],
+        question_id: 1,
+      description: "¿Comenzaste un negocio en tu área de expertise o talento como por ejemplo, consultoría, diseño o jardinería?",
     },{
-      question: "¿Comenzaste un negocio para tener un ingreso personal adicional?",
-      options: ["Si", "No"],
+        question_id: 2,
+        description: "¿Comenzaste un negocio para tener un ingreso personal adicional?",
     },{
-      question: "¿Trabajas por tu cuenta, por servicios profesionales o tienes una tienda online?",
-      options: ["Si", "No"],
+        question_id: 3,
+        description: "¿Trabajas por tu cuenta, por servicios profesionales o tienes una tienda online?",
     },{
-      question: "¿Tienes un local físico? ¿Como por ejemplo una tienda, restaurante, colmado, cafetería o boutique?",
-      options: ["Si", "No"],
+        question_id: 4,
+        description: "¿Tienes un local físico? ¿Como por ejemplo una tienda, restaurante, colmado, cafetería o boutique?",
     },{
-      question: "¿Cuentas con empleados que te ayudan a operar el negocio?",
-      options: ["Si", "No"],
+        question_id: 5,
+        description: "¿Cuentas con empleados que te ayudan a operar el negocio?"
     }
 ]
 
@@ -316,7 +319,7 @@ function setAdminProfile(profile) {
     }
 }
 
-function handleGetRequests(path) {
+function handleGetRequests(path, content) {
     if(path == 'profile') {
         if(!isAuthenticated()) {
             return new Promise(function(){
@@ -328,6 +331,25 @@ function handleGetRequests(path) {
                 setTimeout(function(){
                     userProfile = getUserProfile();
                     resolve(userProfile);
+                }, 1000);
+            });
+        }
+    }
+    else if (path == 'tce/roadmap/organizations') {
+        if(!isAuthenticated()) {
+            return new Promise(function(){
+                throw new ApiException("user is not logged in.");
+            });
+        }
+        else {
+            return new Promise((resolve, reject) => {
+                setTimeout(function(){
+                    var data = [
+                            createOrganizationsData(7, 'Organización 1', "787 987 6656", "asdf@goog.com", "Lanzamiento", "Microempresa", 5, true),
+                            createOrganizationsData(8, 'Organización 2', "787 987 6656", "asdf@goog.com", "Lanzamiento", "Microempresa", 3, true),
+                            createOrganizationsData(9, 'Organización 3', "787 987 6656", "asdf@goog.com", "Lanzamiento", "Microempresa", 0, false),
+                        ];
+                    resolve(data);
                 }, 1000);
             });
         }
@@ -347,6 +369,21 @@ function handleGetRequests(path) {
             });
         }
     }
+    else if (path == 'user/'+userProfile.id) {
+        if(!isAuthenticated()) {
+            return new Promise(function(){
+                throw new ApiException("user is not logged in.");
+            });
+        }
+        else {
+            return new Promise((resolve, reject) => {
+                setTimeout(function(){
+                    userProfile = getUserProfile();
+                    resolve(userProfile);
+                }, 1000);
+            });
+        }
+    }
     else if (path == 'tce/businesstype/'+userProfile.id) {
         if(!isAuthenticated()) {
             return new Promise(function(){
@@ -362,7 +399,7 @@ function handleGetRequests(path) {
             });
         }
     }
-    else if(path == 'quiz') {
+    else if(path == 'tce/questions') {
         if(!isAuthenticated()) {
             return new Promise(function(){
                 throw new ApiException("user is not logged in.");
@@ -391,7 +428,7 @@ function handleGetRequests(path) {
             });
         }
     }
-    else if(path.startsWith("organizations?")) {
+    else if(path == "organizations") {
         if(!isAuthenticated()) {
             return new Promise(function(){
                 throw new ApiException("user is not logged in.");
@@ -400,17 +437,7 @@ function handleGetRequests(path) {
         else {
             return new Promise((resolve, reject) => {
                 setTimeout(function(){
-                    var temp = path.replace("organizations?","");
-                    var elems = temp.split("&");
-                    var type = elems[0].replace("type=","");
-                    var stage = elems[1].replace("stage=","");
                     var data = organizations;
-                    if(type && type.length>0) {
-                        data = data.filter(org => org.bt_id == type);
-                    }
-                    if(stage && stage.length>0) {
-                        data = data.filter(org => org.bs_id == stage);
-                    }
                     resolve(data);
                 }, 3000);
             });
@@ -508,7 +535,6 @@ function handlePostRequests(path, content) {
         if(content) {
             return new Promise((resolve, reject) => {
                 setTimeout(function(){
-                    console.log('admin reset')
                     resolve(true);
                 }, 1000);
             });
@@ -523,7 +549,6 @@ function handlePostRequests(path, content) {
         if(content) {
             return new Promise((resolve, reject) => {
                 setTimeout(function(){
-                    console.log('user reset')
                     resolve(true);
                 }, 1000);
             });
@@ -591,7 +616,7 @@ function handlePostRequests(path, content) {
             }, 1000);
         });
     }
-    else if (path == 'quiz/submit') {
+    else if (path == 'tce/answers/'+userProfile.id) {
         if(!isAuthenticated()) {
             return new Promise(function(){
                 throw new ApiException("user is not logged in.");
@@ -601,26 +626,26 @@ function handlePostRequests(path, content) {
             state.quizSubmitted = content;
             return new Promise((resolve, reject) => {
                 setTimeout(function(){
-                    userProfile = getUserProfile();
-                    state.quizResults = {
-                        first_name: userProfile.first_name,
-                        email: userProfile.email,
-                        phone: userProfile.phone,
-                        bs_id: userProfile.bs_id,
-                        bt_id: "Microempresa",
-                        organizations: [
-                            createOrganizationsData(7, 'Organización 1', "787 987 6656", "asdf@goog.com", "Lanzamiento", "Microempresa", 5, true),
-                            createOrganizationsData(8, 'Organización 2', "787 987 6656", "asdf@goog.com", "Lanzamiento", "Microempresa", 3, true),
-                            createOrganizationsData(9, 'Organización 3', "787 987 6656", "asdf@goog.com", "Lanzamiento", "Microempresa", 0, false),
-                        ],
-                        roadmap: [
-                            {name:"Entrada al Mercado", organizations: ["Organización 1", "Organización 2", "Organización 3"]},
-                            {name:"Capital Para Entrada al Mercado", organizations: ["Organización 4", "Organización 5", "Organización 6"]},
-                            {name:"Coworking", organizations: ["Organización 7", "Organización 8", "Organización 9"]},
-                            {name:"Incubación", organizations: ["Organización 10", "Organización 11", "Organización 12"]},
-                        ]
-                    }
-                    resolve(state.quizResults);
+                    // userProfile = getUserProfile();
+                    // state.quizResults = {
+                    //     first_name: userProfile.first_name,
+                    //     email: userProfile.email,
+                    //     phone: userProfile.phone,
+                    //     bs_id: userProfile.bs_id,
+                    //     bt_id: "Microempresa",
+                    //     organizations: [
+                    //         createOrganizationsData(7, 'Organización 1', "787 987 6656", "asdf@goog.com", "Lanzamiento", "Microempresa", 5, true),
+                    //         createOrganizationsData(8, 'Organización 2', "787 987 6656", "asdf@goog.com", "Lanzamiento", "Microempresa", 3, true),
+                    //         createOrganizationsData(9, 'Organización 3', "787 987 6656", "asdf@goog.com", "Lanzamiento", "Microempresa", 0, false),
+                    //     ],
+                    //     roadmap: [
+                    //         {name:"Entrada al Mercado", organizations: ["Organización 1", "Organización 2", "Organización 3"]},
+                    //         {name:"Capital Para Entrada al Mercado", organizations: ["Organización 4", "Organización 5", "Organización 6"]},
+                    //         {name:"Coworking", organizations: ["Organización 7", "Organización 8", "Organización 9"]},
+                    //         {name:"Incubación", organizations: ["Organización 10", "Organización 11", "Organización 12"]},
+                    //     ]
+                    // }
+                    resolve("Microempresa");
                 }, 1000);
             });
         }
@@ -776,10 +801,10 @@ function handlePutRequests(path, content) {
             }, 1000);
         });
     }
-    else if (path.startsWith("admin/organization?id=")) {
+    else if (path.startsWith("admin/organization/")) {
         return new Promise((resolve, reject) => {
             setTimeout(function() {
-                var id = path.replace("admin/organization?id=","");
+                var id = path.replace("admin/organization/","");
                 for(var i = 0; i < organizations.length; i++) {
                     if(organizations[i].id == id) {
                         organizations[i].name = content.name;
@@ -798,10 +823,10 @@ function handlePutRequests(path, content) {
 }
 
 function handleDeleteRequests(path, content) {
-    if (path.startsWith("admin/organization?orgId=")) {
+    if (path.startsWith("admin/organization/")) {
         return new Promise((resolve, reject) => {
             setTimeout(function() {
-                var id = path.replace("admin/organization?orgId=","");
+                var id = path.replace("admin/organization/","");
                 for(var i = 0; i < organizations.length; i++) {
                     if(organizations[i].id == id) {
                         organizations.splice(i, 1);
@@ -821,8 +846,8 @@ const apiService = {
         //}
         //TODO: Initialize anything needed
     },
-    getRequest: (path) => {
-        return handleGetRequests(path);
+    getRequest: (path, content) => {
+        return handleGetRequests(path, content);
     },
     postRequest: (path, content) => {
         return handlePostRequests(path, content);

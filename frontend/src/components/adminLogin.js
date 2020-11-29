@@ -6,8 +6,8 @@ import Button from '@material-ui/core/Button';
 import Spinner from './loading'
 import Alert from './alert'
 import '../index.css';
-import apiService from "./mockApiService";
-//import apiService from "./apiService";
+//import apiService from "./mockApiService";
+import apiService from "./apiService";
 
 function AdminLogin() {
     //State Variables getters & setters
@@ -19,7 +19,9 @@ function AdminLogin() {
     const [errorMessage, setErrorMessage] = useState('');
     const [showLoading, setShowLoading] = useState(false);
 
-    //email validation helper function
+    //Email validation helper function
+    //@param email - user email
+    //@return if it's valid or not
     function isValidEmail(email) {
         if(email && email.length == 0) {
             return true;
@@ -29,6 +31,8 @@ function AdminLogin() {
     }
 
     //password validation helper function
+    //@param text - user password
+    //@return if it's valid or not
     function isValidPass(text) {
         if(text && text.length == 0) {
             return true;
@@ -59,15 +63,16 @@ function AdminLogin() {
         setShowLoading(true);
 
         //Perform admin login request
-        apiService.postRequest("admin/login", { email: email, password: password }).then(response => {
-            //Handle admin login
-            apiService.adminProfile(response);
+        apiService.postRequest("admin", { email: email, password: password }).then(loginResponse => {
+            //Handle login
+            console.log(loginResponse.data)
+            apiService.adminProfile(loginResponse.data);
             setShowLoading(false);
             window.location.href = "/admin/organizaciones";
         }).catch(err =>{
             //Handle error
             setShowLoading(false);
-            setErrorMessage(err.response.data);
+            setErrorMessage(err ? (err.response ? (err.response.data? String(err.response.data) : String(err.response)) : String(err)) : 'Ocurrio un error');
             setShowErrorAlert(true);
         });
     };

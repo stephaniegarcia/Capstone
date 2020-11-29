@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Redirect, useHistory } from 'react-router-dom';
 import Paper from '@material-ui/core/Paper'
 import TextField from '@material-ui/core/TextField';
@@ -6,8 +6,8 @@ import Button from '@material-ui/core/Button';
 import MenuItem from '@material-ui/core/MenuItem';
 import Spinner from './loading'
 import Alert from './alert'
-import apiService from "./mockApiService";
-//import apiService from "./apiService";
+//import apiService from "./mockApiService";
+import apiService from "./apiService";
 
 function Register() {
     //State Variables getters & setters
@@ -17,7 +17,8 @@ function Register() {
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [phone, setPhone] = useState('');
-    const [businessStage, setBusinessStage] = useState('Idea');
+    const [orgStages, setOrgStages] = useState([]);
+    const [businessStage, setBusinessStage] = useState('');
     const [businessStatus, setBusinessStatus] = useState('true');
     const [requiredAssistance, setRequiredAssistance] = useState('Ninguna');
     const [validEmail, setValidEmail] = useState(true);
@@ -29,8 +30,11 @@ function Register() {
     const [showErrorAlert, setShowErrorAlert] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
     const [showLoading, setShowLoading] = useState(false);
+    const [initialLoad, setInitialLoad] = useState(true);
 
     //email validation helper function
+     //@param email - new user email
+    //@return if it's valid or not
     function isValidEmail(email) {
         if(email && email.length == 0) {
             return true;
@@ -40,6 +44,8 @@ function Register() {
     }
 
     //password validation helper function
+     //@param text - new user password
+    //@return if it's valid or not
     function isValidPass(text) {
         if(text && text.length == 0) {
             return true;
@@ -48,17 +54,22 @@ function Register() {
     }
     
     //phone validation helper function
+     //@param phone - new user phone
+    //@return if it's valid or not
     function isValidPhone(phone) {
         const re = /^[+]*[(]{0,1}[0-9]{1,3}[)]{0,1}[-\s\./0-9]*$/g;
         return re.test(String(phone));
     }
     
     //name validation helper function
+     //@param text - new user name
+    //@return if it's valid or not
     function isValidName(text) {
         const re = /^[a-zA-Z ]+(([',. -][a-zA-Z ])?[a-zA-Z ]*)*$/g;
         return text.length >= 2 && re.test(String(text))
     }
     
+    //Event Handlers
     //first name change event callback
     const handleFirstNameChange = (event) => {
         setFirstName(event.target.value.trim());
@@ -123,26 +134,48 @@ function Register() {
         var data = {
             email: email, 
             password: password,
-            first_name: firstName,
-            last_name: lastName,
+            firstname: firstName,
+            lastname: lastName,
             phone_number: phone,
-            business_status: String(businessStatus).toLowerCase() == 'true',
-            bs_id: businessStage,
-            required_assistance: requiredAssistance
+            business_status: String(businessStatus),
+            bstage_id: businessStage,
+            requested_assistance: requiredAssistance
         };
+        console.log(data);
         //Perform register request
         apiService.postRequest("register", data).then(response => {
             //Handle register
-            apiService.profile(response);
-            setShowLoading(false);
-            window.location.href = "/";
+            if(response.data[0].is_verified) {
+                apiService.profile(response.data[0]);
+                setShowLoading(false);
+                if(response.data[0].bt_id && response.data[0].bt_id > 0) {
+                    window.location.href = "/";    
+                }
+                else {
+                    window.location.href = "/tce";
+                }
+            }
+            else {
+                window.location.href = "/";
+            }
         }).catch(err =>{
             //Handle error
             setShowLoading(false);
-            setErrorMessage(err.response.data);
+            setErrorMessage(err ? (err.response ? (err.response.data? String(err.response.data) : String(err.response)) : String(err)) : 'Ocurrio un error');
             setShowErrorAlert(true);
         });
     };
+
+
+    useEffect(()=>{
+        apiService.refreshOrgStages().then(response => {
+          var temp = response.data;
+          apiService.orgStages(temp);
+          setOrgStages(temp);
+          setBusinessStage(temp[0].bstage_id);
+        }).catch(err =>{
+        });
+      },[initialLoad])
 
     return(
         apiService.isAuthenticated() ?
@@ -230,10 +263,7 @@ function Register() {
                         className="form-control"
                         value={businessStage}
                         onChange={handleBusinessStageChange}>
-                        <MenuItem value='Idea'>Idea</MenuItem>
-                        <MenuItem value='Prototipo'>Prototipo</MenuItem>
-                        <MenuItem value='Expansión'>Expansión</MenuItem>
-                        <MenuItem value='Lanzamiento'>Lanzamiento</MenuItem>
+                        {orgStages.map((stage) => ( <MenuItem key={stage.bstage_id} value={stage.bstage_id}>{stage.description}</MenuItem> ))}
                     </TextField>
                  </div>
                 <div className="margin-25">

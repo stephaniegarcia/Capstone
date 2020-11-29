@@ -1,10 +1,7 @@
 import * as React from 'react';
-import Grid from '@material-ui/core/Grid';
+import { useRef } from 'react';
 import { Redirect } from 'react-router-dom';
 import { TextField } from '@material-ui/core';
-import PropTypes from 'prop-types';
-import { makeStyles } from '@material-ui/core/styles';
-import Box from '@material-ui/core/Box';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -12,7 +9,6 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Link from '@material-ui/core/Link';
-import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
 import Popover from '@material-ui/core/Popover';
 import Button from '@material-ui/core/Button';
@@ -25,11 +21,10 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import Rating from '@material-ui/lab/Rating';
 import Spinner from './loading'
 import Alert from './alert'
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Checkbox from '@material-ui/core/Checkbox';
+import ReactToPrint from "react-to-print";
 import '../index.css';
-import apiService from "./mockApiService";
-//import apiService from "./apiService";
+//import apiService from "./mockApiService";
+import apiService from "./apiService";
 
 function UserProfile() {
   //State Variables getters & setters
@@ -48,17 +43,42 @@ function UserProfile() {
   const [organizations, setOrganizations] = React.useState([]);
   const [roadmap, setRoadmap] = React.useState([]);
   const [showErrorAlert, setShowErrorAlert] = React.useState(false);
+  const [showMessageAlert, setShowMessageAlert] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState('');
+  const [message, setMessage] = React.useState('');
   const [showLoading, setShowLoading] = React.useState(false);
   const [allowUpdate, setAllowUpdate] = React.useState(true);
   const [validFirstName, setValidFirstName] = React.useState(true);
   const [validLastName, setValidLastName] = React.useState(true);
   const [validEmail, setValidEmail] = React.useState(true);
   const [validPhone, setValidPhone] = React.useState(true);
+  const [orgTypes, setOrgTypes] = React.useState([]);
+  const [orgStages, setOrgStages] = React.useState([]);
+
+  //Event 
+  
+  //change password handler
+  const handleChangePassword = () => {
+    setShowLoading(true);  
+    var profile = apiService.profile();
+    apiService.postRequest('user/changePassword', {email:profile.email}).then(response => {
+      setShowLoading(false);
+      setMessage("Se envió un correo electrónico para completar el proceso de recuperación de contraseña");
+      setShowMessageAlert(true);
+    }).catch(err => {
+      setShowLoading(false);
+      setErrorMessage(err ? (err.response ? (err.response.data? String(err.response.data) : String(err.response)) : String(err)) : 'Ocurrio un error');
+      setShowErrorAlert(true);
+    });
+  };
 
   //alert button click event callback
   const onAlertClick = () => {
     setShowErrorAlert(false);
+  };
+
+  const onMessageAlertClick = () => {
+    setShowMessageAlert(false);
   };
 
   //email validation helper function
@@ -121,11 +141,8 @@ function UserProfile() {
   //organization feedback submit event
   const setOrgRating = (id, rating, comments) => {
     handleClose();
-    var ratingData = {organizationId: id, rating: rating};
-    var commentsData = {organizationId: id, comments: comments};
-    apiService.postRequest("tce/organization/"+id+"/user/"+userId+"/rating", rating);
-    apiService.postRequest("tce/organization/"+id+"/user/"+userId+"/comment", rating);
-    apiService.postRequest("tce/organization/"+id+"/user/"+userId+"/check", true);
+    var data = { rating: parseInt(rating), user_id: userId, organization_id: id, rating_comment: comments };
+    apiService.postRequest("ratings", data);
   };
 
   //Organization row snippet
@@ -146,21 +163,18 @@ function UserProfile() {
           <TableCell className="no-bottom-border" scope="row">
             {row.name}
           </TableCell>
-          <TableCell className="no-bottom-border" align="right">{row.phone}</TableCell>
+          <TableCell className="no-bottom-border" align="right">{row.phone_number}</TableCell>
           <TableCell className="no-bottom-border" align="right">{row.email}</TableCell>
-          <TableCell className="no-bottom-border" align="right">{row.bs_id}</TableCell>
-          <TableCell className="no-bottom-border" align="right">{row.bt_id}</TableCell>
+          <TableCell className="no-bottom-border" align="right">{apiService.getOrgStage(row.bstage_id)}</TableCell>
+          <TableCell className="no-bottom-border" align="right">{apiService.getOrgType(row.bt_id)}</TableCell>
         </TableRow>
         <TableRow>
           <TableCell colSpan="6" style={{padding: "0 80px 30px 80px"}}>
-            <Typography gutterBottom component="div">
-              Descripción:
-            </Typography>
+            <p style={{fontStyle:"italic", fontWeight: "bold"}}>Descripción:</p>
             <p>
               {row.description}
             </p>
-              <Link href={row.link} target='_blank'>Ver más información</Link>
-
+              {row.org_link && row.org_link.length>0 && (<Link href={row.org_link} target='_blank'>Ver más información</Link>)}
               <div style={{marginTop: "15px"}}>
                 <Button variant="outlined" color="primary" onClick={handleClickOpen}>
                   Clasificación
@@ -186,7 +200,7 @@ function UserProfile() {
                     <Button onClick={handleClose} color="primary">
                       Cancelar
                     </Button>
-                    <Button onClick={()=>{ setOrgRating(row.id, rating, comments); }} color="primary">
+                    <Button onClick={()=>{ setOrgRating(row.org_id, rating, comments); }} color="primary">
                       Someter
                     </Button>
                   </DialogActions>
@@ -205,7 +219,7 @@ function UserProfile() {
       <React.Fragment>            
         <TableRow>
           <TableCell>
-            {row}
+            {row.name}
           </TableCell>
         </TableRow>
       </React.Fragment>
@@ -261,13 +275,13 @@ function UserProfile() {
                 }}
               >
                 <div style={{margin:"15px"}}>
-                  <h6>Organizaciones</h6>
+                  <h4>Organizaciones</h4>
                   <Table>
-                    {row.organizations.map((org) => (<RoadmapOrganizationRow  key={row.name} row={org} />))}
+                    {row.orgs.map((org) => (<RoadmapOrganizationRow  key={row.org_id} row={org} />))}
                   </Table>
                 </div>
               </Popover>
-              <h5>{row.name}</h5>
+              <h5>{row.description}</h5>
             </div>
         </TableRow>
       </React.Fragment>
@@ -278,65 +292,68 @@ function UserProfile() {
   function getProfile() {
     var profile = apiService.profile();
     if(profile) {
-      setUserId(profile.id);
+      setUserId(profile.user_id);
       setFirstName(profile.first_name);
       setLastName(profile.last_name);
       setEmail(profile.email);
       setPhone(profile.phone_number);
-      setBusinessStage(profile.bs_id);
+      setBusinessStage(profile.bstage_id);
       setBusinessStatus(String(profile.business_status));
-      setRequiredAssistance(profile.required_assistance);
+      setRequiredAssistance(profile.requested_assistance && profile.requested_assistance != null ? profile.requested_assistance : 'Ninguna');
 
-      apiService.getRequest('tce/user/'+profile.id+'/organizations').then(response => {
-        //Handle organization response
-        if(!response) {
-          response = [];
-        }
-        setOrganizations(response);          
-      }).catch(err =>{
-        //Handle error
-        setShowLoading(false);
-        setErrorMessage(err.response.data);
-        setShowErrorAlert(true);
-      });
+      setBusinessType(profile.bt_id);
+      if(profile.bt_id && profile.bt_id != null) {
 
-      apiService.getRequest('tce/businesstype/'+profile.id).then(response => {
-        //Handle business type response
-        setBusinessType(response);
-      }).catch(err =>{
-        //Handle error
-        setShowLoading(false);
-        setErrorMessage(err.response.data);
-        setShowErrorAlert(true);
-      });
+        var roadmapSteps = apiService.getRoadmapSteps(profile.bt_id, profile.bstage_id);
 
-      if(!profile.roadmap) {
-        profile.roadmap = [];
+        apiService.getRequest('tce/roadmap/organizations/'+profile.bt_id).then(response => {
+          //Handle organization response
+          if(!response.data) {
+            response.data = [];
+          }
+          for(var i = 0; i < roadmapSteps.length; i++) {
+            var step = roadmapSteps[i];
+            step.index = i+1;
+            step.orgs = response.data.filter(o => o.bs_id == step.bs_id);
+          }
+          console.log(roadmapSteps);
+          setRoadmap(roadmapSteps);
+          setOrganizations(response.data);          
+        }).catch(err =>{
+          //Handle error
+          setShowLoading(false);
+          setErrorMessage(err ? (err.response ? (err.response.data? String(err.response.data) : String(err.response)) : String(err)) : 'Ocurrio un error');
+          setShowErrorAlert(true);
+        });
       }
-      setRoadmap(profile.roadmap);
     }
   }
 
   //update profile button click event callback
   const updateProfile = () => {
     var data = {
-      first_name: firstName,
-      last_name: lastName,
+      firstname: firstName,
+      lastname: lastName,
       email: email,
       phone_number: phone,
-      bs_id: businessStage,
-      required_assistance: requiredAssistance,
-      business_status: String(businessStatus).toLowerCase() == 'true'
+      bstage_id: businessStage,
+      requested_assistance: requiredAssistance,
+      
+      //business_status: String(businessStatus).toLowerCase() == 'true'
+      business_status: String(businessStatus)
     };
+
+    console.log(data);
     var profile = apiService.profile();
     setShowLoading(true);
-    apiService.putRequest("user/"+profile.Id, data).then(response => {
+    apiService.putRequest("user/"+profile.user_id, data).then(response => {
         setShowLoading(false);
-        apiService.profile(response);
+        apiService.profile(response.data[0]);
         getProfile();
     }).catch(err =>{
+        debugger;
         setShowLoading(false);
-        setErrorMessage(err.response.data);
+        setErrorMessage(err ? (err.response ? (err.response.data? String(err.response.data) : String(err.response)) : String(err)) : 'Ocurrio un error');
         setShowErrorAlert(true);
     });
   };
@@ -352,8 +369,28 @@ function UserProfile() {
   };
   //Load profile into view
   React.useEffect(()=> {
+    apiService.refreshOrgTypes().then(response => {
+      var temp = response.data;
+      apiService.orgTypes(temp);
+      setOrgTypes(temp);
+    }).catch(err =>{
+    });
+    apiService.refreshOrgStages().then(response => {
+      var temp = response.data;
+      apiService.orgStages(temp);
+      setOrgStages(temp);
+    }).catch(err =>{
+    });
+    apiService.refreshOrgSteps().then(response => {
+      var temp = response.data;
+      apiService.orgSteps(temp);
+    }).catch(err =>{
+    });
     getProfile();
   }, [shouldLoad]);
+
+  const organizationsRef = useRef();
+  const roadmapRef = useRef();
 
   return (
     !apiService.isAuthenticated() ?
@@ -395,7 +432,7 @@ function UserProfile() {
                   shrink: true,
               }}      
               className="form-control"
-              onChange={handleEmailChange}
+              disabled={true}
               error={!validEmail}
               label="Correo Electrónico:"
               defaultValue=" "
@@ -420,11 +457,7 @@ function UserProfile() {
                 className="form-control"
                 value={businessStage}
                 onChange={handleBusinessStageChange}>
-                <MenuItem value=''></MenuItem>
-                <MenuItem value='Idea'>Idea</MenuItem>
-                <MenuItem value='Prototipo'>Prototipo</MenuItem>
-                <MenuItem value='Expansión'>Expansión</MenuItem>
-                <MenuItem value='Lanzamiento'>Lanzamiento</MenuItem>
+                {orgStages.map((stage) => ( <MenuItem key={stage.bstage_id} value={stage.bstage_id}>{stage.description}</MenuItem> ))}
               </TextField>
           </div>  
           <div className="margin-25">
@@ -462,7 +495,7 @@ function UserProfile() {
               className="form-control"
               label="Tipo de Negocio"
               defaultValue=" "
-              value={businessType}
+              value={apiService.getOrgType(businessType)}
               InputProps={{
                 readOnly: true,
               }} />
@@ -476,18 +509,24 @@ function UserProfile() {
           </Button>
           <br/>
           <Button
-                    href="/passwordReset"
-                    color="inherit"
-                    className="form-control">
-                        Cambiar Contrasena
-                </Button>
+            onClick={handleChangePassword}
+            color="inherit"
+            className="form-control">
+                Cambiar Contrasena
+          </Button>
         </form> 
       </Paper>
 
+      {(businessType && businessType != null) ? (
+          <div>
+          <div>
       <Paper className="paper-margin" elevation={10} >
-        <div>
+        <div ref={roadmapRef}>
           <h1>Tu Camino a Recorrer</h1>
-          <TableContainer>
+          {apiService.getOrgTypeVideo(businessType) && apiService.getOrgTypeVideo(businessType) != null && (
+            <iframe src={apiService.getOrgTypeVideo(businessType)} frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+          )}
+          <TableContainer style={{marginTop:"15px"}}>
             <Table aria-label="table" className={'rm-table'}>
               <TableBody >
                 {roadmap.map((row) => (<RoadmapRow  key={row.name} row={row} />))}
@@ -495,10 +534,13 @@ function UserProfile() {
             </Table>
           </TableContainer>
         </div>
+        <ReactToPrint
+          trigger={() => <Button style={{'margin':'15px'}} variant="contained" color="primary">Save to Pdf</Button>}
+          content={() => roadmapRef.current} />
       </Paper>
                 
       <Paper className="paper-margin" elevation={10} >
-        <div>
+        <div ref={organizationsRef}>
           <h1>Tus Organizaciones</h1>
           <div>
             <TableContainer>
@@ -520,13 +562,31 @@ function UserProfile() {
             </TableContainer>
           </div>
         </div>
+        <ReactToPrint
+          trigger={() => <Button style={{'margin':'15px'}} variant="contained" color="primary">Save to Pdf</Button>}
+          content={() => organizationsRef.current} />
       </Paper>
-        
+      </div>
+      </div>
+      
+      ): (
+        <Paper className="paper-margin" elevation={10} >
+          <div>
+            <h2>Completa tu Camino empresarial para ver mas informacion.</h2>
+          </div>
+        </Paper>
+      )}
       <Alert
         isOpen={showErrorAlert}
         handleSubmit={onAlertClick}
         title="Error"
         text={errorMessage}
+        submitButtonText="Ok" />
+      <Alert
+        isOpen={showMessageAlert}
+        handleSubmit={onMessageAlertClick}
+        title="Restablecimiento de contraseña"
+        text={message}
         submitButtonText="Ok" />
       <Spinner isShown={showLoading} />
     </div>

@@ -6,8 +6,8 @@ import Typography from '@material-ui/core/Typography';
 import LiveHelp from '@material-ui/icons/LiveHelp';
 import Button from '@material-ui/core/Button';
 import Radio from '@material-ui/core/Radio';
-import apiService from "./mockApiService";
-//import apiService from "./apiService";
+//import apiService from "./mockApiService";
+import apiService from "./apiService";
 
 const styles = theme => ({
   root: theme.mixins.gutters({
@@ -43,6 +43,8 @@ constructor(props){
   }
 }
 
+//Event Handlers
+//Submit handler
 handleChange = event => {
     this.state.quiz[this.state.current].answer = event.target.value;
     this.setState({ selectedValue: event.target.value });
@@ -54,12 +56,12 @@ handleChange = event => {
     apiService.saveQuiz(this.state.quiz);
   };
 
-
+//Next Button handlerr
 moveNextClick = () => {
   this.setState({ selectedValue: this.state.quiz[this.state.current+1].answer });
   this.setState({current: this.state.current+1})
 }
-
+//Previous Button handler
 movePreviousClick = () => {
   this.setState({ selectedValue: this.state.quiz[this.state.current-1].answer });
   this.setState({current: this.state.current-1})
@@ -88,7 +90,7 @@ movePreviousClick = () => {
 
         <hr style={{marginBottom: "20px"}}/>
         <Typography variant="headline" component="h5">
-          {question.question}
+          {question.description}
         </Typography>
 
         {question.options.map((opt, index)=>(

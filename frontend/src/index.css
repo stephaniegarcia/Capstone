@@ -145,3 +145,25 @@ input {
 .footer-color {
   color: #333333 !important;
 }
+
+.MuiDrawer-paper {
+  background-color: #333333 !important;
+  color: white !important;
+}
+
+.drawer-links {
+  padding: 20px;
+}
+
+.drawer-links > a, .drawer-links > button, .drawer-links > div > button, .drawer-links > div > a {
+  display: block;
+}
+
+
+
+.content-desktop {display: block;}
+.content-mobile {display: none;}
+@media screen and (max-width: 768px) {
+  .content-desktop {display: none;}
+  .content-mobile {display: block;}
+}

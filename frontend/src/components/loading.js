@@ -1,6 +1,7 @@
 import React from 'react'
 import CircularProgress from '@material-ui/core/CircularProgress'
 
+//Loading Icon Logic
 export default function Loading({isShown = true}) {
   var display = isShown ? 'flex' : 'none'
   return (
