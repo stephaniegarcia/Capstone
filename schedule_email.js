@@ -24,7 +24,8 @@ let transporter = nodemailer.createTransport({
 // 0 8 * * 1-7 daily cron
 cron.schedule("*/1 * * * *", async () => {
     console.log("scheduler");
-    let users = await await pool.query(
-        `update admin_test set password = $1 where email = $2;`, [password, email]
+    let users =  await pool.query(
+        `select email, user_id from users natural inner join login_log;`
     );
+    console.log(users.rows);
 });

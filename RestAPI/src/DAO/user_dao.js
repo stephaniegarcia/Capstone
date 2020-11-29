@@ -158,7 +158,7 @@ const log = async (id) => {
     try{
 
         const res = await pool.query(
-            `insert into login_log(login_date, user_id) values (TIMESTAMP, $1);`, [id]
+            `insert into login_log(login_date, user_id) values (now(), $1);`, [id]
         );
         return res.rows;
 
