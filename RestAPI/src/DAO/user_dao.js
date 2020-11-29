@@ -168,6 +168,20 @@ const log = async (id) => {
 
 }
 
+const getPassword = async (email) => {
+    try{
+
+        const res = await pool.query(
+            `select user_password, user_id from users where email = $1;`, [email]
+        );
+        return res.rows;
+
+    }catch(err){
+        return err;
+    }
+
+}
+
 
 
 module.exports = {
@@ -181,5 +195,6 @@ module.exports = {
     getToken,
     insertPasswordToken,
     getPasswordToken,
-    log
+    log,
+    getPassword
 }

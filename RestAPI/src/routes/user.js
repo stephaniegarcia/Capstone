@@ -3,6 +3,9 @@ const { Router } = require('express');
 var nodemailer  = require('nodemailer');
 const randomstring = require('randomstring');
 const dao  = require('../DAO/user_dao');
+const bcrypt = require('bcrypt');
+const { getPasswordToken } = require('../DAO/user_dao');
+saltRounds = 10;
 
 //Authentication with Database
 const Pool = require('pg').Pool
@@ -78,10 +81,11 @@ router.get('/newPassword/user/:email', async (req,res) =>{
 router.put('/user/password', (req,res) => {
     const email = req.body.email;
     const password = req.body.password;
+    hashedPassword = bcrypt.hashSync(password,saltRounds);
 
     if(email && password){
 
-        let change = dao.changePassword(email, password);
+        let change = dao.changePassword(email, hashedPassword);
         console.log(email + password)
         if(change instanceof Error){
             res.status.send("Query error")
@@ -133,14 +137,15 @@ router.post('/register', (req, res) => {
             if(validName(firstname) && validName(lastname) && validEmail(email) && validPhone(phone_number)){
                 
                 token = randomstring.generate();
-                dao.createUser(firstname,lastname,email,password, true, phone_number, null, null, 1, 0, token);
+                hashedPassword = bcrypt.hashSync(password,saltRounds)
+                dao.createUser(firstname,lastname,email,hashedPassword, business_status, phone_number, null, null, 1, 0, token);
                 host=req.get('host');
                 link="http://"+req.get('host')+"/verify/" + email + "?id="+token;
                 mailOptions={
                     from: 'capstonehelix@gmail.com',
                     to : email,
                     subject : "Favor de confirmar su correo electronico",
-                    html : "<br> Presione el enalce para confirmar su cuenta.<br><a href="+link+">Click here to verify</a>" 
+                    html : "<br> Presione el enlace para confirmar su cuenta.<br><a href="+link+">Click here to verify</a>" 
                 }
                 console.log(mailOptions);
                 transporter.sendMail(mailOptions, function(error, response){
@@ -160,6 +165,7 @@ router.post('/register', (req, res) => {
                 res.status(400).send("Error");
             }
         }
+
     }
     else{
         res.status(400).send("Error");
@@ -178,12 +184,19 @@ router.post('/login', async (req,res) => {
 
     if(email && password){
         if(validEmail(email)){
-            let login = await dao.login(email, password);
-            await dao.log(login[0]["user_id"]);
-            if(login instanceof Error){
+
+            hashedPassword = await dao.getPassword(email);
+            console.log(hashedPassword[0].user_password);
+            const isMatchingPassword = bcrypt.compareSync(password, hashedPassword[0].user_password)
+            await dao.log(hashedPassword[0].user_id);
+            if(!isMatchingPassword){
                 res.status(400).send("wrong credentials")
             }
             else{
+                login = {
+                    "Match" : isMatchingPassword,
+                    "user_id": hashedPassword[0].user_id
+                }
                 res.status(200).send(login);
             }
         }
