@@ -56,7 +56,15 @@ router.get('/organizationsContacted', async (req,res) =>{
 //Inserting a rating and comment (optional) for an organization
 router.post('/ratings', (req, res) => {
     const {rating, user_id, organization_id, rating_comment} = req.body;
-    dao.createRating(rating, user_id, organization_id, rating_comment)
+    if(rating && user_id && organization_id && rating_comment){
+        dao.createRating(rating, user_id, organization_id, rating_comment)
+        res.status(200).send("Rating added")
+
+    }
+    else{
+        res.status(200).send("Error");
+    }
+    
   });
 
 module.exports = router;

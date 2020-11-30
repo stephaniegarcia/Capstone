@@ -100,11 +100,29 @@ const setType = async (user_id, type) => {
   }
 };
 
+
+const organizationsByUser = async (user_id) => {
+  try {
+    const res = await pool.query(
+      `SELECT R.rating, R.user_id, R.organization_id, R.rating_comment, O.name
+      FROM public.organization_rating as R inner join organization as O ON R.organization_id = O.org_id
+      where user_id = $1;`, [user_id]
+    );
+    console.log(res.rows)
+    return res.rows;
+  } catch (err) {
+    return err;
+  }
+
+
+}
+
 module.exports = {
     getQuestions,
     getOrganizationsFiltered,
     getOrganizationsByType,
     saveAnswers,
     changeAnswers,
-    setType
+    setType,
+    organizationsByUser
 }

@@ -228,16 +228,15 @@ router.put('/tce/answers/:userID', async (req, res) => {
 
 
 
-router.get('/tce/user/:userID/organizations', (req, res) => {
+router.get('/tce/user/:userID/organizations', async (req, res) => {
 
-    console.log(req.params.userID);
-    if(req.params.userID){
-        res.status(200).send(organizations);
+    const organization = await dao.organizationsByUser(req.params.userID);
+    if(organization instanceof Error){
+        res.status(400).send("Error");
     }
     else{
-        res.status(404).send("User not found");
+        res.status(200).send(organization);
     }
-
 });
 
 
