@@ -24,8 +24,8 @@ import GAReports from './components/gaReports';
 import ReactGA from 'react-ga';
 
 function App() {
-  const trackingId = "G-6J4HWVEF9W";
-  //ReactGA.initialize(trackingId);
+  const trackingId = "G-9HLLQC0MWW";
+  ReactGA.initialize(trackingId);
   
   return (
     <Router>
