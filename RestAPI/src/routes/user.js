@@ -157,14 +157,14 @@ router.get('/verify/:email', async (req,res) => {
 
 router.post('/register', (req, res) => {
 
-    const {firstname, lastname, business_status, email, phone_number, requested_assistance, password} = req.body;
+    const {firstname, lastname, business_status, business_stage, email, phone_number, requested_assistance, password} = req.body;
 
     if (firstname && lastname && business_status && email && password){
         //insert query should be here
             if(validName(firstname) && validName(lastname) && validEmail(email) && validPhone(phone_number)){
                 token = randomstring.generate();
                 hashedPassword = bcrypt.hashSync(password,saltRounds)
-                dao.createUser(firstname,lastname,email,hashedPassword, business_status, requested_assistance, phone_number, null, null, 1, 0, token);
+                dao.createUser(firstname,lastname,email,hashedPassword, business_status, requested_assistance, phone_number, null, business_stage, 1, 0, token);
                 host=req.get('host');
                 link="http://"+req.get('host')+"/verify/" + email + "?id="+token;
                 mailOptions={
