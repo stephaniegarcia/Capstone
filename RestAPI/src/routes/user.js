@@ -1,13 +1,25 @@
 
 const { Router } = require('express');
+const router = Router();
 var nodemailer  = require('nodemailer');
 const randomstring = require('randomstring');
 const dao  = require('../DAO/user_dao');
 const bcrypt = require('bcrypt');
 saltRounds = 10;
 
-
-//Authentication with Database
+/**
+ * 
+ * @constructor Pool
+ * 
+ * 
+ * @augments user
+ * @augments host
+ * @augments database
+ * @augments password
+ * @augments port
+ * 
+ * @description Constructor for data base autenticacion
+ */
 const Pool = require('pg').Pool
 const pool = new Pool({
     user: 'colmena66@tucaminoempresarial2',
@@ -17,9 +29,20 @@ const pool = new Pool({
     port: 5432
 })
 
-const router = Router();
 
 
+/**
+ * 
+ * @constructor Pool
+ * 
+ * 
+ * @augments service
+ * @augments auth
+ * @augments user
+ * @augments pass
+ * 
+ * @description Constructor for nodemailer
+ */
 let transporter = nodemailer.createTransport({
     service: 'gmail',
  auth: {
@@ -28,6 +51,15 @@ let transporter = nodemailer.createTransport({
     }
 });
 
+
+/**
+ * @description route to change the password
+ * 
+ * @param req
+ * @param res
+ * 
+ * 
+ */
 router.post('/user/changePassword', (req, res) => {
 
     const email = req.body.email;
@@ -219,8 +251,7 @@ router.put('/user/:userId', async (req, res) => {
     const {firstname, lastname, business_status, phone_number, bstage_id, requested_assistance} = req.body;
     
     
-    if (firstname && lastname && business_status && bstage_id && requested_assistance){
-        if(phone_number){  
+    if (firstname && lastname && business_status && bstage_id && requested_assistance){ 
             if(validName(firstname) && validName(lastname) && validPhone(phone_number)){
                 
                 let value = await dao.updateUser(req.params.userId, firstname, lastname, business_status, phone_number, bstage_id, requested_assistance);
@@ -235,7 +266,6 @@ router.put('/user/:userId', async (req, res) => {
             else{
                 res.status(400).send("Error in validation");
             }
-        }
     }
     else{
         res.status(400).send("Error in values");
