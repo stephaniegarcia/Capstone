@@ -110,7 +110,6 @@ export default class ForgotPassword extends Component {
                   <Input
                     id="email"
                     name="email"
-                    onKeyDown={(e)=>{handleSubmit(e,'email');}}
                     value={values.email}
                     onChange={handleChange}
                     onBlur={handleBlur}

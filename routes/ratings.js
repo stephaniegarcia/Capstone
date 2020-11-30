@@ -59,12 +59,16 @@ router.post('/api/ratings', (req, res) => {
     if(rating && user_id && organization_id && rating_comment){
         dao.createRating(rating, user_id, organization_id, rating_comment)
         res.status(200).send("Rating added")
-
     }
     else{
         res.status(200).send("Error");
-    }
-    
-  });
+    }    
+});
+
+router.get('/api/ratings/:userID', async (req, res) => {
+    const ratings = await dao.getRatingsPerUser(req.params.userID)
+    console.log(ratings)
+    res.send(ratings)
+});
 
 module.exports = router;

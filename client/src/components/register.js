@@ -183,7 +183,7 @@ function Register() {
             lastname: lastName.trim(),
             phone_number: phone,
             business_status: String(businessStatus),
-            bstage_id: businessStage,
+            business_stage: businessStage,
             requested_assistance: requiredAssistance
         };
         console.log(data);

@@ -10,13 +10,14 @@ import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableContainer from '@material-ui/core/TableContainer';
 import TableRow from '@material-ui/core/TableRow';
+import Rating from '@material-ui/lab/Rating';
 import Box from '@material-ui/core/Box';
 import ReactToPrint from "react-to-print";
 import IconButton from '@material-ui/core/IconButton';
 import Spinner from './loading'
 import SmallSpinner from './smallLoading'
 import Alert from './alert'
-import { BarChart, Bar, CartesianGrid, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, PieChart, Pie, Sector, Cell, CartesianGrid, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import Grid from '@material-ui/core/Grid';
 import Card from '@material-ui/core/Card';
 import '../index.css';
@@ -35,7 +36,11 @@ function AdminReports() {
     const [loadingMostContacted, setLoadingMostContacted] = useState(true);
     const [loadingPoorPerforming, setLoadingPoorPerforming] = useState(true);
     const [loadingAccountsPerWeek, setLoadingAccountsPerWeek] = useState(true);
-
+    const [loadingContactRate, setLoadingContactRate] = useState(true);
+    const [loadingAverage, setLoadingAverage] = useState(true);
+    
+    const [contactRate, setContactRate] = useState([]);
+    const [averages, setAverages] = useState([]);
     const [topPerType, setTopPerType] = useState([]);
     const [topPerStage, setTopPerStage] = useState([]);
     const [mostContacted, setMostContacted] = useState([]);
@@ -47,6 +52,21 @@ function AdminReports() {
     //alert button click event callback
     const onAlertClick = () => {
         setShowErrorAlert(false);
+    };
+    const COLORS = ['#fcc449', '#ed4628'];
+    const RADIAN = Math.PI / 180;
+    const renderCustomizedLabel = ({
+        cx, cy, midAngle, innerRadius, outerRadius, percent, index,
+    }) => {
+        const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+        const x = cx + radius * Math.cos(-midAngle * RADIAN);
+        const y = cy + radius * Math.sin(-midAngle * RADIAN);
+
+        return (
+            <text x={x} y={y} fill="white" textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central">
+            {`${(percent * 100).toFixed(2)}%`}
+            </text>
+        );
     };
 
     const randomGuid = () => {
@@ -79,7 +99,6 @@ function AdminReports() {
             var finalList = [];
             for (let index = 0; index < temp.length; index++) {
                 const element = temp[index];
-                console.log(element);
                 var test = await apiService.getRequest("topTenPerBS/"+element.bstage_id);
                 if(test.data) {
                     finalList.push({ id:randomGuid(), name: element.description, orgs: test.data });
@@ -88,7 +107,6 @@ function AdminReports() {
             setTopPerStage(finalList);
             setLoadingTopPerStage(false);
         }).catch(err =>{
-            console.log("Error: " + JSON.stringify(err));
             setLoadingTopPerStage(false);
         });
 
@@ -101,6 +119,34 @@ function AdminReports() {
             
         }).catch(err =>{
             setLoadingMostContacted(false);
+        });
+
+        apiService.getRequest("ratings").then(response => {
+            setLoadingAverage(false);
+            for (let index = 0; index < response.data.length; index++) {
+                response.data[index].rating = parseInt(response.data[index].rating);
+                response.data[index].id = randomGuid()
+            }
+            setAverages(response.data);
+        }).catch(err =>{
+            setLoadingAverage(false);
+        });
+
+        apiService.getRequest("referred/contacted").then(response => {
+            setLoadingContactRate(false);
+            for (let index = 0; index < response.data.length; index++) {
+                response.data[index].not_contacted_total = parseInt(response.data[index].not_contacted_total);
+                response.data[index].percentage = parseFloat(response.data[index].percentage);
+                response.data[index].contacted = response.data[index].percentage*response.data[index].not_contacted_total;
+                response.data[index].data = [
+                    { name: 'Contactado', value: response.data[index].contacted },
+                    { name: 'Referido', value: response.data[index].not_contacted_total }
+                ];
+                response.data[index].id = randomGuid();
+            }
+            setContactRate(response.data);
+        }).catch(err =>{
+            setLoadingContactRate(false);
         });
 
         apiService.getRequest("badOrganizations").then(response => {
@@ -199,6 +245,43 @@ function AdminReports() {
         );
     }
 
+    //row snippet for average rating
+    function RatingOrgRow(props) {
+        const { row } = props;
+        const [rating, setRating] = React.useState(row.rating);
+        return (
+            <React.Fragment>
+                <TableRow>        
+                    <TableCell component="h5">
+                        {row.name}
+                    </TableCell>
+                    <TableCell>
+                        <Rating
+                            disabled={true}
+                            value={rating} />
+                    </TableCell>
+                </TableRow>
+            </React.Fragment>
+        );
+    }
+
+    //row snippet for average rating
+    function ContactedOrgRow(props) {
+        const { row } = props;
+        return (
+            <React.Fragment>
+                <TableRow>        
+                    <TableCell component="h5">
+                        {row.name}
+                    </TableCell>
+                    <TableCell>
+                        {(row.percentage*100).toFixed(2)}%
+                    </TableCell>
+                </TableRow>
+            </React.Fragment>
+        );
+    }
+
     //Load profile into view
     React.useEffect(()=> {
         getAnalytics();
@@ -218,16 +301,16 @@ function AdminReports() {
                         <Card variant="outlined">
                             <div>
                                 <h3>
-                                    Top Per Type
+                                    Average Ratings
                                 </h3>
                                 <TableContainer>
                                     <Table aria-label="collapsible table">
                                         <TableBody >
-                                            {topPerType.map((row) => (<CollapsibleTypeOrgRow  key={'type'+row.id} row={row} />))}
+                                            {averages.map((row) => (<RatingOrgRow key={'average'+row.id} row={row} />))}
                                         </TableBody>
                                     </Table>
                                 </TableContainer>
-                                <SmallSpinner isShown={loadingTopPerType} />
+                                <SmallSpinner isShown={loadingAverage} />
                             </div>
                         </Card>
                     </Grid>
@@ -235,19 +318,20 @@ function AdminReports() {
                         <Card variant="outlined">
                             <div>
                                 <h3>
-                                    Top Per Stage
+                                    Contacted Rate
                                 </h3>
                                 <TableContainer>
                                     <Table aria-label="collapsible table">
                                         <TableBody >
-                                            {topPerStage.map((row) => (<CollapsibleStageOrgRow key={'stage'+row.id} row={row} />))}
+                                            {contactRate.map((row) => (<ContactedOrgRow key={'contacted'+row.id} row={row} />))}
                                         </TableBody>
                                     </Table>
                                 </TableContainer>
-                                <SmallSpinner isShown={loadingTopPerStage} />
-                            </div>    
+                                <SmallSpinner isShown={loadingContactRate} />
+                            </div>
                         </Card>
                     </Grid>
+
                     <Grid item xs={6}>
                         <Card variant="outlined">
                             <div style={{
@@ -279,19 +363,6 @@ function AdminReports() {
                                 <h3>
                                     Poor Performing
                                 </h3>
-                                {/* <TableContainer>
-                                    <Table aria-label="collapsible table">
-                                        <TableHead>
-                                            <TableRow>
-                                                <TableCell>Nombre</TableCell>
-                                                <TableCell>Puntuación media</TableCell>
-                                            </TableRow>
-                                        </TableHead>
-                                        <TableBody>
-                                            {poorPerforming.name.map((row) => (<PoorPerfOrgRow  key={row.name} row={row} />))}
-                                        </TableBody>
-                                    </Table>
-                                </TableContainer> */}
                                 <ResponsiveContainer width="100%" height="80%">
                                     <BarChart data={poorPerforming}>
                                         <CartesianGrid strokeDasharray="3 3" />
@@ -324,6 +395,40 @@ function AdminReports() {
                                     </BarChart>
                                 </ResponsiveContainer>
                                 <SmallSpinner isShown={loadingAccountsPerWeek} />
+                            </div>    
+                        </Card>
+                    </Grid>
+                    <Grid item xs={6}>
+                        <Card variant="outlined">
+                            <div>
+                                <h3>
+                                    Top Per Type
+                                </h3>
+                                <TableContainer>
+                                    <Table aria-label="collapsible table">
+                                        <TableBody >
+                                            {topPerType.map((row) => (<CollapsibleTypeOrgRow  key={'type'+row.id} row={row} />))}
+                                        </TableBody>
+                                    </Table>
+                                </TableContainer>
+                                <SmallSpinner isShown={loadingTopPerType} />
+                            </div>
+                        </Card>
+                    </Grid>
+                    <Grid item xs={6}>
+                        <Card variant="outlined">
+                            <div>
+                                <h3>
+                                    Top Per Stage
+                                </h3>
+                                <TableContainer>
+                                    <Table aria-label="collapsible table">
+                                        <TableBody >
+                                            {topPerStage.map((row) => (<CollapsibleStageOrgRow key={'stage'+row.id} row={row} />))}
+                                        </TableBody>
+                                    </Table>
+                                </TableContainer>
+                                <SmallSpinner isShown={loadingTopPerStage} />
                             </div>    
                         </Card>
                     </Grid>

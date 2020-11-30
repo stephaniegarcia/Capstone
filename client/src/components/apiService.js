@@ -34,11 +34,6 @@ function setAdminProfile(profile) {
 }
 
 const apiService = {
-    initialize: (config) =>{
-        if(config && config.BaseApiUrl) {
-            settings.BaseApiUrl = config.BaseApiUrl;
-        }
-    },
     refreshOrgTypes: () => {
         return axios.get(settings.BaseApiUrl+"/businessType");
     },
@@ -166,7 +161,8 @@ const apiService = {
         return [];
     },
     getRequest: (path) => {
-        return axios.get(settings.BaseApiUrl+"/"+path);
+        var url = settings.BaseApiUrl+"/"+path;
+        return axios.get(url);
     },
     postRequest: (path, content) => {
         return axios.post(settings.BaseApiUrl+"/"+path, content);

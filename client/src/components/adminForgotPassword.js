@@ -108,7 +108,6 @@ export default class AdminForgotPassword extends Component {
                   <Input
                     id="email"
                     name="email"
-                    onKeyDown={(e)=>{handleSubmit(e,'email');}}
                     value={values.email}
                     onChange={handleChange}
                     onBlur={handleBlur}

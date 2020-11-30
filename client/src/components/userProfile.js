@@ -54,9 +54,20 @@ function UserProfile() {
   const [validPhone, setValidPhone] = React.useState(true);
   const [orgTypes, setOrgTypes] = React.useState([]);
   const [orgStages, setOrgStages] = React.useState([]);
+  const [rating, setRating] = React.useState('');
+  const [comments, setComments] = React.useState('');
+  const [orgId, setOrgId] = React.useState(0);
+  const [hadRating, setHadRating] = React.useState(false);
 
   //Event 
   //Enter key event callback
+  const handleRatingChange = (event) => {
+    setRating(event.target.value);
+  };
+  const handleCommentsChange = (event) => {
+    setComments(event.target.value);
+  };
+
   const onEnterPress = (event, inputName) => {
     if (event.key === 'Enter' || event.keyCode == 13) {
       if(inputName == 'name') {
@@ -163,29 +174,30 @@ function UserProfile() {
     handleClose();
     var data = { rating: parseInt(rating), user_id: userId, organization_id: id, rating_comment: comments.trim() };
     apiService.postRequest("ratings", data);
+    for(var i = 0; i < organizations.length; i++) {
+      if(organizations[i].org_id == id) {
+        organizations[i].rating = rating;
+        organizations[i].comments = comments;
+      }
+    }
+    setOrganizations(organizations);
   };
 
   //Organization row snippet
   function Row(props) {
     const { row } = props;
-    const [rating, setRating] = React.useState(row.rating);
-    const [comments, setComments] = React.useState(row.comments);
-    const handleRatingChange = (event) => {
-      setRating(event.target.value);
-    };
-    const handleCommentsChange = (event) => {
-      setComments(event.target.value);
-    };
+    
     var orgStage = '';
-        if(row.bstage_id) {
-          orgStage = apiService.getOrgStage(row.bstage_id);
-        }
-        else {
-          var step = apiService.getOrgStep(row.bs_id);
-          if(step) {
-            orgStage = apiService.getOrgStage(step.bstage_id);
-          }
-        }
+      if(row.bstage_id) {
+        orgStage = apiService.getOrgStage(row.bstage_id);
+      }
+      else {
+      var step = apiService.getOrgStep(row.bs_id);
+      if(step) {
+        orgStage = apiService.getOrgStage(step.bstage_id);
+      }
+    }
+
     return (
       <React.Fragment>
         <TableRow >
@@ -204,35 +216,9 @@ function UserProfile() {
             </p>
               {row.org_link && row.org_link.length>0 && (<Link href={row.org_link} target='_blank'>Ver más información</Link>)}
               <div style={{marginTop: "15px"}}>
-                <Button variant="contained" color="primary" onClick={handleClickOpen}>
+                <Button variant="contained" color="primary" onClick={()=>{handleClickOpen(row);}}>
                   Calificar
                 </Button>
-                <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
-                  <DialogTitle id="form-dialog-title">Calificar</DialogTitle>
-                  <DialogContent>
-                    <DialogContentText>
-                      Déjanos saber como ha sido la calidad del servicio y tu experiencia con esta organización
-                    </DialogContentText>
-                    <Rating
-                        value={rating}
-                        onChange={handleRatingChange} />
-                    <TextField
-                      autoFocus
-                      value={comments}
-                      onChange={handleCommentsChange}
-                      margin="dense"
-                      label="Comentario"
-                      fullWidth />
-                  </DialogContent>
-                  <DialogActions>
-                    <Button onClick={handleClose} color="primary">
-                      Cancelar
-                    </Button>
-                    <Button onClick={()=>{ setOrgRating(row.org_id, rating, comments); }} color="primary">
-                      Someter
-                    </Button>
-                  </DialogActions>
-                </Dialog>
               </div>
           </TableCell>
         </TableRow>
@@ -320,7 +306,7 @@ function UserProfile() {
   }
 
   //get profile from current session
-  function getProfile() {
+  async function getProfile() {
     var profile = apiService.profile();
     if(profile) {
       setUserId(profile.user_id);
@@ -337,7 +323,9 @@ function UserProfile() {
 
         var roadmapSteps = apiService.getRoadmapSteps(profile.bt_id, profile.bstage_id);
 
-        apiService.getRequest('tce/roadmap/organizations/'+profile.bt_id).then(response => {
+        var ratingsResponse = await apiService.getRequest('ratings/'+profile.user_id);
+        var ratings = ratingsResponse.data;
+        apiService.getRequest('roadmap/'+profile.bt_id).then(response => {
           //Handle organization response
           if(!response.data) {
             response.data = [];
@@ -347,7 +335,23 @@ function UserProfile() {
             step.index = i+1;
             step.orgs = response.data.filter(o => o.bs_id == step.bs_id);
           }
-          console.log(roadmapSteps);
+
+          if(ratings) {
+            for(var i = 0; i < response.data.length; i++) {
+              var org = response.data[i];
+              var orgRating = ratings.filter(r => r.org_id == org.org_id);
+              if(orgRating && orgRating.length>0) {
+                response.data[i].had_rating = true;
+                response.data[i].rating = orgRating[0].rating;
+                response.data[i].comments = orgRating[0].rating_comment;
+              }
+              else {
+                response.data[i].had_rating = false;
+                response.data[i].rating = 0;
+                response.data[i].comments = '';
+              }
+            } 
+          }
           setRoadmap(roadmapSteps);
           setOrganizations(response.data);          
         }).catch(err =>{
@@ -375,17 +379,16 @@ function UserProfile() {
       phone_number: phone,
       bstage_id: businessStage,
       requested_assistance: requiredAssistance,
-      
-      //business_status: String(businessStatus).toLowerCase() == 'true'
       business_status: String(businessStatus)
     };
 
     console.log(data);
     var profile = apiService.profile();
     setShowLoading(true);
-    apiService.putRequest("user/"+profile.user_id, data).then(response => {
+    apiService.putRequest("user/"+profile.user_id, data).then(async (response) => {
+        var profileResponse = await apiService.getRequest("user/"+profile.user_id);
+        apiService.profile(profileResponse.data[0]);
         setShowLoading(false);
-        apiService.profile(response.data[0]);
         getProfile();
     }).catch(err =>{
         debugger;
@@ -397,7 +400,13 @@ function UserProfile() {
 //Rating and Comment Button
   const [open, setOpen] = React.useState(false);
 
-  const handleClickOpen = () => {
+  const handleClickOpen = (org) => {
+    if(org) {
+      setRating(org.rating);
+      setComments(org.comments);
+      setOrgId(org.org_id);
+      setHadRating(org.rating > 0);
+    }
     setOpen(true);
   };
 
@@ -636,6 +645,35 @@ function UserProfile() {
         title="Restablecimiento de contraseña"
         text={message}
         submitButtonText="Ok" />
+        <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
+          <DialogTitle id="form-dialog-title">Calificar</DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              Déjanos saber como ha sido la calidad del servicio y tu experiencia con esta organización
+            </DialogContentText>
+            <Rating
+                disabled={hadRating}
+                value={rating}
+                onChange={handleRatingChange} />
+            <TextField
+              autoFocus
+              value={comments}
+              disabled={hadRating}
+              onChange={handleCommentsChange}
+              margin="dense"
+              name="commentsbox"
+              label="Comentario"
+              fullWidth />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleClose} color="primary">
+              Cancelar
+            </Button>
+            <Button disabled={hadRating} onClick={()=>{ setOrgRating(orgId, rating, comments); }} color="primary">
+              Someter
+            </Button>
+          </DialogActions>
+        </Dialog>
       <Spinner isShown={showLoading} />
     </div>
   );

@@ -1,13 +1,26 @@
 
 const { Router } = require('express');
+const router = Router();
 var nodemailer  = require('nodemailer');
 const randomstring = require('randomstring');
 const dao  = require('../DAO/user_dao');
 const bcrypt = require('bcrypt');
+const { token } = require('morgan');
 saltRounds = 10;
 
-
-//Authentication with Database
+/**
+ * 
+ * @constructor Pool
+ * 
+ * 
+ * @augments user
+ * @augments host
+ * @augments database
+ * @augments password
+ * @augments port
+ * 
+ * @description Constructor for data base autenticacion
+ */
 const Pool = require('pg').Pool
 const pool = new Pool({
     user: 'colmena66@tucaminoempresarial2',
@@ -17,9 +30,20 @@ const pool = new Pool({
     port: 5432
 })
 
-const router = Router();
 
 
+/**
+ * 
+ * @constructor Pool
+ * 
+ * 
+ * @augments service
+ * @augments auth
+ * @augments user
+ * @augments pass
+ * 
+ * @description Constructor for nodemailer
+ */
 let transporter = nodemailer.createTransport({
     service: 'gmail',
  auth: {
@@ -28,6 +52,15 @@ let transporter = nodemailer.createTransport({
     }
 });
 
+
+/**
+ * @description route to change the password
+ * 
+ * @param req
+ * @param res
+ * 
+ * 
+ */
 router.post('/api/user/changePassword', (req, res) => {
 
     const email = req.body.email;
@@ -113,28 +146,28 @@ router.get('/api/verify/:email', async (req,res) => {
         }
         else{
         console.log("email is verified");
-        res.send("<h1>Email "+req.params.email+" is been Successfully verified");
+        res.status(200).send("<h1>Email "+req.params.email+" is been Successfully verified");
         }
     }
     else
     {
         console.log("email is not verified");
-        res.send("<h1>Bad Request</h1>");
+        res.status(400).send("<h1>Bad Request</h1>");
     }
 });
 
 router.post('/api/register', (req, res) => {
 
-    const {firstname, lastname, business_status, email, phone_number, requested_assistance, password} = req.body;
+    const {firstname, lastname, business_status, business_stage, email, phone_number, requested_assistance, password} = req.body;
 
     if (firstname && lastname && business_status && email && password){
         //insert query should be here
             if(validName(firstname) && validName(lastname) && validEmail(email) && validPhone(phone_number)){
-                token = randomstring.generate();
+                var registerToken = randomstring.generate();
                 hashedPassword = bcrypt.hashSync(password,saltRounds)
-                dao.createUser(firstname,lastname,email,hashedPassword, business_status, phone_number, null, null, 1, 0, token);
-                host=req.get('host');
-                link="http://"+req.get('host')+"/verify/" + email + "?id="+token;
+                dao.createUser(firstname,lastname,email,hashedPassword, business_status, requested_assistance, phone_number, null, business_stage, 1, 0, registerToken);
+                var hostUrl = process.env.WebsiteUrl || req.get('host');
+                link="http://"+hostUrl+"/verify/" +email+ "?id="+registerToken;
                 mailOptions={
                     from: 'capstonehelix@gmail.com',
                     to : email,
@@ -219,11 +252,10 @@ router.put('/api/user/:userId', async (req, res) => {
     const {firstname, lastname, business_status, phone_number, bstage_id, requested_assistance} = req.body;
     
     
-    if (firstname && lastname && business_status && bstage_id && requested_assistance){
-        if(phone_number){  
+    if (firstname && lastname && business_status && bstage_id && requested_assistance){ 
             if(validName(firstname) && validName(lastname) && validPhone(phone_number)){
                 
-                let value = await dao.updateUser(req.params.userId, firstname, lastname, business_status, phone_number, business_stage, requested_assistance);
+                let value = await dao.updateUser(req.params.userId, firstname, lastname, business_status, phone_number, bstage_id, requested_assistance);
                 console.log(value)
                 if(value instanceof Error){
                     res.status(400).send("Error in query");
@@ -235,7 +267,6 @@ router.put('/api/user/:userId', async (req, res) => {
             else{
                 res.status(400).send("Error in validation");
             }
-        }
     }
     else{
         res.status(400).send("Error in values");

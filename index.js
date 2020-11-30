@@ -1,9 +1,12 @@
 const express = require('express');
+var cors = require('cors')
 const path = require('path');
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
 const router = express.Router()
 const app = express();
+
+app.use(cors());
 
 // Serve static files from the React app
 app.use(express.static(path.join(__dirname, 'client/build')));
@@ -35,4 +38,4 @@ app.get('*', (req, res) => {
 const port = process.env.PORT || 5000;
 app.listen(port);
 
-console.log(`Password generator listening on ${port}`);
+console.log(`Server listening on ${port}`);

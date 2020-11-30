@@ -239,5 +239,16 @@ router.get('/api/tce/user/:userID/organizations', async (req, res) => {
     }
 });
 
+router.get('/api/referred/contacted', async (req,res) =>{
+    const organizations = await dao.getOrganizationsReferredVersusContacted()
+    console.log(organizations)
+   res.send(organizations)
+});
+
+router.get('/api/roadmap/:btID', async (req,res) =>{
+    const roadmap = await dao.getRoadMap(req.params.btID)
+    console.log(roadmap)
+   res.send(roadmap)
+});
 
 module.exports = router;

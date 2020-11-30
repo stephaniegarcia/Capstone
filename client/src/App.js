@@ -19,6 +19,7 @@ import AdminLogin from './components/adminLogin';
 import AdminReports from './components/adminReports';
 import AdminOrganizations from './components/adminOrganizations';
 import AdminForgotPassword from './components/adminForgotPassword';
+import VerifyAccount from './components/verifyAccount';
 import GAReports from './components/gaReports';
 import ReactGA from 'react-ga';
 
@@ -40,6 +41,8 @@ function App() {
 
           <Route path='/newPassword/user/:email' component={PasswordReset} />
           <Route path='/newPassword/admin/:email' component={AdminPasswordReset} />
+
+          <Route path='/verify/:email' component={VerifyAccount} />
 
           <Route path='/forgotPassword' component={ForgotPassword} />
           <Route path='/tce' component={Questionnaire} />
