@@ -44,7 +44,6 @@ router.post('/user/changePassword', (req, res) => {
         subject : "Cambio de contraseña",
         html : "<br> Presione el enlace para cambiar su contraseña.<br><a href="+link+">Presione aqui.</a>"
     }
-    console.log(mailOptions);
     transporter.sendMail(mailOptions, (error, response) => {
         if(error){
             console.log(error);
@@ -54,7 +53,7 @@ router.post('/user/changePassword', (req, res) => {
             console.log("Message sent: " + response.message);
             res.status(200).send("sent");
         }
-});
+    });
 });
 
 

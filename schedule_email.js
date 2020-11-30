@@ -22,10 +22,33 @@ let transporter = nodemailer.createTransport({
 
 
 // 0 8 * * 1-7 daily cron
-cron.schedule("*/1 * * * *", async () => {
+cron.schedule("*/5 * * * *", async () => {
     console.log("scheduler");
     let users =  await pool.query(
-        `select email, user_id from users natural inner join login_log;`
+        `SELECT MAX(login_date),user_id,email 
+        FROM public.login_log NATURAL INNER JOIN users group by user_id, email
+        having MAX(login_date) <= NOW() - interval '5 minutes';`
     );
-    console.log(users.rows);
+    
+    console.log(users.rows)
+
+    for (var i = 0; i < users.rows.length; i++){
+        mailOptions={
+            from: 'capstonehelix@gmail.com',
+            to : users.rows[i].email,
+            subject : "Recuerda seguir Tu Camino Empresarial",
+            html : "<br> Llevas tiempo sin seguir tu camino empresarial. Recuerda visitarnos para que asi tu empresa pueda seguir creciendo.<br>"
+        }
+        transporter.sendMail(mailOptions, (error, response) => {
+            if(error){
+                console.log(error);
+                res.status(400).send("error");
+            }
+            else{
+                console.log("Message sent: ");
+                res.status(200).send("sent");
+            }
+        });
+    } 
+  
 });
