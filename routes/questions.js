@@ -5,7 +5,7 @@ const { _ } = require('underscore');
 const dao  = require('../DAO/question_dao');
 
 //Function to gather the questions
-router.get('/questions', async (req,res) =>{
+router.get('/api/questions', async (req,res) =>{
   const questions = await dao.getQuestions()
   console.log(questions)
  res.send(questions)

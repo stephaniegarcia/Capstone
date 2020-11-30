@@ -5,7 +5,7 @@ const { _ } = require('underscore');
 const dao  = require('../DAO/business_step_dao');
 
 //Function to gather the business steps
-router.get('/businessStep', async (req,res) =>{
+router.get('/api/businessStep', async (req,res) =>{
   const steps = await dao.getSteps()
   console.log(steps)
  res.send(steps)

@@ -5,19 +5,19 @@ const { _ } = require('underscore');
 const dao  = require('../DAO/org_dao');
 
 //Function to get all the organizations in the system
-router.get('/organizations', async (req,res) =>{
+router.get('/api/organizations', async (req,res) =>{
   const organization = await dao.getOrganizations()
   console.log(organization)
  res.send(organization)
 });
 
-router.get('/organization/:orgId', async (req,res) => {
+router.get('/api/organization/:orgId', async (req,res) => {
   const organization = await dao.getOrganizationByID(req.params.orgId)
   console.log(organization)
   res.send(organization)
 });
 
-router.post('/organization', (req, res) => {
+router.post('/api/organization', (req, res) => {
 
   const {name, description, email, phone_number, bt_id, bs_id, is_active, org_link} = req.body;
   if(name && description && email && phone_number && bt_id && bs_id && is_active && org_link){
@@ -29,7 +29,7 @@ router.post('/organization', (req, res) => {
   }
 });
 
-router.put('/organization', (req, res) => {
+router.put('/api/organization', (req, res) => {
   const {name, description, email, phone_number, bt_id, bs_id, org_link, org_id} = req.body;
   if(name && email && phone_number && bt_id && bs_id && org_link && org_id){
     dao.updateOrganization(name, description, email, phone_number, bt_id, bs_id, org_link, org_id)
@@ -40,7 +40,7 @@ router.put('/organization', (req, res) => {
   }
 });
 
-router.put('/inactiveOrganization', (req, res) => {
+router.put('/api/inactiveOrganization', (req, res) => {
   const {is_active, org_id} = req.body;
   if(is_active && org_id)
   {

@@ -28,7 +28,7 @@ let transporter = nodemailer.createTransport({
     }
 });
 
-router.post('/user/changePassword', (req, res) => {
+router.post('/api/user/changePassword', (req, res) => {
 
     const email = req.body.email;
     console.log(email);
@@ -58,7 +58,7 @@ router.post('/user/changePassword', (req, res) => {
 });
 
 
-router.get('/newPassword/user/:email', async (req,res) =>{
+router.get('/api/newPassword/user/:email', async (req,res) =>{
 
     console.log(req.query.id);
     const email = req.params.body;
@@ -75,7 +75,7 @@ router.get('/newPassword/user/:email', async (req,res) =>{
 });
 
 
-router.put('/user/password', (req,res) => {
+router.put('/api/user/password', (req,res) => {
     const email = req.body.email;
     const password = req.body.password;
     hashedPassword = bcrypt.hashSync(password,saltRounds);
@@ -99,7 +99,7 @@ router.put('/user/password', (req,res) => {
 
 
 
-router.get('/verify/:email', async (req,res) => {
+router.get('/api/verify/:email', async (req,res) => {
     console.log(req.protocol+":/"+req.get('host'));
     let userToken = await dao.getToken(req.params.email);
     console.log(userToken[0]["verify_token"])
@@ -123,7 +123,7 @@ router.get('/verify/:email', async (req,res) => {
     }
 });
 
-router.post('/register', (req, res) => {
+router.post('/api/register', (req, res) => {
 
     const {firstname, lastname, business_status, email, phone_number, requested_assistance, password} = req.body;
 
@@ -165,13 +165,13 @@ router.post('/register', (req, res) => {
     }
 });
 
-router.get('/users', async (req,res) =>{
+router.get('/api/users', async (req,res) =>{
     const users = await dao.getUsers()
     console.log(users)
    res.send(users)
 });
 
-router.post('/login', async (req,res) => {
+router.post('/api/login', async (req,res) => {
 
     const {email, password} = req.body;
 
@@ -202,7 +202,7 @@ router.post('/login', async (req,res) => {
     }
 });
 
-router.get('/user/:userId', async (req,res) => {
+router.get('/api/user/:userId', async (req,res) => {
     const id = parseInt(req.params.userId)
 
     let user = await dao.getUserById(id);
@@ -214,7 +214,7 @@ router.get('/user/:userId', async (req,res) => {
     }
 });
 
-router.put('/user/:userId', async (req, res) => {
+router.put('/api/user/:userId', async (req, res) => {
     
     const {firstname, lastname, business_status, phone_number, bstage_id, requested_assistance} = req.body;
     

@@ -18,7 +18,7 @@ const pool = new Pool({
 
 const router = Router();
 
-router.post('/testuser', (req, res) => {
+router.post('/api/testuser', (req, res) => {
     const {name, email, password, phone} = req.body;
     const hashedPassword = bcrypt.hashSync(password,saltRounds)
     if(name && email && password && phone){
@@ -30,13 +30,13 @@ router.post('/testuser', (req, res) => {
     }
 });
 
-router.get('/testuser', async (req,res) => {
+router.get('/api/testuser', async (req,res) => {
     const organization = await dao.getTestUsers()
     console.log(organization)
     res.send(organization)
 });
 
-router.post('/testlogin', async (req,res) => {
+router.post('/api/testlogin', async (req,res) => {
 
     const {email, password} = req.body;
     if (!(email && password)) {

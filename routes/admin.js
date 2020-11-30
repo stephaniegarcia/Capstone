@@ -14,19 +14,19 @@ auth: {
   }
 });
 
-router.get('/admins', async (req,res) =>{
+router.get('/api/admins', async (req,res) =>{
   const admins = await dao.getAdmins()
   console.log(admins)
  res.send(admins)
 });
 
-router.get('/admin/:adminID', async (req,res) => {
+router.get('/api/admin/:adminID', async (req,res) => {
   const admin = await dao.getAdminByID(req.params.adminID)
   console.log(admin)
   res.send(admin)
 });
 
-router.post('/admin', async (req, res) => {
+router.post('/api/admin', async (req, res) => {
   const {email, password} = req.body;
 
     if(email && password){
@@ -48,7 +48,7 @@ router.post('/admin', async (req, res) => {
     }
 });
 
-router.post('/admin/changePassword', (req, res) => {
+router.post('/api/admin/changePassword', (req, res) => {
 
   const email = req.body.email;
   console.log(email);
@@ -79,7 +79,7 @@ router.post('/admin/changePassword', (req, res) => {
 });
 
 
-router.get('/newPassword/admin/:email', async (req,res) =>{
+router.get('/api/newPassword/admin/:email', async (req,res) =>{
 
   console.log(req.query.id);
   const email = req.params.body;
@@ -98,7 +98,7 @@ router.get('/newPassword/admin/:email', async (req,res) =>{
 });
 
 
-router.put('/admin/password', (req,res) => {
+router.put('/api/admin/password', (req,res) => {
   const email = req.body.email;
   const password = req.body.password;
 

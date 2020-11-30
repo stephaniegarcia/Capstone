@@ -5,7 +5,7 @@ const dao = require('../DAO/tce_dao')
 
 const router = Router();
 
-router.get('/tce/questions', async (req, res) => {
+router.get('/api/tce/questions', async (req, res) => {
 
     let questions = await dao.getQuestions();
 
@@ -19,7 +19,7 @@ router.get('/tce/questions', async (req, res) => {
 });
 
 //aun falta definir bien como se va a filtrar
-router.get('/tce/organizations/filter', async (req, res) => {
+router.get('/api/tce/organizations/filter', async (req, res) => {
 
     const {stage, type} = req.body;
 
@@ -38,7 +38,7 @@ router.get('/tce/organizations/filter', async (req, res) => {
 
 });
 
-router.get('/tce/roadmap/organizations/:type', async (req, res) => {
+router.get('/api/tce/roadmap/organizations/:type', async (req, res) => {
     const type = req.params.type;
 
     if (type){
@@ -59,7 +59,7 @@ router.get('/tce/roadmap/organizations/:type', async (req, res) => {
 });
 
 
-router.get('/tce/answers/user/:userID', (req, res) => {
+router.get('/api/tce/answers/user/:userID', (req, res) => {
 
 
     if(answers){
@@ -77,7 +77,7 @@ router.get('/tce/answers/user/:userID', (req, res) => {
     }
 });
 
-router.get('/tce/businesstype/user/:userID', (req, res) => {
+router.get('/api/tce/businesstype/user/:userID', (req, res) => {
 
     const types =  [
         {
@@ -119,7 +119,7 @@ router.get('/tce/businesstype/user/:userID', (req, res) => {
     }
 });
 
-router.post('/tce/answers/:userID', async (req, res) => {
+router.post('/api/tce/answers/:userID', async (req, res) => {
     const {answer1,answer2,answer3,answer4,answer5,answer6,answer7,
     answer8,answer9,answer10,answer11} = req.body;
     let type = "";
@@ -165,7 +165,7 @@ router.post('/tce/answers/:userID', async (req, res) => {
 });
 
 
-router.post('/tce/businesstype/:userID', (req, res) => {
+router.post('/api/tce/businesstype/:userID', (req, res) => {
 
     const {type} = req.body;
 
@@ -182,7 +182,7 @@ router.post('/tce/businesstype/:userID', (req, res) => {
 
 
 
-router.put('/tce/answers/:userID', async (req, res) => {
+router.put('/api/tce/answers/:userID', async (req, res) => {
     const {answer1,answer2,answer3,answer4,answer5,answer6,answer7,
     answer8,answer9,answer10,answer11} = req.body;
     let type = "";
@@ -228,7 +228,7 @@ router.put('/tce/answers/:userID', async (req, res) => {
 
 
 
-router.get('/tce/user/:userID/organizations', async (req, res) => {
+router.get('/api/tce/user/:userID/organizations', async (req, res) => {
 
     const organization = await dao.organizationsByUser(req.params.userID);
     if(organization instanceof Error){
