@@ -50,7 +50,6 @@ router.get('/tce/roadmap/organizations/:type', async (req, res) => {
         else{
             res.status(200).send(organizations);
         }
-
     }
     else {
         res.status(400).send("Error");
@@ -238,6 +237,12 @@ router.get('/tce/user/:userID/organizations', (req, res) => {
         res.status(404).send("User not found");
     }
 
+});
+
+router.get('/referred/contacted', async (req,res) =>{
+    const organizations = await dao.getOrganizationsReferredVersusContacted()
+    console.log(organizations)
+   res.send(organizations)
 });
 
 

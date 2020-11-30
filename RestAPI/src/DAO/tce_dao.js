@@ -71,6 +71,25 @@ const saveAnswers = async (user_id,a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11) => {
   }
 }
 
+const getOrganizationsReferredVersusContacted = async () => {
+  try {
+      const res = await pool.query(
+        `SELECT O.name, 
+        COUNT(*) FILTER (WHERE r.organization_id IS NULL) as Not_Contacted_Total,
+        AVG((r.organization_id IS NOT NULL)::int) as percentage
+        FROM users u
+        CROSS JOIN organization o
+        LEFT JOIN organization_rating r ON u.user_id = r.user_id AND o.org_id = r.organization_id
+        Where O.is_active = true AND u.is_active=true
+        GROUP BY o.name`,
+      );
+      console.log(res.rows)
+      return res.rows;
+    } catch (err) {
+      return err;
+    }
+}
+
 
 const changeAnswers = async (user_id,a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11) => {
   try {
@@ -106,5 +125,6 @@ module.exports = {
     getOrganizationsByType,
     saveAnswers,
     changeAnswers,
-    setType
+    setType,
+    getOrganizationsReferredVersusContacted
 }

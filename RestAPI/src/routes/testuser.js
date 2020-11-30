@@ -44,7 +44,6 @@ router.post('/testlogin', async (req,res) => {
     }
     const hashedPassword = await dao.getUserWithEmail(email)
     const isMatchingPassword = bcrypt.compareSync(password, hashedPassword[0].password)
-
     if (!isMatchingPassword) {
         res.status(404).send("Authentication Failed!")
     }
