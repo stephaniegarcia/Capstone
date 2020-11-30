@@ -13,8 +13,7 @@ const pool = new Pool({
 
 const createUser =  async (first_name, last_name, email, user_password, business_status, phone_number, bt_id, bs_id, is_active, is_verified, token) => {
 
-
-    pool.query('INSERT INTO public.users(first_name, last_name, email, user_password, business_status, phone_number, bt_id, bs_id, is_active, is_verified, verify_token) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)', [first_name, last_name, email, user_password, business_status, phone_number, bt_id, bs_id, is_active, is_verified, token], (error, results) => {
+    pool.query('INSERT INTO public.users(first_name, last_name, email, user_password, business_status, phone_number, bt_id, bstage_id, is_active, is_verified, verify_token) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)', [first_name, last_name, email, user_password, business_status, phone_number, bt_id, bs_id, is_active, is_verified, token], (error, results) => {
         if (error) {
             throw error
         }
@@ -39,11 +38,12 @@ const verify =  async (email) => {
 
 }
 
-const updateUser = async (id, first_name, last_name, business_status, phone_number, business_stage) => {
+const updateUser = async (id, first_name, last_name, business_status, phone_number, business_stage, required_assitance) => {
+    
         try {
             const res = await pool.query(
-                `UPDATE public.users SET first_name=$1, last_name=$2, business_status=$3, phone_number=$4, bs_id=$5 WHERE user_id=$6;`,
-                [first_name, last_name, business_status, phone_number,business_stage, id]
+                `UPDATE public.users SET first_name=$1, last_name=$2, business_status=$3, phone_number=$4, bstage_id=$5, assistance_required = $6 WHERE user_id=$7;`,
+                [first_name, last_name, business_status, phone_number,business_stage,required_assitance, id]
             );
             console.log(res.rows)
             return res;
@@ -152,7 +152,21 @@ const log = async (id) => {
     try{
 
         const res = await pool.query(
-            `insert into login_log(login_date, user_id) values (TIMESTAMP, $1);`, [id]
+            `insert into login_log(login_date, user_id) values (now(), $1);`, [id]
+        );
+        return res.rows;
+
+    }catch(err){
+        return err;
+    }
+
+}
+
+const getPassword = async (email) => {
+    try{
+
+        const res = await pool.query(
+            `select user_password, user_id from users where email = $1 and is_verified = true;`, [email]
         );
         return res.rows;
 
@@ -175,5 +189,6 @@ module.exports = {
     getToken,
     insertPasswordToken,
     getPasswordToken,
-    log
+    log,
+    getPassword
 }

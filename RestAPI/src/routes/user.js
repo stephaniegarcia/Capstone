@@ -3,6 +3,8 @@ const { Router } = require('express');
 var nodemailer  = require('nodemailer');
 const randomstring = require('randomstring');
 const dao  = require('../DAO/user_dao');
+const bcrypt = require('bcrypt');
+saltRounds = 10;
 
 
 //Authentication with Database
@@ -31,8 +33,8 @@ router.post('/user/changePassword', (req, res) => {
     const email = req.body.email;
     console.log(email);
     passwordtoken = randomstring.generate();
-    host=req.get('host');
-    link="http://"+req.get('host')+"/newPassword/user/" +email+ "?id="+passwordtoken;
+    host =  process.env.WebsiteUrl || req.get('host');
+    link="http://"+host+"/newPassword/user/" +email+ "?id="+passwordtoken;
     let insertToken = dao.insertPasswordToken(email, passwordtoken);
     if(insertToken instanceof Error){
         res.status(404).send("User not found");
@@ -43,7 +45,6 @@ router.post('/user/changePassword', (req, res) => {
         subject : "Cambio de contraseña",
         html : "<br> Presione el enlace para cambiar su contraseña.<br><a href="+link+">Presione aqui.</a>"
     }
-    console.log(mailOptions);
     transporter.sendMail(mailOptions, (error, response) => {
         if(error){
             console.log(error);
@@ -53,7 +54,7 @@ router.post('/user/changePassword', (req, res) => {
             console.log("Message sent: " + response.message);
             res.status(200).send("sent");
         }
-});
+    });
 });
 
 
@@ -77,10 +78,11 @@ router.get('/newPassword/user/:email', async (req,res) =>{
 router.put('/user/password', (req,res) => {
     const email = req.body.email;
     const password = req.body.password;
+    hashedPassword = bcrypt.hashSync(password,saltRounds);
 
     if(email && password){
 
-        let change = dao.changePassword(email, password);
+        let change = dao.changePassword(email, hashedPassword);
         console.log(email + password)
         if(change instanceof Error){
             res.status.send("Query error")
@@ -127,17 +129,17 @@ router.post('/register', (req, res) => {
 
     if (firstname && lastname && business_status && email && password){
         //insert query should be here
-        if(phone_number){
             if(validName(firstname) && validName(lastname) && validEmail(email) && validPhone(phone_number)){
                 token = randomstring.generate();
-                dao.createUser(firstname,lastname,email,password, true, phone_number, null, null, 1, 0, token);
+                hashedPassword = bcrypt.hashSync(password,saltRounds)
+                dao.createUser(firstname,lastname,email,hashedPassword, business_status, phone_number, null, null, 1, 0, token);
                 host=req.get('host');
                 link="http://"+req.get('host')+"/verify/" + email + "?id="+token;
                 mailOptions={
                     from: 'capstonehelix@gmail.com',
                     to : email,
                     subject : "Favor de confirmar su correo electronico",
-                    html : "<br> Presione el enalce para confirmar su cuenta.<br><a href="+link+">Click here to verify</a>" 
+                    html : "<br> Presione el enlace para confirmar su cuenta.<br><a href="+link+">Click here to verify</a>" 
                 }
                 console.log(mailOptions);
                 transporter.sendMail(mailOptions, function(error, response){
@@ -156,7 +158,7 @@ router.post('/register', (req, res) => {
             else{
                 res.status(400).send("Error");
             }
-        }
+
     }
     else{
         res.status(400).send("Error");
@@ -175,13 +177,20 @@ router.post('/login', async (req,res) => {
 
     if(email && password){
         if(validEmail(email)){
-            let login = await dao.login(email, password);
-            await dao.log(login[0]["user_id"]);
-            if(login instanceof Error){
-                res.status(400).send("Error: Wrong credentials")
+
+            hashedPassword = await dao.getPassword(email);
+            
+            if(hashedPassword[0]){
+                const isMatchingPassword = bcrypt.compareSync(password, hashedPassword[0].user_password)
+                await dao.log(hashedPassword[0].user_id);
+                login = {
+                    "Match" : isMatchingPassword,
+                    "user_id": hashedPassword[0].user_id
+                } 
+                res.status(200).send(login);
             }
             else{
-                res.status(200).send(login);
+                res.status(400).send("Account does not exist o is not verified");
             }
         }
         else{
@@ -206,11 +215,15 @@ router.get('/user/:userId', async (req,res) => {
 });
 
 router.put('/user/:userId', async (req, res) => {
-    const {firstname, lastname, business_status, phone_number, business_stage} = req.body;
-    if (firstname && lastname && business_status){
-        if(phone_number){
+    
+    const {firstname, lastname, business_status, phone_number, bstage_id, requested_assistance} = req.body;
+    
+    
+    if (firstname && lastname && business_status && bstage_id && requested_assistance){
+        if(phone_number){  
             if(validName(firstname) && validName(lastname) && validPhone(phone_number)){
-                let value = await dao.updateUser(req.params.userId, firstname, lastname, business_status, phone_number, business_stage);
+                
+                let value = await dao.updateUser(req.params.userId, firstname, lastname, business_status, phone_number, business_stage, requested_assistance);
                 console.log(value)
                 if(value instanceof Error){
                     res.status(400).send("Error in query");
@@ -241,8 +254,14 @@ function validEmail(email) {
 }
 
 function validPhone(phone) {
-    var filter = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/im;
-    return String(phone).search (filter) != -1;
+    if(phone){
+        var filter = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/im;
+        return String(phone).search (filter) != -1;
+    }
+    else{
+        return " "
+    }
+    
 }
 
 function validName(name) {
