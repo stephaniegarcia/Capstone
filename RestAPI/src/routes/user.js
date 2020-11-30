@@ -132,7 +132,7 @@ router.post('/register', (req, res) => {
             if(validName(firstname) && validName(lastname) && validEmail(email) && validPhone(phone_number)){
                 token = randomstring.generate();
                 hashedPassword = bcrypt.hashSync(password,saltRounds)
-                dao.createUser(firstname,lastname,email,hashedPassword, business_status, phone_number, null, null, 1, 0, token);
+                dao.createUser(firstname,lastname,email,hashedPassword, business_status, requested_assistance, phone_number, null, null, 1, 0, token);
                 host=req.get('host');
                 link="http://"+req.get('host')+"/verify/" + email + "?id="+token;
                 mailOptions={
@@ -223,7 +223,7 @@ router.put('/user/:userId', async (req, res) => {
         if(phone_number){  
             if(validName(firstname) && validName(lastname) && validPhone(phone_number)){
                 
-                let value = await dao.updateUser(req.params.userId, firstname, lastname, business_status, phone_number, business_stage, requested_assistance);
+                let value = await dao.updateUser(req.params.userId, firstname, lastname, business_status, phone_number, bstage_id, requested_assistance);
                 console.log(value)
                 if(value instanceof Error){
                     res.status(400).send("Error in query");

@@ -11,9 +11,9 @@ const pool = new Pool({
 
 
 
-const createUser =  async (first_name, last_name, email, user_password, business_status, phone_number, bt_id, bs_id, is_active, is_verified, token) => {
+const createUser =  async (first_name, last_name, email, user_password, business_status,requested_assistance, phone_number, bt_id, bs_id, is_active, is_verified, token) => {
 
-    pool.query('INSERT INTO public.users(first_name, last_name, email, user_password, business_status, phone_number, bt_id, bstage_id, is_active, is_verified, verify_token) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)', [first_name, last_name, email, user_password, business_status, phone_number, bt_id, bs_id, is_active, is_verified, token], (error, results) => {
+    pool.query('INSERT INTO public.users(first_name, last_name, email, user_password, business_status,assistance_required, phone_number, bt_id, bstage_id, is_active, is_verified, verify_token) VALUES($1, $2, $3, $4, $5,$12, $6, $7, $8, $9, $10, $11, $12)', [first_name, last_name, email, user_password, business_status, phone_number, bt_id, bs_id, is_active, is_verified, token, requested_assistance], (error, results) => {
         if (error) {
             throw error
         }
