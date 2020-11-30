@@ -10,7 +10,7 @@
       "concurrently": "^3.1.0"
     },
     "scripts": {
-      "install": "cd client && yarn",
-      "start": "cd client && yarn start"
+      "install": "cd server && yarn",
+      "start": "cd server && yarn start"
     }
   }
