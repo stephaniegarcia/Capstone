@@ -1,0 +1,149 @@
+import React, { Component } from 'react'
+import { Formik } from 'formik'
+import { object, ref, string } from 'yup'
+import Input from '@material-ui/core/Input'
+import InputLabel from '@material-ui/core/InputLabel'
+import FormControl from '@material-ui/core/FormControl'
+import FormHelperText from '@material-ui/core/FormHelperText'
+import Button from '@material-ui/core/Button'
+import Paper from '@material-ui/core/Paper'
+import Spinner from './loading'
+import Alert from './alert'
+//import apiService from "./mockApiService";
+import apiService from "./apiService";
+
+export default class ForgotPassword extends Component {
+  
+  state = {
+    passChangeSuccess: false,
+  }
+
+  _handleModalClose = () => {
+    this.setState(() => ({
+      passChangeSuccess: false,
+    }))
+  }
+
+  _renderModal = () => {
+    const onClick = () => {
+      this.setState(() => ({ passChangeSuccess: false }))
+    }
+
+    return (
+      <Alert
+        isOpen={this.state.passChangeSuccess}
+        onClose={this._handleClose}
+        handleSubmit={onClick}
+        title="Restablecimiento de contraseña"
+        text="Se envió un correo electrónico para completar el proceso de recuperación de contraseña"
+        submitButtonText="Ok"
+      />
+    )
+  }
+
+//Submit Handler
+  _handleSubmit = ({
+    email,
+    setSubmitting,
+    resetForm,
+  }) => {
+    // fake async login
+    setTimeout(async () => {
+      setSubmitting(false)
+
+      this.setState(() => ({
+        passChangeSuccess: true,
+      }))
+      apiService.postRequest('user/changePassword', {email: email});
+      resetForm()
+    }, 1000)
+  }
+
+  render() {
+    return (
+        
+      <Formik
+        initialValues={{
+          email: '',
+        }}
+        validationSchema={object().shape({
+          email: string().required('Correo electronico es requerido'),
+        })}
+        onSubmit={(
+          { email },
+          { setSubmitting, resetForm }
+        ) =>
+          this._handleSubmit({
+            email,
+            setSubmitting,
+            resetForm,
+          })
+        }
+        render={props => {
+          const {
+            values,
+            touched,
+            errors,
+            handleChange,
+            handleBlur,
+            handleSubmit,
+            isValid,
+            isSubmitting,
+          } = props
+          return isSubmitting ? (
+            <Spinner />
+          ) : (
+              
+          <div className="top-margin">
+              <Paper className="form form--wrapper paper-margin" elevation={10}>
+               <h1>Recupera Tu Contrasena</h1>
+               
+              <form className="form form--wrapper" onSubmit={handleSubmit}>
+                <div className="margin-25">
+                <FormControl fullWidth margin="dense">
+                  <InputLabel
+                    htmlFor="email"
+                    error={Boolean(touched.email && errors.email)}
+                  >
+                    {'Correo Electronico'}
+                  </InputLabel>
+                  <Input
+                    id="email"
+                    name="email"
+                    onKeyDown={(e)=>{handleSubmit(e,'email');}}
+                    value={values.email}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    error={Boolean(touched.email && errors.email)}
+                  />
+                  <FormHelperText
+                    error={Boolean(touched.email && errors.email)}
+                  >
+                    {touched.email && errors.email
+                      ? errors.email
+                      : ''}
+                  </FormHelperText>
+                </FormControl>
+     
+                </div>
+           
+                <Button
+                  type="submit"
+                  variant="contained"
+                  color="primary"
+                  disabled={Boolean(!isValid || isSubmitting)}
+                  style={{ margin: '16px' }}
+                >
+                  {'Restablecer la contraseña'}
+                </Button>
+              </form>
+              {this._renderModal()}
+            </Paper>
+          
+          </div>
+          )
+        }}
+      />
+    )
+  }
+}
