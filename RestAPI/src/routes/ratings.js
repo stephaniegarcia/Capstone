@@ -54,9 +54,16 @@ router.get('/organizationsContacted', async (req,res) =>{
 });
 
 //Inserting a rating and comment (optional) for an organization
-router.post('/ratings', (req, res) => {
-    const {rating, user_id, organization_id, rating_comment} = req.body;
-    dao.createRating(rating, user_id, organization_id, rating_comment)
+router.get('/ratings/:userID', async (req, res) => {
+    const ratings = await dao.getRatingsPerUser(req.params.userID)
+    console.log(ratings)
+    res.send(ratings)
   });
+
+  router.get('/organizationsContacted', async (req,res) =>{
+    const comments = await dao.getContactedCount()
+    console.log(comments)
+   res.send(comments)
+});
 
 module.exports = router;

@@ -119,6 +119,21 @@ const setType = async (user_id, type) => {
   }
 };
 
+async function getRoadMap(btID){
+  try {
+      const res = await pool.query(
+        `SELECT org_id, name, description, email, phone_number, bt_id, bs_id, is_active, org_link
+        FROM public.organization
+        where bt_id = $1
+        ORDER BY bs_id ASC`, [btID]
+      );
+      console.log(res.rows)
+      return res.rows;
+    } catch (err) {
+      return err.stack;
+    }
+}
+
 module.exports = {
     getQuestions,
     getOrganizationsFiltered,
@@ -126,5 +141,6 @@ module.exports = {
     saveAnswers,
     changeAnswers,
     setType,
-    getOrganizationsReferredVersusContacted
+    getOrganizationsReferredVersusContacted,
+    getRoadMap
 }

@@ -162,6 +162,20 @@ const createRating =  (rating, user_id, organization_id, rating_comment) => {
     })
 }
 
+async function getRatingsPerUser(userID){
+  try {
+      const res = await pool.query(
+        `Select O.name, O.bt_id, R.user_id, R.rating, R.rating_comment
+        From organization as O left outer Join organization_rating as R on O.org_id = R.organization_id
+        where R.user_id = $1`, [userID]
+      );
+      console.log(res.rows)
+      return res.rows;
+    } catch (err) {
+      return err.stack;
+    }
+}
+
 module.exports = {
     getAverageEvaluations,
     getTopTenBT,
@@ -170,5 +184,6 @@ module.exports = {
     getAccountsPerWeek,
     getComments,
     getContactedCount,
-    createRating
+    createRating,
+    getRatingsPerUser
 }

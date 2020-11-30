@@ -224,9 +224,6 @@ router.put('/tce/answers/:userID', async (req, res) => {
 
 });
 
-
-
-
 router.get('/tce/user/:userID/organizations', (req, res) => {
 
     console.log(req.params.userID);
@@ -243,6 +240,12 @@ router.get('/referred/contacted', async (req,res) =>{
     const organizations = await dao.getOrganizationsReferredVersusContacted()
     console.log(organizations)
    res.send(organizations)
+});
+
+router.get('/roadmap/:btID', async (req,res) =>{
+    const roadmap = await dao.getRoadMap(req.params.btID)
+    console.log(roadmap)
+   res.send(roadmap)
 });
 
 
