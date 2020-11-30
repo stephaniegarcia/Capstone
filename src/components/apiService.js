@@ -77,9 +77,11 @@ const apiService = {
     },
     getOrgType: (bt_id) => {
         var orgTypes = JSON.parse(localStorage.getItem('col-org-types'));
-        orgTypes = orgTypes.filter(o => o.bt_id == bt_id);
-        if(orgTypes.length>0) {
-            return orgTypes[0].description;
+        if(orgTypes && orgTypes != null) {
+            orgTypes = orgTypes.filter(o => o.bt_id == bt_id);
+            if(orgTypes.length>0) {
+                return orgTypes[0].description;
+            }
         }
         return '';
     },
@@ -135,25 +137,31 @@ const apiService = {
     },
     getOrgStage: (bstage_id) => {
         var orgStages = JSON.parse(localStorage.getItem('col-org-stages'));
-        orgStages = orgStages.filter(o => o.bstage_id == bstage_id);
-        if(orgStages.length>0) {
-            return orgStages[0].description;
+        if(orgStages && orgStages != null) {
+            orgStages = orgStages.filter(o => o.bstage_id == bstage_id);
+            if(orgStages.length>0) {
+                return orgStages[0].description;
+            }
         }
         return '';
     },
     getOrgStep: (bs_id) => {
         var orgSteps = JSON.parse(localStorage.getItem('col-org-steps'));
-        orgSteps = orgSteps.filter(o => o.bs_id == bs_id);
-        if(orgSteps.length>0) {
-            return orgSteps[0];
+        if(orgSteps && orgSteps != null) {
+            orgSteps = orgSteps.filter(o => o.bs_id == bs_id);
+            if(orgSteps.length>0) {
+                return orgSteps[0];
+            }   
         }
         return '';
     },
     getRoadmapSteps: (bt_id, bstage_id) => {
         var orgSteps = JSON.parse(localStorage.getItem('col-org-steps'));
-        orgSteps = orgSteps.filter(o => o.bt_id == bt_id);
-        if(orgSteps.length>0) {
-            return orgSteps;
+        if(orgSteps && orgSteps != null) {
+            orgSteps = orgSteps.filter(o => o.bt_id == bt_id);
+            if(orgSteps.length>0) {
+                return orgSteps;
+            }
         }
         return [];
     },

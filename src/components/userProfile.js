@@ -409,6 +409,7 @@ function UserProfile() {
     setShowLoading(true);
     var orgTypesResponse = await apiService.refreshOrgTypes();
     var orgTypesTemp = orgTypesResponse.data;
+    console.log(orgTypesTemp);
     apiService.orgTypes(orgTypesTemp);
     setOrgTypes(orgTypesTemp);
 
@@ -421,7 +422,9 @@ function UserProfile() {
     var orgStepsTemp = orgStepsResponse.data;
     apiService.orgSteps(orgStepsTemp);
 
-    getProfile();
+    setTimeout(()=>{
+      getProfile();
+    }, 500);
     setShowLoading(false);
   }, [shouldLoad]);
 
