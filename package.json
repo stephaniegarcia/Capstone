@@ -1,58 +1,26 @@
 {
-  "name": "testing-app",
-  "version": "0.1.0",
-  "private": true,
-  "proxy": "http://localhost:3030",
-  "dependencies": {
-    "@material-ui/core": "^4.11.0",
-    "@material-ui/icons": "^4.9.1",
-    "@material-ui/lab": "^4.0.0-alpha.56",
-    "@material-ui/styles": "^4.10.0",
-    "@testing-library/jest-dom": "^5.11.4",
-    "@testing-library/react": "^11.1.0",
-    "@testing-library/user-event": "^12.1.10",
-    "axios": "^0.21.0",
-    "concurrently": "^5.3.0",
-    "eslint-plugin-react-hooks": "^4.2.0",
-    "formik": "^2.2.3",
-    "react": "^17.0.1",
-    "react-charts": "^2.0.0-beta.7",
-    "react-dom": "^17.0.1",
-    "react-ga": "^3.2.1",
-    "react-material-ui-carousel": "^2.1.1",
-    "react-router-dom": "^5.2.0",
-    "react-scripts": "4.0.0",
-    "react-spinners": "^0.9.0",
-    "react-to-print": "^2.11.0",
-    "react-use-analytics-api": "^1.4.15",
-    "recharts": "^1.8.5",
-    "web-vitals": "^0.2.4",
-    "yup": "^0.29.3"
-  },
+  "name": "RestAPI",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
   "scripts": {
-    "start-client": "react-scripts start",
-    "build": "react-scripts build && (cd RestAPI && yarn install)",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "start": "concurrently \"react-scripts start\" \"cd RestAPI && yarn start\"",
-    "heroku-postbuild": "yarn build"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon index.js",
+    "start": "node index.js",
+    "heroku-postbuild": "cd client && yarn && yarn run build"
   },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^5.0.0",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "morgan": "^1.10.0",
+    "nodemailer": "^6.4.14",
+    "nodemon": "^2.0.4",
+    "pg": "^8.5.1",
+    "randomstring": "^1.1.5",
+    "underscore": "^1.11.0"
   }
 }
