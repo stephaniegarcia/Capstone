@@ -23,8 +23,6 @@ const createUser =  async (first_name, last_name, email, user_password, business
     })
 }
 
-
-
 const verify =  async (email) => {
     try {
 
@@ -52,7 +50,6 @@ const updateUser = async (id, first_name, last_name, business_status, phone_numb
           } catch (err) {
             return err;
           }
-    
 }
 
 const getUserById = async (id) => {
@@ -78,15 +75,12 @@ async function getUsers(){
       } catch (err) {
         return err.stack;
       }
-    
 }
 
 
 
 const login = async (email, password) =>{
-
     try{
-
         const res = await pool.query(
             `select user_password = $1 as Match, user_id from users where email = $2;`, [password, email]
         );

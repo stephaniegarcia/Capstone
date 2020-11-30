@@ -24,8 +24,8 @@ app.use(require('./routes/ratings'));
 app.use(require('./routes/questions'));
 app.use(require('./routes/businessType'));
 app.use(require('./routes/businessStep'));
-app.use(cors());
-
+app.use(require('./routes/businessStage'));
+app.use(require('./routes/testuser'));
 
 //starting the server
 app.listen(app.get('port'), () => {

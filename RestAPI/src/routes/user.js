@@ -6,6 +6,7 @@ const dao  = require('../DAO/user_dao');
 const bcrypt = require('bcrypt');
 saltRounds = 10;
 
+
 //Authentication with Database
 const Pool = require('pg').Pool
 const pool = new Pool({
@@ -71,8 +72,6 @@ router.get('/newPassword/user/:email', async (req,res) =>{
         {
             res.status(400).send("<h1>Bad Request</h1>");
         }
-
- 
 });
 
 
@@ -122,7 +121,6 @@ router.get('/verify/:email', async (req,res) => {
         console.log("email is not verified");
         res.send("<h1>Bad Request</h1>");
     }
-    
 });
 
 router.post('/register', (req, res) => {
@@ -132,7 +130,6 @@ router.post('/register', (req, res) => {
     if (firstname && lastname && business_status && email && password){
         //insert query should be here
             if(validName(firstname) && validName(lastname) && validEmail(email) && validPhone(phone_number)){
-                
                 token = randomstring.generate();
                 hashedPassword = bcrypt.hashSync(password,saltRounds)
                 dao.createUser(firstname,lastname,email,hashedPassword, business_status, phone_number, null, null, 1, 0, token);
@@ -197,11 +194,11 @@ router.post('/login', async (req,res) => {
             }
         }
         else{
-            res.status(400).send("error");
+            res.status(400).send("Error: Invalid Email!");
         }
     }
     else{
-        res.status(400).send("error");
+        res.status(400).send("Error: Missing parameters!");
     }
 });
 
@@ -215,8 +212,6 @@ router.get('/user/:userId', async (req,res) => {
     else{
         res.status(200).send(user);
     }
-    
-
 });
 
 router.put('/user/:userId', async (req, res) => {
@@ -231,18 +226,16 @@ router.put('/user/:userId', async (req, res) => {
                 let value = await dao.updateUser(req.params.userId, firstname, lastname, business_status, phone_number, business_stage, requested_assistance);
                 console.log(value)
                 if(value instanceof Error){
-                    
                     res.status(400).send("Error in query");
                 }
                 else{
                     res.status(200).send(value);
-                }    
+                }
             }
             else{
                 res.status(400).send("Error in validation");
             }
         }
-        
     }
     else{
         res.status(400).send("Error in values");
