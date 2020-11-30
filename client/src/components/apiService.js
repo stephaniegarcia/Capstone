@@ -4,7 +4,7 @@ let state = {};
 
 let settings =
 {
-    BaseApiUrl: "http://localhost:" + (process.env.REACT_API_PORT || 3030)
+    BaseApiUrl: process.env.REACT_APP_API_URL || "http://localhost:5000/api"
 };
 
 function getUserProfile() {
