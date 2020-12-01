@@ -5,6 +5,11 @@ const dao = require('../DAO/tce_dao')
 
 const router = Router();
 
+/**
+ * @route /api/tce/questions
+ * @description route to gather the questions
+ * @return questions
+ */
 router.get('/api/tce/questions', async (req, res) => {
 
     let questions = await dao.getQuestions();
@@ -18,26 +23,13 @@ router.get('/api/tce/questions', async (req, res) => {
 
 });
 
-//aun falta definir bien como se va a filtrar
-router.get('/api/tce/organizations/filter', async (req, res) => {
 
-    const {stage, type} = req.body;
-
-    if(stage || type){
-        let organizations = await dao.getOrganizationsFiltered(2,2);
-        if(organizations instanceof Error){
-            res.status(400).send("Error");
-        }
-        else{
-            res.status(200).send(organizations);
-        }
-    }
-    else{
-        res.status(404).send("Error")
-    }
-
-});
-
+/**
+ * @route /api/tce/roadmap/organizations/:type
+ * @description routes that brings organizations by type
+ * @param type
+ * @return organizations
+ */
 router.get('/api/tce/roadmap/organizations/:type', async (req, res) => {
     const type = req.params.type;
 
@@ -59,66 +51,24 @@ router.get('/api/tce/roadmap/organizations/:type', async (req, res) => {
 });
 
 
-router.get('/api/tce/answers/user/:userID', (req, res) => {
 
 
-    if(answers){
-
-    }
-    else{
-        res.status(400).send("Error");
-    }
-
-    if(founded){
-        res.status(200).json(etr.answers);
-    }
-    else{
-        res.status(404).send("User not found");
-    }
-});
-
-router.get('/api/tce/businesstype/user/:userID', (req, res) => {
-
-    const types =  [
-        {
-            userID: "1",
-            type : "microempresa"
-        },
-        {
-            userID: "2",
-            type : "comerciante"
-        },
-        {
-            userID: "3",
-            type : "empresa basada en innovacion"
-        }
-    ];
-
-    let i = 0;
-    let founded = false;
-    let etr;
-
-    if(types){
-        types.forEach((user) => {
-            if(req.params.userID == user.userID){
-                founded = true;
-                etr = user;
-
-            }
-        });
-    }
-    else{
-        res.status(400).send("Error");
-    }
-
-    if(founded){
-        res.status(200).json(etr.type);
-    }
-    else{
-        res.status(404).send("User not found");
-    }
-});
-
+/**
+ * @route /api/tce/answers/:userID
+ * @description routes to save the answers
+ * @param answer1
+ * @param answer2
+ * @param answer3
+ * @param answer4
+ * @param answer5
+ * @param answer6
+ * @param answer7
+ * @param answer8
+ * @param answer9
+ * @param answer10
+ * @param answer11
+ * 
+ */
 router.post('/api/tce/answers/:userID', async (req, res) => {
     const {answer1,answer2,answer3,answer4,answer5,answer6,answer7,
     answer8,answer9,answer10,answer11} = req.body;
@@ -147,7 +97,7 @@ router.post('/api/tce/answers/:userID', async (req, res) => {
                 //res.status(200).send(`User with id: ${req.params.userID} is Empresa en Crecimiento`);
         }
         else{
-            res.status(400).send("No se puede determinar con las respuestas.");
+            res.status(400).send("No se puede determinar con las respuestas. Para mas informacion llamar a Colmena66 a 787.525.4111");
         }
         
         let answers = await dao.saveAnswers(req.params.userID,answer1,answer2,answer3,answer4,answer5,answer6,answer7,
@@ -165,23 +115,24 @@ router.post('/api/tce/answers/:userID', async (req, res) => {
 });
 
 
-router.post('/api/tce/businesstype/:userID', (req, res) => {
-
-    const {type} = req.body;
-
-    if(type){
-        res.status(200).send(`User with id ${req.params.userID} is ${type}`);
-    }
-    else{
-        res.status(400).send("Error");
-    }
-
-});
 
 
-
-
-
+/**
+ * @route /api/tce/answers/:userID
+ * @description routes to save the new answers
+ * @param answer1
+ * @param answer2
+ * @param answer3
+ * @param answer4
+ * @param answer5
+ * @param answer6
+ * @param answer7
+ * @param answer8
+ * @param answer9
+ * @param answer10
+ * @param answer11
+ * 
+ */
 router.put('/api/tce/answers/:userID', async (req, res) => {
     const {answer1,answer2,answer3,answer4,answer5,answer6,answer7,
     answer8,answer9,answer10,answer11} = req.body;
@@ -227,7 +178,12 @@ router.put('/api/tce/answers/:userID', async (req, res) => {
 
 
 
-
+/**
+ * @route /api/tce/user/:userID/organizations
+ * @description return the organizations by user
+ * @param userID
+ * @returns organization
+ */
 router.get('/api/tce/user/:userID/organizations', async (req, res) => {
 
     const organization = await dao.organizationsByUser(req.params.userID);
@@ -239,6 +195,11 @@ router.get('/api/tce/user/:userID/organizations', async (req, res) => {
     }
 });
 
+/**
+ * @route /api/referred/contacted
+ * @description return the referredvscontacted organizations
+ * @returns organizations
+ */
 router.get('/api/referred/contacted', async (req,res) =>{
     const organizations = await dao.getOrganizationsReferredVersusContacted()
     console.log(organizations)

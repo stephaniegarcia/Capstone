@@ -54,12 +54,9 @@ let transporter = nodemailer.createTransport({
 
 
 /**
+ * @route /api/user/changePassword'
  * @description route to change the password
- * 
- * @param req
- * @param res
- * 
- * 
+ * @param email
  */
 router.post('/api/user/changePassword', (req, res) => {
 
@@ -90,7 +87,11 @@ router.post('/api/user/changePassword', (req, res) => {
     });
 });
 
-
+/**
+ * @route /api/newPassword/user/:email'
+ * @description route to change the password
+ * @param email
+ */
 router.get('/api/newPassword/user/:email', async (req,res) =>{
 
     console.log(req.query.id);
@@ -107,7 +108,12 @@ router.get('/api/newPassword/user/:email', async (req,res) =>{
         }
 });
 
-
+/**
+ * @route /api/user/password'
+ * @description route to change the password on data base
+ * @param email
+ * @param password 
+ */
 router.put('/api/user/password', (req,res) => {
     const email = req.body.email;
     const password = req.body.password;
@@ -131,14 +137,13 @@ router.put('/api/user/password', (req,res) => {
 });
 
 
-
+/**
+ * @route /api/verify/:email
+ * @description route to verify the email when registered
+ */
 router.get('/api/verify/:email', async (req,res) => {
-    console.log(req.protocol+":/"+req.get('host'));
-    let userToken = await dao.getToken(req.params.email);
-    console.log(userToken[0]["verify_token"])
-    console.log(req.params.email)
 
-    console.log("Domain is matched. Information is from Authentic email");
+    let userToken = await dao.getToken(req.params.email);
     if(req.query.id==userToken[0]["verify_token"]) {
         const ver = dao.verify(req.params.email);
         if(ver instanceof Error){
@@ -156,6 +161,12 @@ router.get('/api/verify/:email', async (req,res) => {
     }
 });
 
+/**
+ * @route /api/register
+ * @description route to register new users
+ * @params firstname, lastname, business_status, business_stage, email, phone_number, requested_assistance, password
+ * 
+ */
 router.post('/api/register', (req, res) => {
 
     const {firstname, lastname, business_status, business_stage, email, phone_number, requested_assistance, password} = req.body;
@@ -204,6 +215,11 @@ router.get('/api/users', async (req,res) =>{
    res.send(users)
 });
 
+/**
+ * @route /api/login
+ * @description route to login 
+ * @params email, password
+ */
 router.post('/api/login', async (req,res) => {
 
     const {email, password} = req.body;
@@ -235,6 +251,7 @@ router.post('/api/login', async (req,res) => {
     }
 });
 
+
 router.get('/api/user/:userId', async (req,res) => {
     const id = parseInt(req.params.userId)
 
@@ -247,6 +264,11 @@ router.get('/api/user/:userId', async (req,res) => {
     }
 });
 
+/**
+ * @route /api/user/:userId
+ * @description route to edit account
+ * @params firstname, lastname, business_status, phone_number, bstage_id, requested_assistance
+ */
 router.put('/api/user/:userId', async (req, res) => {
     
     const {firstname, lastname, business_status, phone_number, bstage_id, requested_assistance} = req.body;
