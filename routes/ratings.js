@@ -82,7 +82,15 @@ router.get('/api/organizationsContacted', async (req,res) =>{
     res.send(comments)
 });
 
-//Inserting a rating and comment (optional) for an organization
+
+/**
+ * @route /api/ratings
+ * @description Inserting a rating and comment (optional) for an organization
+ * @param rating
+ * @param user_id
+ * @param organization_id
+ * @param rating_comment
+ */
 router.post('/api/ratings', (req, res) => {
     const {rating, user_id, organization_id, rating_comment} = req.body;
     if(rating && user_id && organization_id && rating_comment){
@@ -94,6 +102,12 @@ router.post('/api/ratings', (req, res) => {
     }    
 });
 
+/**
+ * @route /api/ratings
+ * @description Inserting a rating and comment (optional) for an organization
+ * @param userID
+ * @return rating per user
+ */
 router.get('/api/ratings/:userID', async (req, res) => {
     const ratings = await dao.getRatingsPerUser(req.params.userID)
     console.log(ratings)
