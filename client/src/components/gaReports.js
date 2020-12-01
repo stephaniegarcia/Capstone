@@ -20,7 +20,7 @@ import apiService from "./apiService";
 function GAReports() {
     //Constants
     const viewSelectorContainerId = 'view-selector-container';
-    const clientId = "301486511541-qlfg0rutlomiioq9e58oj05r2duj73go.apps.googleusercontent.com";
+    const clientId = "250457166472-n7pvo2gl7ucn8brpa2jic8o5abilnne8.apps.googleusercontent.com";
 
     //State Variables getters & setters
     const { ready, gapi, authorized, error } = useAnalyticsApi();

@@ -57,8 +57,11 @@ function Register() {
      //@param phone - new user phone
     //@return if it's valid or not
     function isValidPhone(phone) {
-        const re = /^[+]*[(]{0,1}[0-9]{1,3}[)]{0,1}[-\s\./0-9]*$/g;
-        return re.test(String(phone));
+        if(!phone || phone == null) {
+            return false;
+        }
+        var filter = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/im;
+        return String(phone).search (filter) != -1;
     }
     
     //name validation helper function
@@ -152,6 +155,10 @@ function Register() {
     const handlePasswordChange = (event) => {
         setValidPassword((isValidPass(event.target.value)));
         setPassword(event.target.value);
+
+        if(confirmPassword && confirmPassword.length>0) {
+            setValidConfirmPassword(event.target.value == confirmPassword);    
+        }
     };
 
     //comfirm password change event callback

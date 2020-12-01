@@ -73,6 +73,9 @@ function AdminPasswordReset() {
   const handleConfirmPasswordChange = (event) => {
     setConfirmPass(event.target.value);
     setValidConfirmPassword((isValidPass(event.target.value)));
+    if(confirmPass && confirmPass.length>0) {
+      setValidConfirmPassword(event.target.value == confirmPass);    
+    }
   };
 
   //submit button click event callback
