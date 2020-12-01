@@ -89,7 +89,7 @@ function Outcome() {
           setBusinessType(bt_id);
           if(bt_id && bt_id != null) {
             var roadmapSteps = apiService.getRoadmapSteps(bt_id, tempProfile.bstage_id);
-            apiService.getRequest('tce/roadmap/organizations/'+bt_id).then(response => {
+            apiService.getRequest('roadmap/'+bt_id +'/'+tempProfile.bstage_id).then(response => {
               //Handle organization response
               if(!response.data) {
                 response.data = [];
