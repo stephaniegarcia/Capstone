@@ -88,8 +88,8 @@ function AdminLogin() {
             //Handle login
             console.log(loginResponse.data)
             debugger;
-            if(loginResponse.data && loginResponse.data[0]) {
-                if(loginResponse.data[0].Match) {
+            if(loginResponse.data && loginResponse.data) {
+                if(loginResponse.data.Match) {
                     apiService.adminProfile(loginResponse.data);
                     setShowLoading(false);
                     window.location.href = "/admin/organizaciones";
