@@ -39,13 +39,28 @@ const loginAdmin = async (email, password) => {
   try{
 
     const res = await pool.query(
-        `select password = $1 as Match, admin_id from admin_test where email = $2;`, [password, email]
+        `select password = $1 as Match, admin_id from admin where email = $2;`, [password, email]
     );
+    console.log(res.rows)
     return res.rows;
 
 }catch(err){
     return err;
 }
+}
+
+const getPassword = async (email) => {
+    try{
+
+        const res = await pool.query(
+            `select password, admin_id from admin_test where email = $1;`, [email]
+        );
+        return res.rows;
+
+    }catch(err){
+        return err;
+    }
+
 }
 
 const insertPasswordToken = async (email, token) => {
@@ -79,10 +94,10 @@ const getPasswordToken = async (email) => {
 const changePassword = async (email, password) => {
 
   try{
-
       const res = await pool.query(
           `update admin_test set password = $1 where email = $2;`, [password, email]
       );
+      
       return res.rows;
 
   }catch(err){
@@ -98,5 +113,6 @@ module.exports = {
     loginAdmin,
     insertPasswordToken,
     getPasswordToken,
-    changePassword
+    changePassword,
+    getPassword
 }

@@ -1,10 +1,12 @@
 const { Router } = require('express');
 const router = Router();
-const { _ } = require('underscore');
-//const organizations = require('../organizations.json');
 const dao  = require('../DAO/question_dao');
 
-//Function to gather the questions
+/**
+ * @route /api/questions
+ * @description gather the questions
+ * @returns all the business steps
+ */
 router.get('/api/questions', async (req,res) =>{
   const questions = await dao.getQuestions()
   console.log(questions)

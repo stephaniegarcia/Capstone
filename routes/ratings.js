@@ -1,56 +1,85 @@
 const { Router } = require('express');
 const router = Router();
-const { _ } = require('underscore');
-//const organizations = require('../organizations.json');
 const dao  = require('../DAO/ratings_dao');
 
-//Average Evaluation of organizations
+
+/**
+ * @route /api/ratings
+ * @description route the get the average evaluations of the organizations
+ * @returns all the average rating of each organization
+ */
 router.get('/api/ratings', async (req,res) =>{
   const average_evaluations = await dao.getAverageEvaluations()
-  console.log(average_evaluations)
  res.send(average_evaluations)
 });
 
-//Top 10 Organizations per business type
+
+/**
+ * @route /api/topTenPerBT/:btID
+ * @description Top 10 Organizations per business type
+ * @param btID
+ * @returns the top 10 organizations per type
+ */
 router.get('/api/topTenPerBT/:btID', async (req,res) =>{
     const ratings = await dao.getTopTenBT(req.params.btID)
-    console.log(ratings)
    res.send(ratings)
 });
 
-//Top 10 Organizations per business stage
+
+/**
+ * @route /api/topTenPerBS/:bstageID
+ * @description Top 10 Organizations per business stage
+ * @param bstageID
+ * @returns the top 10 organizations per stage
+ */
 router.get('/api/topTenPerBS/:bstageID', async (req,res) =>{
     const ratings = await dao.getTopTenBS(req.params.bstageID)
-    console.log(ratings)
    res.send(ratings)
 });
 
-//Organizations performing poorly
+/**
+ * @route /api/badOrganizations
+ * @description Organizations performing poorly
+ * @returns organizations performing poorly
+ */
 router.get('/api/badOrganizations', async (req,res) =>{
     const ratings = await dao.getOrgPerformingPoorly()
-    console.log(ratings)
    res.send(ratings)
 });
 
 //Report of accounts created by year, and week
+/**
+ * @route /api/accountsCreated
+ * @description Report of accounts created by year, and week
+ * @returns oaccounts created by year, and week
+ */
 router.get('/api/accountsCreated', async (req,res) =>{
     const ratings = await dao.getAccountsPerWeek()
-    console.log(ratings)
    res.send(ratings)
 });
 
+
 //Comments for every organization
+/**
+ * @route /api/comments
+ * @description route that gathers the comments of the organizations
+ * @return comments
+ * 
+ */
 router.get('/api/comments', async (req,res) =>{
     const comments = await dao.getComments()
-    console.log(comments)
    res.send(comments)
 });
 
-//Count of organizations contacted
+
+/**
+ * @route /api/organizationsContacted
+ * @description Count of organizations contacted
+ * @return comments
+ */
 router.get('/api/organizationsContacted', async (req,res) =>{
     const comments = await dao.getContactedCount()
-    console.log(comments)
-   res.send(comments)
+    res.send(comments)
 });
 
 //Inserting a rating and comment (optional) for an organization

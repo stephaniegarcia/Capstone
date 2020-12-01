@@ -1,10 +1,11 @@
 const { Router } = require('express');
 const router = Router();
-//const organizations = require('../organizations.json');
 const dao  = require('../DAO/admin_dao');
 const bodyParser = require('body-parser');
 const randomstring = require('randomstring');
 var nodemailer  = require('nodemailer');
+const bcrypt = require('bcrypt');
+saltRounds = 10;
 
 let transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -14,33 +15,41 @@ auth: {
   }
 });
 
-router.get('/api/admins', async (req,res) =>{
-  const admins = await dao.getAdmins()
-  console.log(admins)
- res.send(admins)
-});
-
-router.get('/api/admin/:adminID', async (req,res) => {
-  const admin = await dao.getAdminByID(req.params.adminID)
-  console.log(admin)
-  res.send(admin)
-});
-
+/**
+ * 
+ * @route /api/admin 
+ * 
+ * @description route for log in as an administrator
+ * 
+ * @param body
+ * @param password
+ * 
+ * @return true if the credentials are correct
+ * 
+ */
 router.post('/api/admin', async (req, res) => {
   const {email, password} = req.body;
 
     if(email && password){
         if(validEmail(email)){
-            let adminLogin = await dao.loginAdmin(email, password);
-            if(adminLogin instanceof Error){
-                res.status(400).send("wrong credentials")
+
+            hashedPassword = await dao.getPassword(email);
+            
+            if(hashedPassword[0]){
+                const isMatchingPassword = bcrypt.compareSync(password, hashedPassword[0].password)
+                
+                login = {
+                    "Match" : isMatchingPassword,
+                    "admin_id": hashedPassword[0].admin_id
+                } 
+                res.status(200).send(login);
             }
             else{
-                res.status(200).send(adminLogin);
+                res.status(400).send("Esta cuenta no existe o no esta verificada.");
             }
         }
         else{
-            res.status(400).send("error");
+            res.status(400).send("Error: Invalid Email!");
         }
     }
     else{
@@ -48,6 +57,16 @@ router.post('/api/admin', async (req, res) => {
     }
 });
 
+/**
+ * @route /api/admin/changePassword
+ * 
+ * @description route to recieve the email of the administrator
+ * 
+ * @param email
+ * 
+ * @returns an email with the link to change the password
+ * 
+ */
 router.post('/api/admin/changePassword', (req, res) => {
 
   const email = req.body.email;
@@ -78,7 +97,16 @@ router.post('/api/admin/changePassword', (req, res) => {
 });
 });
 
-
+/**
+ * 
+ * @route /api/newPassword/admin/:email
+ * @description route that verifies the token of change password
+ * @param :email
+ * @param id
+ * 
+ * @returns the validation for the email
+ * 
+ */
 router.get('/api/newPassword/admin/:email', async (req,res) =>{
 
   console.log(req.query.id);
@@ -97,17 +125,23 @@ router.get('/api/newPassword/admin/:email', async (req,res) =>{
 
 });
 
-
-router.put('/api/admin/password', (req,res) => {
+/**
+ * @route /api/admin/password
+ * @description route to change the administrator password
+ * @param email
+ * @param password
+ * 
+ */
+router.put('/api/admin/password', async (req,res) => {
   const email = req.body.email;
   const password = req.body.password;
 
   if(email && password){
+    hashedPassword = bcrypt.hashSync(password,saltRounds);
 
-      let change = dao.changePassword(email, password);
-      console.log(email + password)
+      let change = await dao.changePassword(email, hashedPassword);
       if(change instanceof Error){
-          res.status.send("Query error")
+          res.status(400).send(change)
       }
       else{
           res.status(200).send(change)
@@ -119,7 +153,12 @@ router.put('/api/admin/password', (req,res) => {
   }
 });
 
-// Validates email address of course.
+/**
+ * @function validEmail 
+ * @description verify that the email has the correct format
+ * @param {*} email 
+ * @returns true if is valid, otherwise return false
+ */
 function validEmail(email) {
   var filter = /^\s*[\w\-\+_]+(\.[\w\-\+_]+)*\@[\w\-\+_]+\.[\w\-\+_]+(\.[\w\-\+_]+)*\s*$/;
   return String(email).search (filter) != -1;
