@@ -153,7 +153,12 @@ const apiService = {
     getRoadmapSteps: (bt_id, bstage_id) => {
         var orgSteps = JSON.parse(localStorage.getItem('col-org-steps'));
         if(orgSteps && orgSteps != null) {
-            orgSteps = orgSteps.filter(o => o.bt_id == bt_id);
+            if(bstage_id) {
+                orgSteps = orgSteps.filter(o => o.bt_id == bt_id && o.bstage_id == bstage_id);
+            }
+            else {
+                orgSteps = orgSteps.filter(o => o.bt_id == bt_id);
+            }
             if(orgSteps.length>0) {
                 return orgSteps;
             }
