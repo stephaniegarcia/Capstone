@@ -175,7 +175,7 @@ function Outcome() {
               <TableCell className="no-bottom-border" align="center">{row.phone_number}</TableCell>
               <TableCell className="no-bottom-border" align="center">{row.email}</TableCell>
               <TableCell className="no-bottom-border" align="center">{orgStage}</TableCell>
-              <TableCell className="no-bottom-border" align="center">{apiService.getOrgType(row.bt_id)}</TableCell>
+              <TableCell className="no-bottom-border" align="center">{apiService.getOrgType(businessType)}</TableCell>
             </TableRow>
             <TableRow>
                 <TableCell colSpan="6" style={{padding: "0 80px 30px 80px"}}>
@@ -278,9 +278,7 @@ function Outcome() {
         <div>
             <h1>Segun tus respuestas tu tipo de negocio es:</h1>
             <h2>{apiService.getOrgType(businessType)}</h2>
-            <h3>¡Sigue tu camino! Si empezaste tu negocio porque es lo que te apasiona, 
-              con el propósito de generar ingreso personal adicional o porque quieres tener
-               flexibilidad con tu tiempo, tienes una microempresa.</h3>
+            <h3>¡Sigue tu camino!</h3>
                {apiService.getOrgTypeVideo(businessType) && apiService.getOrgTypeVideo(businessType) != null && (
                   <iframe src={apiService.getOrgTypeVideo(businessType)} frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                 )}

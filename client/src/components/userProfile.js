@@ -209,7 +209,7 @@ function UserProfile() {
           <TableCell className="no-bottom-border" align="center">{row.phone_number}</TableCell>
           <TableCell className="no-bottom-border" align="center">{row.email}</TableCell>
           <TableCell className="no-bottom-border" align="center">{orgStage}</TableCell>
-          <TableCell className="no-bottom-border" align="center">{apiService.getOrgType(row.bt_id)}</TableCell>
+          <TableCell className="no-bottom-border" align="center">{apiService.getOrgType(businessType)}</TableCell>
         </TableRow>
         <TableRow>
           <TableCell colSpan="6" style={{padding: "0 80px 30px 80px"}}>
