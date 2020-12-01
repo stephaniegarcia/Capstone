@@ -64,8 +64,16 @@ export default function Organizations() {
     var tempData = [];
     for(var i = 0; i < orgs.length; i++) {
       var org = orgs[i];
-      if(org && searchString && searchString.length>0 && (org.name && String(org.name).toUpperCase().includes(searchString.toUpperCase())) || (org.phone && String(org.phone).includes(searchString)) || (org.email && String(org.email).toUpperCase().includes(searchString.toUpperCase()))) {
-        finalData.push(org);
+      if(searchString && searchString.length > 0) {
+        if(
+            (org.name && String(org.name).toUpperCase().includes(searchString.toUpperCase())) ||
+            (org.email && String(org.email).toUpperCase().includes(searchString.toUpperCase()))
+        ) {
+          finalData.push(org);    
+        }
+      }
+      else {
+        finalData.push(org);  
       }
     }
 

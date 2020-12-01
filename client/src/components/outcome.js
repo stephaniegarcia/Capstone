@@ -278,7 +278,7 @@ function Outcome() {
         <div>
             <h1>Segun tus respuestas tu tipo de negocio es:</h1>
             <h2>{apiService.getOrgType(businessType)}</h2>
-            <h3>¡Sigue el camino rojo! Si empezaste tu negocio porque es lo que te apasiona, 
+            <h3>¡Sigue tu camino! Si empezaste tu negocio porque es lo que te apasiona, 
               con el propósito de generar ingreso personal adicional o porque quieres tener
                flexibilidad con tu tiempo, tienes una microempresa.</h3>
                {apiService.getOrgTypeVideo(businessType) && apiService.getOrgTypeVideo(businessType) != null && (
@@ -299,41 +299,52 @@ function Outcome() {
             <div>
                <h1>Nos indicaste que tu negocio esta en etapa de {apiService.getOrgStage(profile.bstage_id)}</h1>
               <h2>Este sera tu camino a recorrer:</h2>
+              {apiService.getOrgTypeVideo(businessType) && apiService.getOrgTypeVideo(businessType) != null && (
+                <iframe src={apiService.getOrgTypeVideo(businessType)} frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+              )}
               <img className="org-type-icon" src={"images/"+apiService.getOrgTypeIcon(businessType)} />  
-              <TableContainer>
-                <Table aria-label="table" className={'rm-table'}>
-                  <TableBody >
-                    {roadmap.map((row) => (<RoadmapRow  key={row.name} row={row} />))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
+              {roadmap && roadmap.length>0 && (    
+                <TableContainer>
+                  <Table aria-label="table" className={'rm-table'}>
+                    <TableBody >
+                      {roadmap.map((row) => (<RoadmapRow  key={row.name} row={row} />))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              )}
+              {roadmap && roadmap.length==0 && (
+                <h4>
+                    No existen pasos ni organizaciones para tu etapa de negocio.
+                </h4>
+              )}
             </div>
           </div>
           </Paper>  
-          
-          <Paper className="paper-margin" elevation={10} >
-        <div>
-            <h1>Aqui se muestran todas las organizaciones mencionadas en el recorrido: </h1>
-            <h2>Organizaciones</h2>
-            <TableContainer>
-              <Table aria-label="collapsible table">
-                <TableHead>
-                  <TableRow>
-                    <TableCell />
-                    <TableCell component="h4">Nombre</TableCell>
-                    <TableCell component="h4" align="center">Teléfono</TableCell>
-                    <TableCell component="h4" align="center">Correo Electrónico&nbsp;</TableCell>
-                    <TableCell component="h4" align="center">Etapa&nbsp;</TableCell>
-                    <TableCell component="h4" align="center">Tipo&nbsp;</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody >
-                  {organizations.map((row) => (<Row  key={row.name} row={row} />))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-        </div>
-          </Paper>
+          {organizations && organizations.length>0 && (
+            <Paper className="paper-margin" elevation={10} >
+              <div>
+                  <h1>Aqui se muestran todas las organizaciones mencionadas en el recorrido: </h1>
+                  <h2>Organizaciones</h2>
+                  <TableContainer>
+                    <Table aria-label="collapsible table">
+                      <TableHead>
+                        <TableRow>
+                          <TableCell />
+                          <TableCell component="h4">Nombre</TableCell>
+                          <TableCell component="h4" align="center">Teléfono</TableCell>
+                          <TableCell component="h4" align="center">Correo Electrónico&nbsp;</TableCell>
+                          <TableCell component="h4" align="center">Etapa&nbsp;</TableCell>
+                          <TableCell component="h4" align="center">Tipo&nbsp;</TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody >
+                        {organizations.map((row) => (<Row  key={row.name} row={row} />))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+              </div>
+            </Paper>
+          )}
           <div>
           <Button style={{'margin':'15px'}} variant="contained" color="secondary" href="/tce">
             Repetir el Cuestionario

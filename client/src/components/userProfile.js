@@ -120,8 +120,11 @@ function UserProfile() {
   
   //phone validation helper function
   function isValidPhone(phone) {
-    const re = /^[+]*[(]{0,1}[0-9]{1,3}[)]{0,1}[-\s\./0-9]*$/g;
-    return re.test(String(phone));
+    if(!phone || phone == null) {
+      return false;
+    }
+    var filter = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/im;
+    return String(phone).search (filter) != -1;
   }
   
   //name validation helper function
@@ -325,7 +328,7 @@ function UserProfile() {
 
         var ratingsResponse = await apiService.getRequest('ratings/'+profile.user_id);
         var ratings = ratingsResponse.data;
-        apiService.getRequest('roadmap/'+profile.bt_id).then(response => {
+        apiService.getRequest('roadmap/'+profile.bt_id+'/'+profile.bstage_id).then(response => {
           //Handle organization response
           if(!response.data) {
             response.data = [];
@@ -583,46 +586,57 @@ function UserProfile() {
                     <iframe src={apiService.getOrgTypeVideo(businessType)} frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                   )}
                   <img className="org-type-icon" src={"images/"+apiService.getOrgTypeIcon(businessType)} />
-                  <TableContainer style={{marginTop:"15px"}}>
-                    <Table aria-label="table" className={'rm-table'}>
-                      <TableBody >
-                        {roadmap.map((row) => (<RoadmapRow  key={row.name} row={row} />))}
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
+                  
+                  {roadmap && roadmap.length>0 && (
+                    <TableContainer style={{marginTop:"15px"}}>
+                      <Table aria-label="table" className={'rm-table'}>
+                        <TableBody >
+                          {roadmap.map((row) => (<RoadmapRow  key={row.name} row={row} />))}
+                        </TableBody>
+                      </Table>
+                    </TableContainer>
+                  )}
+                  {roadmap && roadmap.length==0 && (
+                    <h4>
+                        No existen pasos ni organizaciones para tu etapa de negocio.
+                    </h4>
+                  )}
                 </div>
                 <ReactToPrint
                   trigger={() => <Button style={{'margin':'15px'}} variant="contained" color="primary">Guardar a Pdf</Button>}
                   content={() => roadmapRef.current} />
-              </Paper>        
-              <Paper className="paper-margin" elevation={10} >
-                <div ref={organizationsRef}>
-                <h1>Aqui se muestran todas las organizaciones mencionadas en el recorrido: </h1>
-                <h2>Organizaciones</h2>
-                  <div>
-                    <TableContainer>
-                      <Table aria-label="collapsible table">
-                        <TableHead>
-                          <TableRow>
-                            <TableCell />
-                            <TableCell component="h4">Nombre</TableCell>
-                            <TableCell component="h4" align="center">Teléfono</TableCell>
-                            <TableCell component="h4" align="center">Correo Electrónico&nbsp;</TableCell>
-                            <TableCell component="h4" align="center">Etapa&nbsp;</TableCell>
-                            <TableCell component="h4" align="center">Tipo&nbsp;</TableCell>
-                          </TableRow>
-                        </TableHead>
-                        <TableBody >
-                          {organizations.map((row) => (<Row  key={row.name} row={row} />))}
-                        </TableBody>
-                      </Table>
-                    </TableContainer>
+              </Paper>       
+
+              {organizations && organizations.length>0 && (
+                <Paper className="paper-margin" elevation={10} >
+                  <div ref={organizationsRef}>
+                  <h1>Aqui se muestran todas las organizaciones mencionadas en el recorrido: </h1>
+                  <h2>Organizaciones</h2>
+                    <div>
+                      <TableContainer>
+                        <Table aria-label="collapsible table">
+                          <TableHead>
+                            <TableRow>
+                              <TableCell />
+                              <TableCell component="h4">Nombre</TableCell>
+                              <TableCell component="h4" align="center">Teléfono</TableCell>
+                              <TableCell component="h4" align="center">Correo Electrónico&nbsp;</TableCell>
+                              <TableCell component="h4" align="center">Etapa&nbsp;</TableCell>
+                              <TableCell component="h4" align="center">Tipo&nbsp;</TableCell>
+                            </TableRow>
+                          </TableHead>
+                          <TableBody >
+                            {organizations.map((row) => (<Row  key={row.name} row={row} />))}
+                          </TableBody>
+                        </Table>
+                      </TableContainer>
+                    </div>
                   </div>
-                </div>
-                <ReactToPrint
-                  trigger={() => <Button style={{'margin':'15px'}} variant="contained" color="primary">Guardar a Pdf</Button>}
-                  content={() => organizationsRef.current} />
-              </Paper>  
+                  <ReactToPrint
+                    trigger={() => <Button style={{'margin':'15px'}} variant="contained" color="primary">Guardar a Pdf</Button>}
+                    content={() => organizationsRef.current} />
+                </Paper>  
+              )} 
             </div>
           </div>
       ): (

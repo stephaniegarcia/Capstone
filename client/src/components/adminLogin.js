@@ -87,9 +87,24 @@ function AdminLogin() {
         apiService.postRequest("admin", { email: email, password: password }).then(loginResponse => {
             //Handle login
             console.log(loginResponse.data)
-            apiService.adminProfile(loginResponse.data);
-            setShowLoading(false);
-            window.location.href = "/admin/organizaciones";
+            debugger;
+            if(loginResponse.data && loginResponse.data[0]) {
+                if(loginResponse.data[0].match) {
+                    apiService.adminProfile(loginResponse.data);
+                    setShowLoading(false);
+                    window.location.href = "/admin/organizaciones";
+                }
+                else {
+                    setShowLoading(false);
+                    setErrorMessage('Credenciales incorrectas');
+                    setShowErrorAlert(true);        
+                }
+            }
+            else {
+                setShowLoading(false);
+                setErrorMessage('Credenciales incorrectas');
+                setShowErrorAlert(true);        
+            }
         }).catch(err =>{
             //Handle error
             setShowLoading(false);

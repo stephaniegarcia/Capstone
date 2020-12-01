@@ -93,8 +93,8 @@ export default function Organizations() {
     if(!phone || phone == null) {
       return false;
     }
-    const re = /^[+]*[(]{0,1}[0-9]{1,3}[)]{0,1}[-\s\./0-9]*$/g;
-    return re.test(String(phone));
+    var filter = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/im;
+    return String(phone).search (filter) != -1;
   }
 //link validation helper function
 //@param link - url link
@@ -223,8 +223,16 @@ export default function Organizations() {
     var finalData = [];
     for(var i = 0; i < orgs.length; i++) {
       var org = orgs[i];
-      if(org && searchString && searchString.length>0 && (org.name && String(org.name).toUpperCase().includes(searchString.toUpperCase())) || (org.phone && String(org.phone).includes(searchString)) || (org.email && String(org.email).toUpperCase().includes(searchString.toUpperCase()))) {
-        finalData.push(org);
+      if(searchString && searchString.length > 0) {
+        if(
+            (org.name && String(org.name).toUpperCase().includes(searchString.toUpperCase())) ||
+            (org.email && String(org.email).toUpperCase().includes(searchString.toUpperCase()))
+        ) {
+          finalData.push(org);    
+        }
+      }
+      else {
+        finalData.push(org);  
       }
     }
     setOrganizationData(finalData)

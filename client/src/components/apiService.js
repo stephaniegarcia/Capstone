@@ -102,7 +102,7 @@ const apiService = {
                 icon = 'microempresa';
                 break;
             case 2:
-                icon = 'commerciante';
+                icon = 'comerciante';
                 break;
             case 3:
                 icon = 'innovacion';
@@ -121,7 +121,7 @@ const apiService = {
             case 1:
                 return 'microempresa';
             case 2:
-                return 'commerciante';
+                return 'comerciante';
             case 3:
                 return 'innovacion';
             case 4:
