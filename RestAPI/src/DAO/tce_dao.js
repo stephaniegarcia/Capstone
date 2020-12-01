@@ -119,13 +119,13 @@ const setType = async (user_id, type) => {
   }
 };
 
-async function getRoadMap(btID){
+async function getRoadMap(bstageID, btID){
   try {
       const res = await pool.query(
-        `SELECT org_id, name, description, email, phone_number, bt_id, bs_id, is_active, org_link
-        FROM public.organization
-        where bt_id = $1
-        ORDER BY bs_id ASC`, [btID]
+        `SELECT O.org_id, O.name, O.description, O.email, O.phone_number, O.bt_id, O.bs_id, O.is_active, O.org_link, b.bstage_id
+        FROM public.organization as O inner join business_step as B on O.bs_id = b.bs_id
+        where b.bstage_id = $1 AND O.bt_id =$2
+        ORDER BY bs_id ASC`, [bstageID, btID]
       );
       console.log(res.rows)
       return res.rows;
