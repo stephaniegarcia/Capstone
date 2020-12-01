@@ -223,7 +223,7 @@ router.post('/api/login', async (req,res) => {
                 res.status(200).send(login);
             }
             else{
-                res.status(400).send("Account does not exist o is not verified");
+                res.status(400).send("Esta cuenta no existe o no esta verificada.");
             }
         }
         else{
