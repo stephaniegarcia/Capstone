@@ -72,45 +72,36 @@ router.get('/api/tce/roadmap/organizations/:type', async (req, res) => {
 router.post('/api/tce/answers/:userID', async (req, res) => {
     const {answer1,answer2,answer3,answer4,answer5,answer6,answer7,
     answer8,answer9,answer10,answer11} = req.body;
-    let type = "";
-    console.log(answer1);
+    let type = 0;
+
+  
+    if((answer9 && answer10 && answer11) || (answer9 && answer10) || (answer10 && answer11)|| (answer9 && answer11) || answer9){
+        type = 4;
+    }
+    else if((answer6 && answer7 && answer8) || (answer6 && answer7) || (answer7 && answer8) || (answer6 && answer8)){
+        type = 3;
+    }
+     else if((answer5 && answer5) || answer5 || answer4){
+        type = 2;
+    }
+    else if((answer1 && answer2 && answer3) || (answer1 && answer2) || (answer2 && answer3) || (answer1 && answer3) || answer3){
+        type = 1;
+    }
+    else{
+        res.status(400).send("No se puede determinar con las respuestas. Para mas informacion llamar a Colmena66 a 787.525.4111");
+    }
+
     
-        if(((answer1 && answer2 && answer3) || (answer1 && answer2) || (answer2 && answer3) || (answer1 && answer3) || answer3)
-            && (!answer4 && !answer5 && !answer6 && !answer7 && !answer8 && !answer9 && !answer10 && !answer11)){
-                type = 1;
-                //res.status(200).send(`User with id: ${req.params.userID} is Microempresa`);
-                
-        }
-        else if(((answer5 && answer5) || answer5 || answer4)
-            && (!answer1 && !answer2 && !answer3 && !answer6 && !answer7 && !answer8 && !answer9 && !answer10 && !answer11)){
-                type = 2;
-                //res.status(200).send(`User with id: ${req.params.userID} is Comerciante`);
-        }
-        else if(((answer6 && answer7 && answer8) || (answer6 && answer7) || (answer7 && answer8) || (answer6 && answer8))
-            && (!answer1 && !answer2 && !answer3 && !answer4 && !answer5 && !answer9 && !answer10 && !answer11)){
-                type = 3
-                //res.status(200).send(`User with id: ${req.params.userID} is Empresa Basada en Innovacion`);
-        }
-        else if(((answer9 && answer10 && answer11) || (answer9 && answer10) || (answer10 && answer11)|| (answer9 && answer11))
-            && (!answer1 && !answer2 && !answer3 && !answer4 && !answer5 && !answer6 && !answer7 && !answer8)){
-                type = 4;
-                //res.status(200).send(`User with id: ${req.params.userID} is Empresa en Crecimiento`);
-        }
-        else{
-            res.status(400).send("No se puede determinar con las respuestas. Para mas informacion llamar a Colmena66 a 787.525.4111");
-        }
-        
-        let answers = await dao.saveAnswers(req.params.userID,answer1,answer2,answer3,answer4,answer5,answer6,answer7,
+    let answers = await dao.saveAnswers(req.params.userID,answer1,answer2,answer3,answer4,answer5,answer6,answer7,
             answer8,answer9,answer10,answer11);
-        let bs_type = await dao.setType(req.params.userID, type);
+    let bs_type = await dao.setType(req.params.userID, type);
 
-        if(answers instanceof Error || bs_type instanceof Error) {
-            res.status(400).send("Query error");
-        }
-        else{
-            res.status(200).send("Answers saved");
-        }
-
+    if(answers instanceof Error || bs_type instanceof Error) {
+        res.status(400).send("Query error");
+    }
+    else{
+        res.status(200).send("Answers saved");
+    }
 
 });
 
@@ -137,42 +128,33 @@ router.put('/api/tce/answers/:userID', async (req, res) => {
     const {answer1,answer2,answer3,answer4,answer5,answer6,answer7,
     answer8,answer9,answer10,answer11} = req.body;
     let type = "";
-    console.log(answer1);
     
-        if(((answer1 && answer2 && answer3) || (answer1 && answer2) || (answer2 && answer3) || (answer1 && answer3) || answer3)
-            && (!answer4 && !answer5 && !answer6 && !answer7 && !answer8 && !answer9 && !answer10 && !answer11)){
-                type = 1;
-                //res.status(200).send(`User with id: ${req.params.userID} is Microempresa`);
-        }
-        else if(((answer5 && answer5) || answer5 || answer4)
-            && (!answer1 && !answer2 && !answer3 && !answer6 && !answer7 && !answer8 && !answer9 && !answer10 && !answer11)){
-                type = 2;
-                //res.status(200).send(`User with id: ${req.params.userID} is Comerciante`);
-        }
-        else if(((answer6 && answer7 && answer8) || (answer6 && answer7) || (answer7 && answer8) || (answer6 && answer8))
-            && (!answer1 && !answer2 && !answer3 && !answer4 && !answer5 && !answer9 && !answer10 && !answer11)){
-                type = 3;
-                //res.status(200).send(`User with id: ${req.params.userID} is Empresa Basada en Innovacion`);
-        }
-        else if(((answer9 && answer10 && answer11) || (answer9 && answer10) || (answer10 && answer11)|| (answer9 && answer11))
-            && (!answer1 && !answer2 && !answer3 && !answer4 && !answer5 && !answer6 && !answer7 && !answer8)){
-                type = 4
-                //res.status(200).send(`User with id: ${req.params.userID} is Empresa en Crecimiento`);
-        }
-        else{
-            res.status(400).send("No se puede determinar con las respuestas.");
-        }
+    if((answer9 && answer10 && answer11) || (answer9 && answer10) || (answer10 && answer11)|| (answer9 && answer11)){
+        type = 4;
+    }
+    else if((answer6 && answer7 && answer8) || (answer6 && answer7) || (answer7 && answer8) || (answer6 && answer8)){
+        type = 3;
+    }
+     else if((answer5 && answer5) || answer5 || answer4){
+        type = 2;
+    }
+    else if((answer1 && answer2 && answer3) || (answer1 && answer2) || (answer2 && answer3) || (answer1 && answer3) || answer3){
+        type = 1;
+    }
+    else{
+        res.status(400).send("No se puede determinar con las respuestas. Para mas informacion llamar a Colmena66 a 787.525.4111");
+    }
     
-        let answers = await dao.changeAnswers(req.params.userID,answer1,answer2,answer3,answer4,answer5,answer6,answer7,
+    let answers = await dao.changeAnswers(req.params.userID,answer1,answer2,answer3,answer4,answer5,answer6,answer7,
             answer8,answer9,answer10,answer11);
-        let bs_type = await dao.setType(req.params.userID, type);
+    let bs_type = await dao.setType(req.params.userID, type);
 
-        if(answers instanceof Error || bs_type instanceof Error) {
-            res.status(400).send("Query error");
-        }
-        else{
-            res.status(200).send("Answers saved");
-        }
+    if(answers instanceof Error || bs_type instanceof Error) {
+        res.status(400).send("Query error");
+    }
+    else{
+        res.status(200).send("Answers saved");
+    }
 
 });
 
