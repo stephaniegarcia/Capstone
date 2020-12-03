@@ -1,148 +1,134 @@
-import React, { Component } from 'react'
-import { Formik } from 'formik'
-import { object, ref, string } from 'yup'
-import Input from '@material-ui/core/Input'
-import InputLabel from '@material-ui/core/InputLabel'
-import FormControl from '@material-ui/core/FormControl'
-import FormHelperText from '@material-ui/core/FormHelperText'
+import React from 'react'
+import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button'
+import { Redirect } from 'react-router-dom';
 import Paper from '@material-ui/core/Paper'
 import Spinner from './loading'
 import Alert from './alert'
 //import apiService from "./mockApiService";
 import apiService from "./apiService";
 
-export default class ForgotPassword extends Component {
+function ForgotPassword() {
+  //State Variables getters & setters
+  const [email, setEmail] = React.useState('');
+  const [validEmail, setValidEmail] = React.useState(true);
+  const [showErrorAlert, setShowErrorAlert] = React.useState(false);
+  const [showMessageAlert, setShowMessageAlert] = React.useState(false);
+  const [errorMessage, setErrorMessage] = React.useState('');
+  const [showLoading, setShowLoading] = React.useState(false);
+
+  //email validation helper function
+  //@param email - user email
+  //@return if it's valid or not
+  function isValidEmail(email) {
+      if(email && email.length == 0) {
+          return true;
+      }
+      const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+      return re.test(String(email).toLowerCase());
+  }
   
-  state = {
-    passChangeSuccess: false,
-  }
+  //Event Handlers 
 
-  _handleModalClose = () => {
-    this.setState(() => ({
-      passChangeSuccess: false,
-    }))
-  }
+  //Enter key event callback
+  const onEnterPress = (event, inputName) => {
+      if (event.key === 'Enter' || event.keyCode == 13) {
+          if(inputName == 'email') {
+            handleClick();
+          }
+      }
+  };
 
-  _renderModal = () => {
-    const onClick = () => {
-      this.setState(() => ({ passChangeSuccess: false }))
-    }
+  //email change event callback
+  const handleEmailChange = (event) => {
+      setEmail(event.target.value.toLowerCase());
+      setValidEmail((isValidEmail(event.target.value.toLowerCase())));
+  };
 
-    return (
-      <Alert
-        isOpen={this.state.passChangeSuccess}
-        onClose={this._handleClose}
-        handleSubmit={onClick}
-        title="Restablecimiento de contraseña"
-        text="Se envió un correo electrónico para completar el proceso de recuperación de contraseña"
-        submitButtonText="Ok"
-      />
-    )
-  }
+  //error alert button click event callback
+  const onErrorAlertClick = () => {
+      setShowErrorAlert(false);
+  };
 
-//Submit Handler
-  _handleSubmit = ({
-    email,
-    setSubmitting,
-    resetForm,
-  }) => {
-    // fake async login
-    setTimeout(async () => {
-      setSubmitting(false)
+  //message alert button click event callback
+  const onMessageAlertClick = () => {
+    window.location.href = "/login";
+  };
 
-      this.setState(() => ({
-        passChangeSuccess: true,
-      }))
-      apiService.postRequest('user/changePassword', {email: email});
-      resetForm()
-    }, 1000)
-  }
+  //login button click event callback
+  const handleClick = () => {
+      if(!validEmail || !email.length>0) {
+          setErrorMessage('Valide la información antes de continuar');
+          setShowErrorAlert(true);
+          return;
+      }
 
-  render() {
-    return (
-        
-      <Formik
-        initialValues={{
-          email: '',
-        }}
-        validationSchema={object().shape({
-          email: string().required('Correo electronico es requerido'),
-        })}
-        onSubmit={(
-          { email },
-          { setSubmitting, resetForm }
-        ) =>
-          this._handleSubmit({
-            email,
-            setSubmitting,
-            resetForm,
-          })
-        }
-        render={props => {
-          const {
-            values,
-            touched,
-            errors,
-            handleChange,
-            handleBlur,
-            handleSubmit,
-            isValid,
-            isSubmitting,
-          } = props
-          return isSubmitting ? (
-            <Spinner />
-          ) : (
-              
-          <div className="top-margin">
-              <Paper className="form form--wrapper paper-margin" elevation={10}>
-               <h1>Recupera Tu Contrasena</h1>
-               
-              <form className="form form--wrapper" onSubmit={handleSubmit}>
-                <div className="margin-25">
-                <FormControl fullWidth margin="dense">
-                  <InputLabel
-                    htmlFor="email"
-                    error={Boolean(touched.email && errors.email)}
-                  >
-                    {'Correo Electronico'}
-                  </InputLabel>
-                  <Input
-                    id="email"
-                    name="email"
-                    value={values.email}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    error={Boolean(touched.email && errors.email)}
-                  />
-                  <FormHelperText
-                    error={Boolean(touched.email && errors.email)}
-                  >
-                    {touched.email && errors.email
-                      ? errors.email
-                      : ''}
-                  </FormHelperText>
-                </FormControl>
-     
-                </div>
-           
-                <Button
-                  type="submit"
-                  variant="contained"
-                  color="primary"
-                  disabled={Boolean(!isValid || isSubmitting)}
-                  style={{ margin: '16px' }}
-                >
-                  {'Restablecer la contraseña'}
-                </Button>
-              </form>
-              {this._renderModal()}
-            </Paper>
+      //Show Loading
+      setShowLoading(true);
+      //Perform login request
+      apiService.postRequest("user/changePassword", { email: email }).then(response => {
+        setShowLoading(false);  
+        showMessageAlert(true);
+      }).catch(err =>{
+          //Handle error
+          setShowLoading(false);
+          setErrorMessage(err ? (err.response ? (err.response.data? String(err.response.data) : String(err.response)) : String(err)) : 'Ocurrio un error');
+          setShowErrorAlert(true);
+      });
+  };
+
+  return(
+      apiService.isAuthenticated() ? 
+      //If authenticated go to home page
+      <Redirect to="/" /> :
+
+      //Show login view
+      <div className="top-margin">
+          <Paper className="form form--wrapper paper-margin" elevation={10}> 
+              <h1>Recupera Tu Contrasena</h1>
+              <div className="margin-25">
+                  <TextField
+                      InputLabelProps={{
+                          shrink: true,
+                      }}  
+                      className="form-control"
+                      label="Correo Electrónico:"
+                      name="email"
+                      error={!validEmail}
+                      helperText={!validEmail ? "Correo electrónico inválido" : ""}
+                      onKeyDown={(e)=>{ onEnterPress(e, 'email'); }}
+                      onChange={handleEmailChange}
+                      value={email} />
+              </div>
+              <div>
+                  <Button
+                      className="form-control"
+                      type="submit"
+                      variant="contained"
+                      color="primary"
+                      onClick={handleClick}
+                      disabled= {!validEmail || !email.length>0}
+                      style={{ margin: '16px' }}>
+                          Restablecer la contraseña
+                  </Button>
+              </div>
+          </Paper>
           
-          </div>
-          )
-        }}
+          <Alert
+              isOpen={showErrorAlert}
+              handleSubmit={onErrorAlertClick}
+              title="Error"
+              text={errorMessage}
+              submitButtonText="Ok" />
+          <Alert
+            isOpen={showMessageAlert}
+            handleSubmit={onMessageAlertClick}
+            title="Restablecimiento de contraseña"
+            text="Se envió un correo electrónico para completar el proceso de recuperación de contraseña"
+            submitButtonText="Ok"
       />
-    )
-  }
+          <Spinner isShown={showLoading} />
+      </div>
+  );
 }
+export default ForgotPassword;

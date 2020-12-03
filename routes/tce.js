@@ -207,7 +207,7 @@ router.get('/api/referred/contacted', async (req,res) =>{
 });
 
 router.get('/api/roadmap/:btID/:bstageID', async (req,res) =>{
-    const roadmap = await dao.getRoadMap(req.params.bstageID,req.params.bstageID)
+    const roadmap = await dao.getRoadMap(req.params.bstageID,req.params.btID)
     console.log(roadmap)
    res.send(roadmap)
 });

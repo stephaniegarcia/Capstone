@@ -37,7 +37,8 @@ function AdminLogin() {
         if(text && text.length == 0) {
             return true;
         }
-        return text.length > 6
+        const re = /^(?=.*\d)(?=.*[a-zA-Z])(?=.*[!#$%&*+,-./:<=>?@^_`{|}~])[a-zA-Z0-9 !#$%&*+,-./:<=>?@^_`{|}~]{8,64}$/;
+        return re.test(text);
     }
 
     //Enter key event callback
@@ -86,8 +87,6 @@ function AdminLogin() {
         //Perform admin login request
         apiService.postRequest("admin", { email: email, password: password }).then(loginResponse => {
             //Handle login
-            console.log(loginResponse.data)
-            debugger;
             if(loginResponse.data && loginResponse.data) {
                 if(loginResponse.data.Match) {
                     apiService.adminProfile(loginResponse.data);
@@ -132,7 +131,7 @@ function AdminLogin() {
                         name="email"
                         onKeyDown={(e)=>{onEnterPress(e,"email")}}
                         error={!validEmail}
-                        //errorText="Correo electrónico inválido"
+                        helperText={!validEmail ? "Correo electrónico inválido" : ""}
                         onChange={handleEmailChange}
                         value={email} />
                 </div>
@@ -146,8 +145,8 @@ function AdminLogin() {
                         label="Contraseña:"
                         name="pass"
                         onKeyDown={(e)=>{onEnterPress(e,"pass")}}
-                        //error={!validPassword}
-                        //helperText="Contraseña inválido"
+                        error={!validPassword}
+                        helperText={!validPassword ? "Contraseña inválido" : ""}
                         onChange={handlePasswordChange}
                         value={password} />
                 </div>

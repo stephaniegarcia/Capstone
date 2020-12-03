@@ -262,8 +262,33 @@ a.MuiButton-containedPrimary.secondary-button:disabled, button.MuiButton-contain
   color: white !important;
 }
 
+.light-text {
+  font-weight: lighter !important;
+}
 
+.center-text {
+  text-align: center;
+}
 
+.collapse-header-buttons > h5 {
+  display: inline-block;
+  width: auto;
+}
+.collapse-header-buttons > div {
+  display: inline-block;
+  float: right;
+}
+
+.not-scrollable > table > tbody > div > div {
+  overflow: hidden;
+}
+
+.home-hr {
+  width: 30%;
+  border-color: #f5d010;
+  border-width: 3px;
+  border-style: solid;
+}
 
 .MuiPaper-elevation10 {
   animation: fadeIn ease 500ms;
@@ -302,4 +327,7 @@ a.MuiButton-containedPrimary.secondary-button:disabled, button.MuiButton-contain
 @media screen and (max-width: 768px) {
   .content-desktop {display: none;}
   .content-mobile {display: block;}
+  .collapse-header-buttons > div {
+    display: block;
+  }
 }

@@ -7,9 +7,7 @@ import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableContainer from '@material-ui/core/TableContainer';
-import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
-import Typography from '@material-ui/core/Typography';
 import Link from '@material-ui/core/Link';
 import Paper from '@material-ui/core/Paper';
 import Dialog from '@material-ui/core/Dialog';
@@ -22,6 +20,13 @@ import FormControl from '@material-ui/core/FormControl';
 import Button from '@material-ui/core/Button';
 import Spinner from './loading'
 import Alert from './alert'
+import Skeleton from '@material-ui/lab/Skeleton';
+import IconButton from '@material-ui/core/IconButton';
+import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
+import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
+import Collapse from '@material-ui/core/Collapse';
+import Grid from '@material-ui/core/Grid';
+
 //import apiService from "./mockApiService";
 import apiService from "./apiService";
 import { Step } from '@material-ui/core';
@@ -42,6 +47,8 @@ export default function Organizations() {
   const [organizationData, setOrganizationData] = useState([]);
   const [searchString, setsearchString] = useState('');
   const [initialLoad, setInitialLoad] = useState(true);
+
+  const [showLoadingOrgs, setShowLoadingOrgs] = React.useState(false);
 
   const [openDeleteAlert, setOpenDeleteAlert] = React.useState(false);
 
@@ -309,11 +316,12 @@ export default function Organizations() {
         setFullOrganizationList(organizationsResponse.data);
         filterOrganizations(organizationsResponse.data);
         setShowLoading(false);
-        
+        setShowLoadingOrgs(false);
       }).catch(err =>{
         setShowLoading(false);
         setErrorMessage(err ? (err.response ? (err.response.data? String(err.response.data) : String(err.response)) : String(err)) : 'Ocurrio un error');
         setShowErrorAlert(true);
+        setShowLoadingOrgs(false);
       });
     }
     else {
@@ -446,21 +454,45 @@ export default function Organizations() {
 
   function OrganizationRow(props) {
     const { row } = props;
-    //const [open, setOpen] = useState(false);
-    console.log(row.is_active);
+    const [open, setOpen] = useState(false);
     return (
       <React.Fragment>
         <TableRow>
-          <div>
-            <Button style={{'margin':'15px'}} variant="contained" color="primary" onClick={()=>{ handleOpenEditOrgModalClickOpen(row); }}>
-              Editar
-            </Button>
-            <Button style={{'margin':'15px'}} variant="contained" color="secondary" onClick={()=>{ handleOpenDeleteAlertClickOpen(row); }}>
-              Remover
-            </Button>
-          </div>
+          <TableCell>
+              <IconButton aria-label="expand row" size="small" onClick={() => setOpen(!open)}>
+                  {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+              </IconButton>
+          </TableCell>
+          <TableCell scope="row" className="collapse-header-buttons">
+              <h5>{row.name}</h5>
+              <div>
+                <Button style={{'margin':'15px'}} variant="contained" color="primary" onClick={()=>{ handleOpenEditOrgModalClickOpen(row); }}>
+                  Editar
+                </Button>
+                <Button style={{'margin':'15px'}} variant="contained" color="secondary" onClick={()=>{ handleOpenDeleteAlertClickOpen(row); }}>
+                  Remover
+                </Button>
+              </div>
+          </TableCell>
         </TableRow>
-        <TableRow className={classes.root}>
+        <TableRow>
+          <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
+              <Collapse in={open} timeout="auto" unmountOnExit>
+                  <Grid container spacing={1}>
+                    <Grid item xs={12} sm={6} md={6} lg={3}><h3 className="center-text"><span className="light-text">Teléfono: </span>{row.phone_number}</h3></Grid>
+                    <Grid item xs={12} sm={6} md={6} lg={3}><h3 className="center-text"><span className="light-text">Correo electrónico: </span>{row.email}</h3></Grid>
+                    <Grid item xs={12} sm={6} md={6} lg={3}><h3 className="center-text"><span className="light-text">Etapa: </span>{apiService.getOrgStage(row.bstage_id)}</h3></Grid>
+                    <Grid item xs={12} sm={6} md={6} lg={3}><h3 className="center-text"><span className="light-text">Tipo: </span>{apiService.getOrgType(row.bt_id)}</h3></Grid>
+                    <Grid item xs={12}>
+                      <h3 className="light-text">Descripción: </h3>
+                      <h3>{row.description}</h3>
+                    </Grid>
+                    {row.org_link && row.org_link.length>0 && (<Grid item xs={12}><Link href={row.org_link} target='_blank'>Ver más información</Link></Grid>)}
+                  </Grid>
+              </Collapse>
+          </TableCell>
+        </TableRow>
+        {/* <TableRow className={classes.root}>
           <TableCell scope="row">{row.name}</TableCell>
           <TableCell align="center">{row.phone_number}</TableCell>
           <TableCell align="center">{row.email}</TableCell>
@@ -475,12 +507,13 @@ export default function Organizations() {
               </p>
               {row.org_link && row.org_link.length > 0 && (<Link href={row.org_link} target='_blank'>Ver más información</Link>)}
             </TableCell>
-        </TableRow>
+        </TableRow> */}
       </React.Fragment>
     );
   }
     
   useEffect(async ()=>{
+    setShowLoadingOrgs(true);
     setShowLoading(true);
     var orgTypesResponse = await apiService.refreshOrgTypes();
     var orgTypesTemp = orgTypesResponse.data;
@@ -525,24 +558,31 @@ export default function Organizations() {
                 Filtrar
               </Button>
             </div>
-            <Button style={{'margin':'15px'}} variant="contained" className="add-btn" onClick={()=>{ handleOpenAddOrgModalClickOpen(); }}>
+            <Button style={{'margin':'15px', float: 'right'}} variant="contained" className="add-btn" onClick={()=>{ handleOpenAddOrgModalClickOpen(); }}>
               Añadir Nueva Organización
             </Button>
           </div>
-          <Table aria-label="collapsible table">
-            <TableHead>
-              <TableRow>
-                <TableCell component="h4">Nombre</TableCell>
-                <TableCell component="h4" align="center">Teléfono</TableCell>
-                <TableCell component="h4" align="center">Correo Electrónico&nbsp;</TableCell>
-                <TableCell component="h4" align="center">Etapa&nbsp;</TableCell>
-                <TableCell component="h4" align="center">Tipo&nbsp;</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {organizationData.map((organization) => ( <OrganizationRow key={organization.name} row={organization} />))}
-            </TableBody>
-          </Table>
+          {!showLoadingOrgs && (
+            <Table aria-label="collapsible table">
+              <TableBody>
+                {organizationData.map((organization) => ( <OrganizationRow key={organization.name} row={organization} /> ))}
+              </TableBody>
+            </Table>
+          )}
+          {showLoadingOrgs && (
+            <div>
+              <Skeleton style={{marginBottom: "10px"}} variant="rect" height={80} />
+              <Skeleton style={{marginBottom: "10px"}} variant="rect" height={80} />
+              <Skeleton style={{marginBottom: "10px"}} variant="rect" height={80} />
+              <Skeleton style={{marginBottom: "10px"}} variant="rect" height={80} />
+              <Skeleton style={{marginBottom: "10px"}} variant="rect" height={80} />
+              <Skeleton style={{marginBottom: "10px"}} variant="rect" height={80} />
+              <Skeleton style={{marginBottom: "10px"}} variant="rect" height={80} />
+              <Skeleton style={{marginBottom: "10px"}} variant="rect" height={80} />
+              <Skeleton style={{marginBottom: "10px"}} variant="rect" height={80} />
+              <Skeleton style={{marginBottom: "10px"}} variant="rect" height={80} />
+            </div>
+          )}
         </TableContainer>
       </Paper>    
     
@@ -558,10 +598,10 @@ export default function Organizations() {
         </DialogContentText>
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleOpenDeleteAlertClose} color="primary">
+        <Button onClick={handleOpenDeleteAlertClose} variant="contained" color="primary">
           No
         </Button>
-        <Button onClick={deleteOrganization} color="secondary" autoFocus>
+        <Button onClick={deleteOrganization} color="secondary" variant="contained" autoFocus>
           Si
         </Button>
       </DialogActions>
@@ -588,6 +628,7 @@ export default function Organizations() {
                 name="add-name"
                 onKeyDown={(e)=>{ onEnterPress(e, 'add-name'); }}
                 error={!validName}
+                helperText={!validName ? "Nombre inválido" : ""}
                 onChange={handleNameTextChange}
                 value={name} />
             </div>
@@ -598,10 +639,11 @@ export default function Organizations() {
                 }}  
                 style={{width:'100%'}}
                 className="form-control"
-                label="Telefono:"
+                label="Teléfono:"
                 name="add-phone"
                 onKeyDown={(e)=>{ onEnterPress(e, 'add-phone'); }}
                 error={!validPhone}
+                helperText={!validPhone ? "Teléfono inválido" : ""}
                 onChange={handlePhoneTextChange}
                 value={phone} />
             </div>
@@ -615,6 +657,7 @@ export default function Organizations() {
                 name="add-email"
                 onKeyDown={(e)=>{ onEnterPress(e, 'add-email'); }}
                 error={!validEmail}
+                helperText={!validEmail ? "Correo electrónico inválido" : ""}
                 style={{width:'100%'}}
                 onChange={handleEmailTextChange}
                 value={email} />
@@ -653,6 +696,7 @@ export default function Organizations() {
                 name="add-link"
                 onKeyDown={(e)=>{ onEnterPress(e, 'add-link'); }}
                 error={!validLink}
+                helperText={!validLink ? "Enlace inválido" : ""}
                 onChange={handleLinkTextChange}
                 value={link} />
             </div>  
@@ -667,6 +711,7 @@ export default function Organizations() {
                 name="add-description"
                 onKeyDown={(e)=>{ onEnterPress(e, 'add-description'); }}
                 error={!validDescription}
+                helperText={!validDescription ? "Descripción inválido" : ""}
                 onChange={handleDescriptionTextChange}
                 value={description} />
             </div>  
@@ -714,6 +759,7 @@ export default function Organizations() {
                 name="edit-name"
                 onKeyDown={(e)=>{ onEnterPress(e, 'edit-name'); }}
                 error={!validName}
+                helperText={!validName ? "Nombre inválido" : ""}
                 onChange={handleNameTextChange}
                 value={name} />
             </div>
@@ -724,10 +770,11 @@ export default function Organizations() {
                 }}  
                 style={{width:'100%'}}
                 className="form-control"
-                label="Telefono:"
+                label="Teléfono:"
                 name="edit-phone"
                 onKeyDown={(e)=>{ onEnterPress(e, 'edit-phone'); }}
                 error={!validPhone}
+                helperText={!validPhone ? "Teléfono inválido" : ""}
                 onChange={handlePhoneTextChange}
                 value={phone} />
             </div>
@@ -741,6 +788,7 @@ export default function Organizations() {
                 name="edit-email"
                 onKeyDown={(e)=>{ onEnterPress(e, 'edit-email'); }}
                 error={!validEmail}
+                helperText={!validEmail ? "Correo electrónico inválido" : ""}
                 style={{width:'100%'}}
                 onChange={handleEmailTextChange}
                 value={email} />
@@ -779,6 +827,7 @@ export default function Organizations() {
                 name="edit-link"
                 onKeyDown={(e)=>{ onEnterPress(e, 'edit-link'); }}
                 error={!validLink}
+                helperText={!validLink ? "Enlace inválido" : ""}
                 onChange={handleLinkTextChange}
                 value={link} />
             </div>  
@@ -793,6 +842,7 @@ export default function Organizations() {
                 name="edit-description"
                 onKeyDown={(e)=>{ onEnterPress(e, 'edit-description'); }}
                 error={!validDescription}
+                helperText={!validDescription ? "Descripción inválido" : ""}
                 onChange={handleDescriptionTextChange}
                 value={description} />
             </div>  

@@ -7,9 +7,14 @@ import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
+import Skeleton from '@material-ui/lab/Skeleton';
 import TableRow from '@material-ui/core/TableRow';
 import Link from '@material-ui/core/Link';
-import Typography from '@material-ui/core/Typography';
+import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
+import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
+import Collapse from '@material-ui/core/Collapse';
+import Grid from '@material-ui/core/Grid';
+import IconButton from '@material-ui/core/IconButton';
 import Paper from '@material-ui/core/Paper';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
@@ -31,7 +36,7 @@ export default function Organizations() {
   const [orgStage, setOrgStage] = useState('');
   const [searchString, setsearchString] = useState('');
   const [initialLoad, setInitialLoad] = useState(true);
-
+  const [showLoadingOrgs, setShowLoadingOrgs] = React.useState(false);
   const [showErrorAlert, setShowErrorAlert] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [showLoading, setShowLoading] = useState(false);
@@ -110,11 +115,12 @@ export default function Organizations() {
         setFullOrganizationList(organizationsResponse.data);
         filterOrganizations(organizationsResponse.data);
         setShowLoading(false);
-        
+        setShowLoadingOrgs(false);
       }).catch(err =>{
         setShowLoading(false);
         setErrorMessage(err ? (err.response ? (err.response.data? String(err.response.data) : String(err.response)) : String(err)) : 'Ocurrio un error');
         setShowErrorAlert(true);
+        setShowLoadingOrgs(false);
       });
     }
     else {
@@ -136,30 +142,36 @@ export default function Organizations() {
 
   function Row(props) {
     const { row } = props;
-    //const [open, setOpen] = useState(false);
+    const [open, setOpen] = useState(false);
     
     return (
       <React.Fragment>
-        <TableRow className={classes.root}>
+        <TableRow>
           <TableCell>
-            {/* <IconButton aria-label="expand row" size="small" onClick={() => row.open = !row.open }>
-              {row.open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-            </IconButton> */}
+              <IconButton aria-label="expand row" size="small" onClick={() => setOpen(!open)}>
+                  {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+              </IconButton>
           </TableCell>
-          <TableCell scope="row">{row.name}</TableCell>
-          <TableCell align="center">{row.phone_number}</TableCell>
-          <TableCell align="center">{row.email}</TableCell>
-          <TableCell align="center">{apiService.getOrgStage(row.bstage_id)}</TableCell>
-          <TableCell align="center">{apiService.getOrgType(row.bt_id)}</TableCell>
+          <TableCell component="h5" scope="row">
+              {row.name}
+          </TableCell>
         </TableRow>
         <TableRow>
-            <TableCell colSpan="6" style={{padding: "0 80px 30px 80px"}}>
-              <h4 style={{fontStyle:"italic", fontWeight: "bold"}}>Descripción:</h4>
-              <p>
-                {row.description}
-              </p>
-              {row.org_link && row.org_link.length>0 && (<Link href={row.org_link} target='_blank'>Ver más información</Link>)}
-            </TableCell>
+          <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
+              <Collapse in={open} timeout="auto" unmountOnExit>
+                  <Grid container spacing={1}>
+                    <Grid item xs={12} sm={6} md={6} lg={3}><h3 className="center-text"><span className="light-text">Teléfono: </span>{row.phone_number}</h3></Grid>
+                    <Grid item xs={12} sm={6} md={6} lg={3}><h3 className="center-text"><span className="light-text">Correo electrónico: </span>{row.email}</h3></Grid>
+                    <Grid item xs={12} sm={6} md={6} lg={3}><h3 className="center-text"><span className="light-text">Etapa: </span>{apiService.getOrgStage(row.bstage_id)}</h3></Grid>
+                    <Grid item xs={12} sm={6} md={6} lg={3}><h3 className="center-text"><span className="light-text">Tipo: </span>{apiService.getOrgType(row.bt_id)}</h3></Grid>
+                    <Grid item xs={12}>
+                      <h3 className="light-text">Descripción: </h3>
+                      <h3>{row.description}</h3>
+                    </Grid>
+                    {row.org_link && row.org_link.length>0 && (<Grid item xs={12}><Link href={row.org_link} target='_blank'>Ver más información</Link></Grid>)}
+                  </Grid>
+              </Collapse>
+          </TableCell>
         </TableRow>
       </React.Fragment>
     );
@@ -167,6 +179,7 @@ export default function Organizations() {
   
   useEffect(async ()=>{
     setShowLoading(true);
+    setShowLoadingOrgs(true);
     var orgTypesResponse = await apiService.refreshOrgTypes();
     var orgTypesTemp = orgTypesResponse.data;
     apiService.orgTypes(orgTypesTemp);
@@ -229,21 +242,27 @@ export default function Organizations() {
               Filtrar
             </Button>
           </div>
-          <Table aria-label="collapsible table">
-            <TableHead>
-              <TableRow>
-                <TableCell />
-                <TableCell component="h4" align="left">Nombre</TableCell>
-                <TableCell component="h4" align="center">Teléfono</TableCell>
-                <TableCell component="h4" align="center">Correo Electrónico&nbsp;</TableCell>
-                <TableCell component="h4" align="center">Etapa&nbsp;</TableCell>
-                <TableCell component="h4" align="center">Tipo&nbsp;</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {organizationData.map((organization) => ( <Row key={organization.name} row={organization} /> ))}
-            </TableBody>
-          </Table>
+          {!showLoadingOrgs && (
+            <Table aria-label="collapsible table">
+              <TableBody>
+                {organizationData.map((organization) => ( <Row key={organization.name} row={organization} /> ))}
+              </TableBody>
+            </Table>
+          )}
+          {showLoadingOrgs && (
+            <div>
+              <Skeleton style={{marginBottom: "10px"}} variant="rect" height={80} />
+              <Skeleton style={{marginBottom: "10px"}} variant="rect" height={80} />
+              <Skeleton style={{marginBottom: "10px"}} variant="rect" height={80} />
+              <Skeleton style={{marginBottom: "10px"}} variant="rect" height={80} />
+              <Skeleton style={{marginBottom: "10px"}} variant="rect" height={80} />
+              <Skeleton style={{marginBottom: "10px"}} variant="rect" height={80} />
+              <Skeleton style={{marginBottom: "10px"}} variant="rect" height={80} />
+              <Skeleton style={{marginBottom: "10px"}} variant="rect" height={80} />
+              <Skeleton style={{marginBottom: "10px"}} variant="rect" height={80} />
+              <Skeleton style={{marginBottom: "10px"}} variant="rect" height={80} />
+            </div>
+          )}
         </TableContainer>
       </Paper>    
     <Alert

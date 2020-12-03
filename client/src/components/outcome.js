@@ -14,7 +14,12 @@ import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
 import Button from '@material-ui/core/Button';
 import { useHistory, Redirect } from 'react-router-dom';
+import Skeleton from '@material-ui/lab/Skeleton';
 import Popover from '@material-ui/core/Popover';
+import IconButton from '@material-ui/core/IconButton';
+import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
+import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
+import Collapse from '@material-ui/core/Collapse';
 import Spinner from './loading'
 import Alert from './alert'
 //import apiService from "./mockApiService";
@@ -46,7 +51,7 @@ function Outcome() {
     const [profile, setProfile] = React.useState({});
     const [orgTypes, setOrgTypes] = React.useState([]);
     const [orgStages, setOrgStages] = React.useState([]);
-
+    const [showLoadingOrgs, setShowLoadingOrgs] = React.useState(false);
     const [showContent, setShowContent] = React.useState(false);
 
     const [showErrorAlert, setShowErrorAlert] = React.useState(false);
@@ -57,6 +62,8 @@ function Outcome() {
     const [businessType, setBusinessType] = React.useState('');
     const [organizations, setOrganizations] = React.useState([]);
     const [roadmap, setRoadmap] = React.useState([]);
+    const [refs, setRefs] = React.useState({});
+    const [zoomRefs, setZoomRefs] = React.useState({});
 
     const onAlertClick = () => {
       setShowErrorAlert(false);
@@ -89,6 +96,7 @@ function Outcome() {
           setBusinessType(bt_id);
           if(bt_id && bt_id != null) {
             var roadmapSteps = apiService.getRoadmapSteps(bt_id, tempProfile.bstage_id);
+
             apiService.getRequest('roadmap/'+bt_id +'/'+tempProfile.bstage_id).then(response => {
               //Handle organization response
               if(!response.data) {
@@ -98,15 +106,21 @@ function Outcome() {
                 var step = roadmapSteps[i];
                 step.index = i+1;
                 step.orgs = response.data.filter(o => o.bs_id == step.bs_id);
+                refs[String("step"+step.index)] = React.createRef();
+                zoomRefs[String("step"+step.index)] = false;
               }
+              setRefs(refs);
+              setZoomRefs(zoomRefs);
               setRoadmap(roadmapSteps);
               setOrganizations(response.data);         
               setShowLoading(false); 
+              setShowLoadingOrgs(false);
             }).catch(err =>{
               //Handle error
               setShowLoading(false);
               setErrorMessage(err ? (err.response ? (err.response.data? String(err.response.data) : String(err.response)) : String(err)) : 'Ocurrio un error');
               setShowErrorAlert(true);
+              setShowLoadingOrgs(false);
             });
           }
           setShowContent(true);
@@ -115,11 +129,13 @@ function Outcome() {
             setShowLoading(false);
             setErrorMessage(err ? (err.response ? (err.response.data? String(err.response.data) : String(err.response)) : String(err)) : 'Ocurrio un error');
             setShowErrorAlert(true);
+            setShowLoadingOrgs(false);
         });
       }).catch(err =>{
         setShowLoading(false);
         setErrorMessage(err ? (err.response ? (err.response.data? String(err.response.data) : String(err.response)) : String(err)) : 'Ocurrio un error');
         setSubmitShowErrorAlert(true);
+        setShowLoadingOrgs(false);
       });
     }
     //Save data to profile
@@ -128,6 +144,7 @@ function Outcome() {
     }
 
     React.useEffect(async ()=> {
+      setShowLoadingOrgs(true);
       setShowLoading(true);
       var orgTypesResponse = await apiService.refreshOrgTypes();
       var orgTypesTemp = orgTypesResponse.data;
@@ -154,8 +171,30 @@ function Outcome() {
         },
       });
     
+      //Organization Segment row snippet
+      function OrganizationRow(props) {
+        const { row } = props;
+        console.log(row);
+        var currentRef = refs[String("step"+row.index)];
+        return (
+          <React.Fragment>
+            <div ref={currentRef}>
+              <h3 style={{textAlign: "left"}} >{row.index}. {row.description}</h3>
+              <TableContainer>
+                <Table aria-label="collapsible table">
+                  <TableBody >
+                    {row.orgs.map((row) => (<Row  key={row.name} row={row} />))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </div>
+          </React.Fragment>
+        );
+      }
+
       function Row(props) {
         const { row } = props;
+        const [open, setOpen] = React.useState(false);
         var orgStage = '';
         if(row.bstage_id) {
           orgStage = apiService.getOrgStage(row.bstage_id);
@@ -166,29 +205,40 @@ function Outcome() {
             orgStage = apiService.getOrgStage(step.bstage_id);
           }
         }
+    
         return (
           <React.Fragment>
-            <TableRow className={classes.root}>
-              <TableCell className="no-bottom-border">
+            <TableRow>
+              <TableCell>
+                <IconButton aria-label="expand row" size="small" onClick={() => setOpen(!open)}>
+                  {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+                </IconButton>
               </TableCell>
-              <TableCell className="no-bottom-border" scope="row">{row.name}</TableCell>
-              <TableCell className="no-bottom-border" align="center">{row.phone_number}</TableCell>
-              <TableCell className="no-bottom-border" align="center">{row.email}</TableCell>
-              <TableCell className="no-bottom-border" align="center">{orgStage}</TableCell>
-              <TableCell className="no-bottom-border" align="center">{apiService.getOrgType(businessType)}</TableCell>
+              <TableCell scope="row">
+                <h5>{row.name}</h5>
+              </TableCell>
             </TableRow>
             <TableRow>
-                <TableCell colSpan="6" style={{padding: "0 80px 30px 80px"}}>
-                  <h4 style={{fontStyle:"italic", fontWeight: "bold"}}>Descripción:</h4>
-                  <p>
-                    {row.description}
-                  </p>
-                  {row.org_link && row.org_link.length>0 && (<Link href={row.org_link} target='_blank'>Ver más información</Link>)}
-                </TableCell>
+              <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
+                <Collapse in={open} timeout="auto" unmountOnExit>
+                  <Grid container spacing={1}>
+                    <Grid item xs={12} sm={6} md={6} lg={3}><h3 className="center-text"><span className="light-text">Teléfono: </span>{row.phone_number}</h3></Grid>
+                    <Grid item xs={12} sm={6} md={6} lg={3}><h3 className="center-text"><span className="light-text">Correo electrónico: </span>{row.email}</h3></Grid>
+                    <Grid item xs={12} sm={6} md={6} lg={3}><h3 className="center-text"><span className="light-text">Etapa: </span>{orgStage}</h3></Grid>
+                    <Grid item xs={12} sm={6} md={6} lg={3}><h3 className="center-text"><span className="light-text">Tipo: </span>{apiService.getOrgType(businessType)}</h3></Grid>
+                    <Grid item xs={12}>
+                      <h3 className="light-text">Descripción: </h3>
+                      <h3>{row.description}</h3>
+                    </Grid>
+                    {row.org_link && row.org_link.length>0 && (<Grid item xs={12}><Link href={row.org_link} target='_blank'>Ver más información</Link></Grid>)}
+                  </Grid>
+                </Collapse>
+              </TableCell>
             </TableRow>
           </React.Fragment>
         );
       }
+      
       function RoadmapOrganizationRow(props) {
         const { row } = props;
         const classes = useRowStyles();
@@ -211,6 +261,9 @@ function Outcome() {
         };
         const handleClose = () => {
           setAnchorEl(null);
+        };
+        const scrollTo = (step) => {
+          window.scrollTo(0, refs["step"+step].current.offsetTop);
         };
         const open = Boolean(anchorEl);
         const id = open ? 'rm-popover'+row.index : undefined;
@@ -236,30 +289,9 @@ function Outcome() {
           <React.Fragment>
             <TableRow>
                 <div style={{"margin-top": marginTop}} className={className}>
-                  <Button style={buttonStyle} aria-describedby={id} variant="contained" color="primary" onClick={handleClick}>
+                  <Button style={buttonStyle} aria-describedby={id} variant="contained" color="primary" onClick={()=>{ scrollTo(row.index); }}>
                     <img style={{maxWidth:"30px"}} src="images/touch_icon.png" />
                   </Button>
-                  <Popover
-                    id={id}
-                    open={open}
-                    anchorEl={anchorEl}
-                    onClose={handleClose}
-                    anchorOrigin={{
-                      vertical: 'bottom',
-                      horizontal: 'center',
-                    }}
-                    transformOrigin={{
-                      vertical: 'top',
-                      horizontal: 'center',
-                    }}
-                  >
-                    <div style={{margin:"15px"}}>
-                      <h6>Organizaciones</h6>
-                      <Table>
-                        {row.orgs.map((org) => (<RoadmapOrganizationRow  key={row.org_id} row={org} />))}
-                      </Table>
-                    </div>
-                  </Popover>
                   <h5>{row.description}</h5>
                 </div>
             </TableRow>
@@ -279,9 +311,6 @@ function Outcome() {
             <h1>Segun tus respuestas tu tipo de negocio es:</h1>
             <h2>{apiService.getOrgType(businessType)}</h2>
             <h3>¡Sigue tu camino!</h3>
-               {apiService.getOrgTypeVideo(businessType) && apiService.getOrgTypeVideo(businessType) != null && (
-                  <iframe src={apiService.getOrgTypeVideo(businessType)} frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-                )}
           <div>
          
            </div>
@@ -301,48 +330,79 @@ function Outcome() {
                 <iframe src={apiService.getOrgTypeVideo(businessType)} frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
               )}
               <img className="org-type-icon" src={"images/"+apiService.getOrgTypeIcon(businessType)} />  
-              {roadmap && roadmap.length>0 && (    
-                <TableContainer>
-                  <Table aria-label="table" className={'rm-table'}>
-                    <TableBody >
-                      {roadmap.map((row) => (<RoadmapRow  key={row.name} row={row} />))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
+              {!showLoadingOrgs && (
+                <div>
+                  {roadmap && roadmap.length>0 && (
+                    <TableContainer style={{marginTop:"15px"}}>
+                      <Table aria-label="table" className={'rm-table'}>
+                        <TableBody >
+                          {roadmap.map((row) => (<RoadmapRow  key={row.name} row={row} />))}
+                        </TableBody>
+                      </Table>
+                    </TableContainer>
+                  )}
+                  {roadmap && roadmap.length==0 && (
+                    <h4>
+                        No existen pasos ni organizaciones para tu etapa de negocio.
+                    </h4>
+                  )}
+                </div>
               )}
-              {roadmap && roadmap.length==0 && (
-                <h4>
-                    No existen pasos ni organizaciones para tu etapa de negocio.
-                </h4>
+              {showLoadingOrgs && (
+                <div>
+                  <Skeleton style={{marginBottom: "10px"}} variant="rect" height={100} />
+                  <Skeleton style={{marginBottom: "10px"}} variant="rect" height={100} />
+                  <Skeleton style={{marginBottom: "10px"}} variant="rect" height={100} />
+                  <Skeleton style={{marginBottom: "10px"}} variant="rect" height={100} />
+                  <Skeleton style={{marginBottom: "10px"}} variant="rect" height={100} />
+                  <Skeleton style={{marginBottom: "10px"}} variant="rect" height={100} />
+                  <Skeleton style={{marginBottom: "10px"}} variant="rect" height={100} />
+                  <Skeleton style={{marginBottom: "10px"}} variant="rect" height={100} />
+                  <Skeleton style={{marginBottom: "10px"}} variant="rect" height={100} />
+                  <Skeleton style={{marginBottom: "10px"}} variant="rect" height={100} />
+                </div>
               )}
             </div>
           </div>
           </Paper>  
-          {organizations && organizations.length>0 && (
             <Paper className="paper-margin" elevation={10} >
               <div>
                   <h1>Aqui se muestran todas las organizaciones mencionadas en el recorrido: </h1>
                   <h2>Organizaciones</h2>
-                  <TableContainer>
-                    <Table aria-label="collapsible table">
-                      <TableHead>
-                        <TableRow>
-                          <TableCell />
-                          <TableCell component="h4">Nombre</TableCell>
-                          <TableCell component="h4" align="center">Teléfono</TableCell>
-                          <TableCell component="h4" align="center">Correo Electrónico&nbsp;</TableCell>
-                          <TableCell component="h4" align="center">Etapa&nbsp;</TableCell>
-                          <TableCell component="h4" align="center">Tipo&nbsp;</TableCell>
-                        </TableRow>
-                      </TableHead>
-                      <TableBody >
-                        {organizations.map((row) => (<Row  key={row.name} row={row} />))}
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
+                  {!showLoadingOrgs && (
+                    <div>
+                      {roadmap && roadmap.length>0 && (
+                        <TableContainer style={{marginTop:"15px"}}>
+                          <Table aria-label="table" className={'rm-table'}>
+                            <TableBody >
+                              {roadmap.map((row) => (<OrganizationRow  key={row.name} row={row} />))}
+                            </TableBody>
+                          </Table>
+                        </TableContainer>
+                      )}
+                      {roadmap && roadmap.length==0 && (
+                        <h4>
+                            No existen pasos ni organizaciones para tu etapa de negocio.
+                        </h4>
+                      )}
+                    </div>
+                  )}
+                  {showLoadingOrgs && (
+                    <div>
+                      <Skeleton style={{marginBottom: "10px"}} variant="rect" height={100} />
+                      <Skeleton style={{marginBottom: "10px"}} variant="rect" height={100} />
+                      <Skeleton style={{marginBottom: "10px"}} variant="rect" height={100} />
+                      <Skeleton style={{marginBottom: "10px"}} variant="rect" height={100} />
+                      <Skeleton style={{marginBottom: "10px"}} variant="rect" height={100} />
+                      <Skeleton style={{marginBottom: "10px"}} variant="rect" height={100} />
+                      <Skeleton style={{marginBottom: "10px"}} variant="rect" height={100} />
+                      <Skeleton style={{marginBottom: "10px"}} variant="rect" height={100} />
+                      <Skeleton style={{marginBottom: "10px"}} variant="rect" height={100} />
+                      <Skeleton style={{marginBottom: "10px"}} variant="rect" height={100} />
+                    </div>
+                  )}
               </div>
             </Paper>
-          )}
           <div>
           <Button style={{'margin':'15px'}} variant="contained" color="secondary" href="/tce">
             Repetir el Cuestionario

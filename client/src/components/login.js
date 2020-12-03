@@ -37,7 +37,8 @@ function Login() {
         if(text && text.length == 0) {
             return true;
         }
-        return text.length > 6
+        const re = /^(?=.*\d)(?=.*[a-zA-Z])(?=.*[!#$%&*+,-./:<=>?@^_`{|}~])[a-zA-Z0-9 !#$%&*+,-./:<=>?@^_`{|}~]{8,64}$/;
+        return re.test(text);
     }
     
     //Event Handlers 
@@ -100,7 +101,7 @@ function Login() {
                         apiService.profile(response.data[0]);
                         setShowLoading(false);
                         if(response.data[0].bt_id && response.data[0].bt_id > 0) {
-                            window.location.href = "/";    
+                            window.location.href = "/userprofile";    
                         }
                         else {
                             window.location.href = "/tce";
@@ -144,7 +145,7 @@ function Login() {
                         label="Correo Electrónico:"
                         name="email"
                         error={!validEmail}
-                        //errorText="Correo electrónico inválido"
+                        helperText={!validEmail ? "Correo electrónico inválido" : ""}
                         onKeyDown={(e)=>{ onEnterPress(e, 'email'); }}
                         onChange={handleEmailChange}
                         value={email} />
@@ -159,8 +160,8 @@ function Login() {
                         name="pass"
                         label="Contraseña:"
                         onKeyDown={(e)=>{ onEnterPress(e, 'pass'); }}
-                        //error={!validPassword}
-                        //helperText="Contraseña inválido"
+                        error={!validPassword}
+                        helperText={!validPassword ? "Contraseña inválido" : ""}
                         onChange={handlePasswordChange}
                         value={password} />
                 </div>

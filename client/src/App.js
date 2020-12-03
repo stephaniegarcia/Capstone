@@ -21,6 +21,7 @@ import AdminOrganizations from './components/adminOrganizations';
 import AdminForgotPassword from './components/adminForgotPassword';
 import VerifyAccount from './components/verifyAccount';
 import GAReports from './components/gaReports';
+import PdfOrgs from './components/printToPdfOrgs'
 import ReactGA from 'react-ga';
 
 function App() {
@@ -49,6 +50,8 @@ function App() {
           <Route path='/outcome' component={Outcome} />
           <Route path='/organizaciones' component={Organizations} />
           <Route path='/userprofile' component={UserProfile} />
+          <Route path='/pdforgs' component={PdfOrgs} />
+          
           <Route path='/admin' component={AdminLogin} />
 
           <Route path='/adminforgotPassword' component={AdminForgotPassword} />

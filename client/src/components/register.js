@@ -50,7 +50,8 @@ function Register() {
         if(text && text.length == 0) {
             return true;
         }
-        return text.length > 5
+        const re = /^(?=.*\d)(?=.*[a-zA-Z])(?=.*[!#$%&*+,-./:<=>?@^_`{|}~])[a-zA-Z0-9 !#$%&*+,-./:<=>?@^_`{|}~]{8,64}$/;
+        return re.test(text);
     }
     
     //phone validation helper function
@@ -68,7 +69,7 @@ function Register() {
      //@param text - new user name
     //@return if it's valid or not
     function isValidName(text) {
-        const re = /^[a-zA-Z ]+(([',. -][a-zA-Z ])?[a-zA-Z ]*)*$/g;
+        const re = /^[a-zA-ZáÁéÉíÍóÓúÚñÑüÜ ]+(([',. -][a-zA-ZáÁéÉíÍóÓúÚñÑüÜ ])?[a-zA-ZáÁéÉíÍóÓúÚñÑüÜ ]*)*$/g;
         return text.length >= 2 && re.test(String(text))
     }
     
@@ -193,7 +194,6 @@ function Register() {
             business_stage: businessStage,
             requested_assistance: requiredAssistance
         };
-        console.log(data);
         //Perform register request
         apiService.postRequest("register", data).then(response => {
             //Handle register
@@ -237,9 +237,10 @@ function Register() {
         //Show register view
         <div className="top-margin">
             <Paper className="form form--wrapper paper-margin" elevation={10}>
-                <h1>Register</h1>
+                <h1>Registrarse</h1>
                 <div className="margin-25">
                     <TextField
+                        required 
                         InputLabelProps={{
                             shrink: true,
                         }}  
@@ -248,37 +249,43 @@ function Register() {
                         name="name"
                         onKeyDown={(e)=>{ onEnterPress(e, 'name'); }}
                         error={!validFirstName}
+                        helperText={!validFirstName ? "Nombre inválido" : ""}
                         onChange={handleFirstNameChange}
                         value={firstName} />
                 </div>
                 <div className="margin-25">
                     <TextField
+                        required 
                         InputLabelProps={{
                             shrink: true,
                         }}  
                         className="form-control"
-                        label="Apellido:"
+                        label="Apellidos:"
                         name="lastname"
                         onKeyDown={(e)=>{ onEnterPress(e, 'lastname'); }}
                         error={!validLastName}
+                        helperText={!validLastName ? "Apellidos inválido" : ""}
                         onChange={handleLastNameChange}
                         value={lastName} />
                 </div>
                 <div className="margin-25">
                     <TextField
+                        required
                         InputLabelProps={{
                             shrink: true,
                         }}  
                         className="form-control"
-                        label="Telefono:"
+                        label="Teléfono:"
                         name="phone"
                         onKeyDown={(e)=>{ onEnterPress(e, 'phone'); }}
                         error={!validPhone}
+                        helperText={!validPhone ? "Teléfono inválido" : ""}
                         onChange={handlePhoneChange}
                         value={phone} />
                 </div>
                 <div className="margin-25">
                     <TextField
+                        required
                         InputLabelProps={{
                             shrink: true,
                         }}  
@@ -287,11 +294,13 @@ function Register() {
                         name="email"
                         onKeyDown={(e)=>{ onEnterPress(e, 'email'); }}
                         error={!validEmail}
+                        helperText={!validEmail ? "Correo electrónico inválido" : ""}
                         onChange={handleEmailChange}
                         value={email} />
                 </div>
                 <div className="margin-25">
                     <TextField
+                        required
                         InputLabelProps={{
                             shrink: true,
                         }}  
@@ -301,12 +310,13 @@ function Register() {
                         name="pass"
                         onKeyDown={(e)=>{ onEnterPress(e, 'pass'); }}
                         error={!validPassword}
-                        helperText="Contraseña debe tener al menos 6 caracteres"
+                        helperText="La contraseña debe contener al menos 1 letra, 1 dígito, 1 carácter especial. #$%&amp;*+,-./:<=>?@^_`{|}~ y entre 8 y 64 caracteres de largo"
                         onChange={handlePasswordChange}
                         value={password} />
                 </div>
                 <div className="margin-25">
                     <TextField
+                        required
                         InputLabelProps={{
                             shrink: true,
                         }}      
@@ -363,7 +373,7 @@ function Register() {
                         onClick={handleRegisterClick}
                         disabled= {!validEmail || !email.length>0 || !validPassword || !password.length>0 || !validConfirmPassword || !confirmPassword.length>0 || !validPhone || !phone.length>0 || !validFirstName || !firstName.length>0 || !validLastName || !lastName.length>0}
                         style={{ margin: '16px' }} >
-                            Submit
+                            Someter
                     </Button>
                 </div>
             </Paper>

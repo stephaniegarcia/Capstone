@@ -32,8 +32,9 @@ function AdminPasswordReset() {
     if(text && text.length == 0) {
         return true;
     }
-    return text.length > 6
-  }
+    const re = /^(?=.*\d)(?=.*[a-zA-Z])(?=.*[!#$%&*+,-./:<=>?@^_`{|}~])[a-zA-Z0-9 !#$%&*+,-./:<=>?@^_`{|}~]{8,64}$/;
+    return re.test(text);
+}
 
   //Event Handlers
   //Enter key event callback
@@ -101,8 +102,6 @@ function AdminPasswordReset() {
   var params = useParams();
   let query = new URLSearchParams(useLocation().search);
   React.useEffect(()=>{
-    console.log(params.email);
-    console.log(query.get("id"));
     setEmail(params.email);
     setId(query.get("id"));
 
@@ -143,7 +142,7 @@ function AdminPasswordReset() {
                         label="Contraseña:"
                         onKeyDown={(e)=>{ onEnterPress(e, 'pass'); }}
                         error={!validPassword}
-                        helperText="Contraseña debe tener al menos 6 caracteres"
+                        helperText="La contraseña debe contener al menos 1 letra, 1 dígito, 1 carácter especial. #$%&amp;*+,-./:<=>?@^_`{|}~ y entre 8 y 64 caracteres de largo"
                         onChange={handlePasswordChange}
                         value={password} />
                 </div>
