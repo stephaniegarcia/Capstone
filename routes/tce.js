@@ -75,7 +75,7 @@ router.post('/api/tce/answers/:userID', async (req, res) => {
     let type = 0;
 
   
-    if((answer9 && answer10 && answer11) || (answer9 && answer10) || (answer10 && answer11)|| (answer9 && answer11)){
+    if((answer9 && answer10 && answer11) || (answer9 && answer10) || (answer10 && answer11)|| (answer9 && answer11) || answer9){
         type = 4;
     }
     else if((answer6 && answer7 && answer8) || (answer6 && answer7) || (answer7 && answer8) || (answer6 && answer8)){
