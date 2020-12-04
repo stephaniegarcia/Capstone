@@ -63,8 +63,8 @@ router.post('/api/user/changePassword', (req, res) => {
     const email = req.body.email;
     console.log(email);
     passwordtoken = randomstring.generate();
-    host =  process.env.WebsiteUrl || req.get('host');
-    link="http://"+host+"/newPassword/user/" +email+ "?id="+passwordtoken;
+    host =  process.env.WebsiteUrl ||  "http://" +req.get('host')
+    link=host+"/newPassword/user/" +email+ "?id="+passwordtoken;
     let insertToken = dao.insertPasswordToken(email, passwordtoken);
     if(insertToken instanceof Error){
         res.status(404).send("User not found");
@@ -177,13 +177,13 @@ router.post('/api/register', (req, res) => {
                 var registerToken = randomstring.generate();
                 hashedPassword = bcrypt.hashSync(password,saltRounds)
                 dao.createUser(firstname,lastname,email,hashedPassword, business_status, requested_assistance, phone_number, null, business_stage, 1, 0, registerToken);
-                var hostUrl = process.env.WebsiteUrl || req.get('host');
-                link="http://"+hostUrl+"/verify/" +email+ "?id="+registerToken;
+                var hostUrl = process.env.WebsiteUrl || "http://" +req.get('host');
+                link=hostUrl+"/verify/" +email+ "?id="+registerToken;
                 mailOptions={
                     from: 'capstonehelix@gmail.com',
                     to : email,
-                    subject : "Favor de confirmar su correo electronico",
-                    html : "<br> Presione el enlace para confirmar su cuenta.<br><a href="+link+">Click here to verify</a>" 
+                    subject : "Tu Camino Empresarial",
+                    html : "<br> Te damos la bienvenida a Tu Camino Empresarial. Presione el enlace para confirmar su cuenta.<br><a href="+link+">Presiona aqui para verificar tu cuenta.</a>" 
                 }
                 console.log(mailOptions);
                 transporter.sendMail(mailOptions, function(error, response){
