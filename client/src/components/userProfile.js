@@ -212,14 +212,15 @@ function UserProfile() {
   //Organization Segment row snippet
   function OrganizationRow(props) {
     const { row } = props;
-    var currentRef = refs[String("step"+row.index)];
+    var stepIndex = String("step"+row.index);
+    var currentRef = refs[stepIndex];
     return (
       <React.Fragment>
         <div ref={currentRef}>
           <h3 style={{textAlign: "left"}} >{row.index}. {row.description}</h3>
           <TableContainer>
             <Table aria-label="collapsible table">
-              <TableBody >
+              <TableBody>
                 {row.orgs.map((row) => (<Row  key={row.name} row={row} />))}
               </TableBody>
             </Table>
@@ -314,7 +315,16 @@ function UserProfile() {
       setAnchorEl(null);
     };
     const scrollTo = (step) => {
-      window.scrollTo(0, refs["step"+step].current.offsetTop);
+      var ref = refs["step"+step].current
+      console.log(ref);
+      //window.scrollTo({0, ref.offsetTop});
+      var headerOffset = 90;
+      var elementPosition = ref.getBoundingClientRect().top;
+      var offsetPosition = elementPosition - headerOffset;
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: "smooth"
+      });
     };
     const open = Boolean(anchorEl);
     const id = open ? 'rm-popover'+row.index : undefined;
@@ -343,27 +353,6 @@ function UserProfile() {
               <Button style={buttonStyle} aria-describedby={id} variant="contained" color="primary" onClick={()=>{ scrollTo(row.index); }}>
               <img style={{maxWidth:"30px"}} src="images/touch_icon.png" />
               </Button>
-              {/* <Popover
-                id={id}
-                open={open}
-                anchorEl={anchorEl}
-                onClose={handleClose}
-                anchorOrigin={{
-                  vertical: 'bottom',
-                  horizontal: 'center',
-                }}
-                transformOrigin={{
-                  vertical: 'top',
-                  horizontal: 'center',
-                }}
-              >
-                <div style={{margin:"15px"}}>
-                  <h4>Organizaciones</h4>
-                  <Table>
-                    {row.orgs.map((org) => (<RoadmapOrganizationRow  key={row.org_id} row={org} />))}
-                  </Table>
-                </div>
-              </Popover> */}
               <h5>{row.description}</h5>
             </div>
         </TableRow>

@@ -13,7 +13,8 @@ const pool = new Pool({
 const getQuestions = async () => {
     try {
         const res = await pool.query(
-          `SELECT * FROM questions;`
+          `SELECT description FROM public.questions
+          ORDER BY question_id ASC;`
         );
         console.log(res.rows)
         return res.rows;
