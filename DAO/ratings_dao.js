@@ -100,12 +100,13 @@ async function getOrgPerformingPoorly(){
 async function getAccountsPerWeek(){
     try {
         const res = await pool.query(
-        `SELECT date_part('year', date::date) as year,
-        date_part('week', date::date) AS week,
+        `SELECT
+        date_part('month', date::date) as month,
+        TO_CHAR( date, 'W' )::integer as week,
         COUNT(signup_id)
         FROM signup_log
-        GROUP BY year, week
-        ORDER BY year, week;
+        Group by month, week
+        Order by month, week
         `,
         );
         console.log(res.rows)
@@ -134,7 +135,7 @@ async function getContactedCount(){
     try {
         const res = await pool.query(
         `SELECT
-            O.name, COUNT(R.rating) as count
+        O.name, COUNT(R.rating) as count
         FROM
             organization_rating as R INNER JOIN organization as O ON O.org_id = R.organization_id
         group by
@@ -167,7 +168,7 @@ async function getRatingsPerUser(userID){
       const res = await pool.query(
         `Select O.name, O.org_id, O.bt_id, R.user_id, R.rating, R.rating_comment
         From organization as O left outer Join organization_rating as R on O.org_id = R.organization_id
-        where R.user_id = $1`, [userID]
+        where R.user_id =$1 and o.is_active = 'true'`, [userID]
       );
       console.log(res.rows)
       return res.rows;

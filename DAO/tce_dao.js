@@ -32,7 +32,7 @@ const getOrganizationsFiltered = async (stage, type) => {
           from organization as O inner join business_type
           as T on O.bt_id = T.bt_id
           inner join business_step as S on O.bs_id = S.bs_id
-            where T.bt_id = $1 AND S.bs_id= $2
+            where T.bt_id = $1 AND S.bs_id= $2 AND O.is_active = 'true'
           order by O.bt_id desc`, [type, stage]
         );
         console.log(res.rows)
@@ -125,7 +125,7 @@ const organizationsByUser = async (user_id) => {
     const res = await pool.query(
       `SELECT R.rating, R.user_id, R.organization_id, R.rating_comment, O.name
       FROM public.organization_rating as R inner join organization as O ON R.organization_id = O.org_id
-      where user_id = $1;`, [user_id]
+      where user_id =$1 AND o.is_active`, [user_id]
     );
     console.log(res.rows)
     return res.rows;
@@ -141,7 +141,7 @@ async function getRoadMap(bstageID, btID){
       const res = await pool.query(
         `SELECT O.org_id, O.name, O.description, O.email, O.phone_number, O.bt_id, O.bs_id, O.is_active, O.org_link, b.bstage_id
         FROM public.organization as O inner join business_step as B on O.bs_id = b.bs_id
-        where b.bstage_id = $1 AND O.bt_id =$2
+        where b.bstage_id = $1 AND O.bt_id =$2 AND O.is_active = 'true'
         ORDER BY bs_id ASC`, [bstageID, btID]
       );
       console.log(res.rows)
