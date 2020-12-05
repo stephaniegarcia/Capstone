@@ -73,7 +73,12 @@ router.post('/api/user/changePassword', (req, res) => {
         from: 'capstonehelix@gmail.com',
         to : email,
         subject : "Cambio de contraseña",
-        html : "<br> Presione el enlace para cambiar su contraseña.<br><a href="+link+">Presione aqui.</a>"
+        html : "<br> Presione el enlace para cambiar su contraseña.<br><a href="+link+">Presione aqui.</a>",
+        attachments: [{
+            filename: 'colmena.png',
+            path: 'routes/colmena.png',
+            cid: 'test' //same cid value as in the html img src
+        }]
     }
     transporter.sendMail(mailOptions, (error, response) => {
         if(error){
@@ -183,7 +188,13 @@ router.post('/api/register', (req, res) => {
                     from: 'capstonehelix@gmail.com',
                     to : email,
                     subject : "Tu Camino Empresarial",
-                    html : "<br> Te damos la bienvenida a Tu Camino Empresarial. Presione el enlace para confirmar su cuenta.<br><a href="+link+">Presiona aqui para verificar tu cuenta.</a>" 
+                    html : `<img src="cid:test"> 
+                    <br> Te damos la bienvenida a Tu Camino Empresarial. Presione el enlace para confirmar su cuenta.<br><a href="+link+">Presiona aqui para verificar tu cuenta.</a>`,
+                    attachments: [{
+                        filename: 'colmena.png',
+                        path: 'routes/colmena.png',
+                        cid: 'test' //same cid value as in the html img src
+                    }]
                 }
                 console.log(mailOptions);
                 transporter.sendMail(mailOptions, function(error, response){
