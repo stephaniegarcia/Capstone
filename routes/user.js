@@ -112,7 +112,7 @@ router.get('/api/newPassword/user/:email', async (req,res) =>{
  * @route /api/user/password'
  * @description route to change the password on data base
  * @param email
- * @param password 
+ * @param password
  */
 router.put('/api/user/password', (req,res) => {
     const email = req.body.email;
@@ -228,14 +228,13 @@ router.post('/api/login', async (req,res) => {
         if(validEmail(email)){
 
             hashedPassword = await dao.getPassword(email);
-            
             if(hashedPassword[0]){
                 const isMatchingPassword = bcrypt.compareSync(password, hashedPassword[0].user_password)
                 await dao.log(hashedPassword[0].user_id);
                 login = {
                     "Match" : isMatchingPassword,
                     "user_id": hashedPassword[0].user_id
-                } 
+                }
                 res.status(200).send(login);
             }
             else{

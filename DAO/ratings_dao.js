@@ -9,12 +9,13 @@ const pool = new Pool({
     port: 5432
 })
 
+//Fixed is organizations inactive to not appear
 async function getAverageEvaluations(){
     try {
         const res = await pool.query(
           `SELECT ROUND(AVG(R.rating)) as rating, O.name
           FROM organization_rating as R INNER JOIN organization as O ON O.org_id = R.organization_id
-          GROUP BY O.name;`
+          GROUP BY O.name`
         );
         console.log(res.rows)
         return res.rows;
@@ -23,24 +24,18 @@ async function getAverageEvaluations(){
       }
 }
 
+//Fixed is active and implemented new org business type
 async function getTopTenBT(btID){
     try {
         const res = await pool.query(
-          `with average_rating as (
-            SELECT organization_id as Organization_ID, ROUND(AVG(rating)) as Rating
-          FROM organization_rating
-          GROUP BY organization_id
-        ),
-        ordered_data as (
-          select O.name, bt_id, rating, row_number() over (partition by bt_id order by rating desc) rank
-          from average_rating r
-            join organization o on o.org_id = r.organization_id
-          where bt_id = $1
-          order by O.name, rating desc 
-        )
-        select  name, bt_id, rating
-        from ordered_data
-        where rank <= 10
+          `SELECT o.name, t.bt_id, ROUND(AVG(rating)) as rating
+          FROM organization_rating as r inner join organization_business_type as t
+          on r.organization_id = t.org_id
+          inner join organization as o 
+          on o.org_id = t.org_id
+          where t.bt_id =$1 and o.is_active ='true'
+          GROUP BY o.name, t.bt_id
+          order by rating desc limit 10
         `, [btID]
         );
         console.log(res.rows)
@@ -50,6 +45,7 @@ async function getTopTenBT(btID){
       }
 }
 
+//Fixed is active
 async function getTopTenBS(bstage_id){
     try {
         const res = await pool.query(
@@ -65,8 +61,8 @@ async function getTopTenBS(bstage_id){
             join organization o on o.org_id = r.organization_id
 			join business_step b on o.bs_id = b.bs_id
 			join business_stage s on b.bstage_id = s.bstage_id
-            where b.bstage_id=$1
-          order by s.description, rating desc 
+            where b.bstage_id=$1 and o.is_active ='true'
+          order by s.description, rating desc
         )
         select  name, description, rating
         from ordered_data
@@ -80,11 +76,13 @@ async function getTopTenBS(bstage_id){
       }
 }
 
+//Fixed is active
 async function getOrgPerformingPoorly(){
     try {
         const res = await pool.query(
         `SELECT O.name, ROUND(AVG(rating)) as Rating
         FROM organization_rating as R INNER JOIN Organization as O on O.org_id = R.organization_id
+		    where O.is_active = 'true'
         GROUP BY O.name
         order by rating asc
         Limit 10
@@ -116,12 +114,14 @@ async function getAccountsPerWeek(){
       }
 }
 
+//Fixed is active
 async function getComments(){
     try {
         const res = await pool.query(
         `SELECT O.name as Organization, R.rating_comment as Comment
         FROM public.organization_rating as R INNER JOIN public.organization as O
         ON O.org_id = R.organization_id
+		    Where o.is_active = 'true'
         `,
         );
         console.log(res.rows)
