@@ -189,7 +189,7 @@ router.post('/api/register', (req, res) => {
                     to : email,
                     subject : "Tu Camino Empresarial",
                     html : `<img src="cid:test"> 
-                    <br> Te damos la bienvenida a Tu Camino Empresarial. Presione el enlace para confirmar su cuenta.<br><a href="+link+">Presiona aqui para verificar tu cuenta.</a>`,
+                    <br> Te damos la bienvenida a Tu Camino Empresarial. Presione el enlace para confirmar su cuenta.<br><a href="${link}">Presiona aqui para verificar tu cuenta.</a>`,
                     attachments: [{
                         filename: 'colmena.png',
                         path: 'routes/colmena.png',
