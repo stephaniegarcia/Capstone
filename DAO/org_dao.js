@@ -23,6 +23,7 @@ async function getOrganizations(){
       }
 }
 
+
 async function getOrganizationByID(id){
     try {
         const res = await pool.query(
@@ -38,32 +39,33 @@ async function getOrganizationByID(id){
 }
 
 //Deleted bt_id from function, added returning values
-const createOrg =  (name, description, email, phone_number, bs_id, is_active, org_link) => {
-    pool.query(`INSERT INTO public.organization(
-        name, description, email, phone_number, bs_id, is_active, org_link)
-        VALUES ('$1, $2, $3, $4, $5, $6, $7)
-        returning org_id, name, description, email, phone_number, bs_id, is_active, org_link`, [name, description, email, phone_number, bs_id, is_active, org_link], (error, results) => {
-        if (error) {
-            throw error
-        }
-        else{
-            return results.rows;
-        }
-    })
+const createOrg =  async (name, description, email, phone_number, bs_id, is_active, org_link) => {
+    try {
+        const res = await pool.query(`INSERT INTO public.organization(
+            name, description, email, phone_number, bs_id, is_active, org_link)
+            VALUES ($1, $2, $3, $4, $5, $6, $7)
+            returning org_id`, [name, description, email, phone_number, bs_id, is_active, org_link]
+        );
+        console.log(res.rows)
+        return res.rows;
+      } catch (err) {
+        return err.stack;
+      }
 }
 
 //Deleted bt_id from function
-const updateOrganization = (name, description, email, phone, bs_id, org_link, org_id) => {
+function updateOrganization(name, description, email, phone, bs_id, org_link, org_id) {
     pool.query(
         'UPDATE public.organization	SET name =$1, description=$2, email =$3, phone_number =$4, bt_id=$5, org_link=$6 WHERE org_id =$7',
         [name, description, email, phone, bs_id, org_link, org_id],
         (error, results) => {
-        if (error)
-            throw error
-        else
-            return results.rows;
+            if (error)
+                throw error;
+
+            else
+                return results.rows;
         }
-    )
+    );
 }
 
 //To be updated -- Have to decide if inactive organization will be inactivating the complete organization, or just the type
@@ -83,10 +85,12 @@ const inactivateOrganization = (is_active, org_id) => {
 async function getOrganizationsTypes(orgID){
     try {
         const res = await pool.query(
-          `select distinct t.bt_id
+          `select distinct t.bt_id, b.description
           from public.organization_business_type as t
           inner join organization as o on t.org_id = o.org_id
-          where o.org_id = $1`[orgID]
+		  inner join business_type as b on b.bt_id = t.bt_id
+          where o.org_id = $1
+          Order by t.bt_id asc`, [orgID]
         );
         console.log(res.rows)
         return res.rows;
@@ -98,14 +102,16 @@ async function getOrganizationsTypes(orgID){
 async function getOrganizationsMissingTypes(orgID){
   try {
       const res = await pool.query(
-        `select distinct t.bt_id
+        `select distinct t.bt_id, b.description
         from public.organization_business_type as t
+		inner join business_type as b on b.bt_id = t.bt_id
         where t.bt_id not in
         (select distinct t.bt_id
          from public.organization_business_type as t
          inner join organization as o on t.org_id = o.org_id
          where o.org_id = $1
-        )`[orgID]
+        )
+        Order by t.bt_id asc`, [orgID]
       );
       console.log(res.rows)
       return res.rows;
