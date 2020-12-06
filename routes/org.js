@@ -120,6 +120,7 @@ router.get('/api/orgBusinessType/:orgID', async (req,res) =>{
 * @description gather the missing business types for an organization
 * @returns all the business types missing for organization orgID
 */
+
 router.get('/api/orgMissingTypes/:orgID', async (req,res) =>{
 const types = await dao.getOrganizationsMissingTypes(req.params.orgID);
   if(types instanceof Error){
