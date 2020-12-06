@@ -99,7 +99,7 @@ router.put('/api/inactiveOrganization', (req, res) => {
  * @description gather the business types for some organization orgID
  * @returns all the business types associated to orgID
  */
-router.getMissingTypes('/api/orgBusinessType/:orgID', async (req,res) =>{
+router.get('/api/orgBusinessType/:orgID', async (req,res) =>{
   const types = await dao.getOrganizationsTypes(req.params.orgID);
     if(types instanceof Error){
         res.status(400).send("Error");
@@ -114,7 +114,7 @@ router.getMissingTypes('/api/orgBusinessType/:orgID', async (req,res) =>{
 * @description gather the missing business types for an organization
 * @returns all the business types missing for organization orgID
 */
-router.getMissingTypes('/api/orgBusinessType/:orgID', async (req,res) =>{
+router.get('/api/orgBusinessType/:orgID', async (req,res) =>{
 const types = await dao.getOrganizationsMissingTypes(req.params.orgID);
   if(types instanceof Error){
       res.status(400).send("Error");
