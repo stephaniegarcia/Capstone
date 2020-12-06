@@ -42,11 +42,16 @@ router.get('/api/organization/:orgId', async (req,res) => {
  * @param is_active
  * @param org_link
  */
-router.post('/api/organization', (req, res) => {
+router.post('/api/organization', async (req, res) => {
 
   const {name, description, email, phone_number, bt_id, bs_id, is_active, org_link} = req.body;
-  if(name && description && email && phone_number && bt_id && bs_id && is_active && org_link){
-          dao.createOrg(name, description, email, phone_number, bt_id, bs_id, is_active, org_link)
+  if(name && description && email && phone_number && bs_id && is_active && org_link){
+          let org = await dao.createOrg(name, description, email, phone_number, bs_id, is_active, org_link)
+          console.log(org)
+          for(let i =0; i<bt_id.length;i++)
+          {
+              dao.attachingOrgToBusinessType(bt_id[i], org[0].org_id)
+          }
           res.status(200).send("Organization registered");
   }
   else{
@@ -100,7 +105,7 @@ router.put('/api/inactiveOrganization', (req, res) => {
  * @description gather the business types for some organization orgID
  * @returns all the business types associated to orgID
  */
-router.getMissingTypes('/api/orgBusinessType/:orgID', async (req,res) =>{
+router.get('/api/orgBusinessType/:orgID', async (req,res) =>{
   const types = await dao.getOrganizationsTypes(req.params.orgID);
     if(types instanceof Error){
         res.status(400).send("Error");
@@ -115,7 +120,7 @@ router.getMissingTypes('/api/orgBusinessType/:orgID', async (req,res) =>{
 * @description gather the missing business types for an organization
 * @returns all the business types missing for organization orgID
 */
-router.getMissingTypes('/api/orgBusinessType/:orgID', async (req,res) =>{
+router.get('/api/orgMissingTypes/:orgID', async (req,res) =>{
 const types = await dao.getOrganizationsMissingTypes(req.params.orgID);
   if(types instanceof Error){
       res.status(400).send("Error");
@@ -124,7 +129,5 @@ const types = await dao.getOrganizationsMissingTypes(req.params.orgID);
       res.status(200).send(types);
   }
 });
-
-
 
 module.exports = router;
