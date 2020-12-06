@@ -20,7 +20,7 @@ router.get('/api/organizations', async (req,res) =>{
 
 /**
  * @route /api/organizations
- * @description route to get an orgization based on a given id
+ * @description route to get an organization based on a given id
  * @param orgId
  * @returns organization
  */

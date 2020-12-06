@@ -313,7 +313,6 @@ function validPhone(phone) {
     else{
         return " "
     }
-    
 }
 
 function validName(name) {
