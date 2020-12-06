@@ -40,6 +40,9 @@ function Home(props)
                 <h2>
                     Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
                 </h2>
+                <hr className="home-hr" />
+                <img src="images/banner1.png" className="drop-image" style={{width:"75%"}} />
+                <hr className="home-hr" />
                 <Grid container spacing={3} style={{marginTop: '60px'}}>
                     <Grid item xs={12} sm={6} md={6} lg={3} style={{padding: "15px"}}>
                         <img src="images/paso1.png" style={{width:"45%"}} />
@@ -87,13 +90,14 @@ function Home(props)
             <Paper className="paper-margin" style={{padding: '30px', marginTop: '60px'}} elevation={10}>
                 <Grid container spacing={3}>
                     <Grid item xs={12}>
-                        {/* <h1>Tu Camino Empresarial</h1> */}
                         <h1>
                             Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
                         </h1>
                         <h2>
                             Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
                         </h2>
+                        <hr className="home-hr" />
+                        <img src="images/about.jpg" className="drop-image" style={{width:"75%"}} />
                         <hr className="home-hr" />
                         <p>
                             Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.

@@ -160,8 +160,8 @@ function Login() {
                         name="pass"
                         label="Contraseña:"
                         onKeyDown={(e)=>{ onEnterPress(e, 'pass'); }}
-                        error={!validPassword}
-                        helperText={!validPassword ? "Contraseña inválido" : ""}
+                        // error={!validPassword}
+                        // helperText={!validPassword ? "Contraseña inválido" : ""}
                         onChange={handlePasswordChange}
                         value={password} />
                 </div>

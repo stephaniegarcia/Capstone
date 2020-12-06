@@ -16,6 +16,10 @@ html {
   letter-spacing: normal !important;
 }
 
+.drop-image {
+  box-shadow: 3px 3px 5px 0px #000000;
+}
+
 body {
   margin: 0;
   font-family: 'Helveltica' !important;
