@@ -23,6 +23,7 @@ async function getOrganizations(){
       }
 }
 
+
 async function getOrganizationByID(id){
     try {
         const res = await pool.query(

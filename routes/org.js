@@ -75,6 +75,7 @@ router.put('/api/organization', (req, res) => {
   }
 });
 
+
 /**
  * @route /api/inactiveOrganization
  * @description route to delete organizations
