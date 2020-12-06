@@ -56,7 +56,7 @@ const createOrg =  async (name, description, email, phone_number, bs_id, is_acti
 //Deleted bt_id from function
 function updateOrganization(name, description, email, phone, bs_id, org_link, org_id) {
     pool.query(
-        'UPDATE public.organization	SET name =$1, description=$2, email =$3, phone_number =$4, bt_id=$5, org_link=$6 WHERE org_id =$7',
+        'UPDATE public.organization	SET name =$1, description=$2, email =$3, phone_number =$4, bs_id=$5, org_link=$6 WHERE org_id =$7',
         [name, description, email, phone, bs_id, org_link, org_id],
         (error, results) => {
             if (error)
@@ -92,8 +92,7 @@ async function getOrganizationsTypes(orgID){
           where o.org_id = $1
           Order by t.bt_id asc`, [orgID]
         );
-        console.log(res.rows)
-        return res.rows;
+        return res;
       } catch (err) {
         return err.stack;
       }
@@ -133,16 +132,16 @@ const attachingOrgToBusinessType =  (bt_id, org_id) => {
     })
 }
 
-const deletingOrgBusinessType =  (bt_id, org_id) => {
-    pool.query(`DELETE FROM public.organization_business_type
-	            WHERE org_id = $1 and bt_id =$2`, [bt_id, org_id], (error, results) => {
-        if (error) {
-            throw error
-        }
-        else{
-            return results.rows;
-        }
-    })
+const deletingOrgBusinessType = async (bt_id, org_id) => {
+    try {
+        const res = await pool.query(
+            `DELETE FROM public.organization_business_type
+            WHERE org_id = $1 and bt_id =$2;`, [org_id, bt_id]
+        );
+        return res;
+      } catch (err) {
+        return err.stack;
+      }
 }
 
 module.exports = {

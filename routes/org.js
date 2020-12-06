@@ -1,5 +1,7 @@
 
 const { Router } = require('express');
+const { type } = require('os');
+const { is } = require('type-is');
 const router = Router();
 
 const dao  = require('../DAO/org_dao');
@@ -69,10 +71,26 @@ router.post('/api/organization', async (req, res) => {
  * @param bs_id
  * @param org_link
  */
-router.put('/api/organization', (req, res) => {
+router.put('/api/organization', async (req, res) => {
   const {name, description, email, phone_number, bt_id, bs_id, org_link, org_id} = req.body;
   if(name && email && phone_number && bt_id && bs_id && org_link && org_id){
-    dao.updateOrganization(name, description, email, phone_number, bt_id, bs_id, org_link, org_id)
+    let types = await dao.getOrganizationsTypes(org_id);
+    //console.log(types.rows)
+      for(let j = 0; j < bt_id.length; j++){
+        if(!isIn(bt_id[j], types.rows)){
+          dao.attachingOrgToBusinessType(bt_id[j],org_id)
+          console.log(1)
+        }
+      }
+      for(let j = 0; j < types.rows.length; j++){
+        if(!isInQ(types.rows[j].bt_id, bt_id)){
+          // remove from
+          console.log(types.rows[j].bt_id)
+          await dao.deletingOrgBusinessType(types.rows[j].bt_id, org_id)
+          //console.log(r)
+        }
+      }
+    dao.updateOrganization(name, description, email, phone_number, bs_id, org_link, org_id)
     res.status(200).send("Organization updated.");
   }
   else{
@@ -131,4 +149,22 @@ const types = await dao.getOrganizationsMissingTypes(req.params.orgID);
   }
 });
 
+
+function isIn(element, list) {
+  for(let i = 0; i < list.length; i++){ 
+    if(element == list[i].bt_id){
+      return true;
+    }
+  }
+  return false;
+}
+function isInQ(element, list) {
+
+  for(let i = 0; i < list.length; i++){
+    if(element == list[i]){
+      return true;
+    }
+  }
+  return false;
+}
 module.exports = router;
