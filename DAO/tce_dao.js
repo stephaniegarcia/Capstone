@@ -141,8 +141,7 @@ async function getRoadMap(bstageID, btID){
       const res = await pool.query(
         `SELECT O.org_id, O.name, O.description, O.email, O.phone_number, t.bt_id, O.bs_id, O.is_active, O.org_link, b.bstage_id
         FROM public.organization as O inner join business_step as B on O.bs_id = b.bs_id
-        inner join organization_business_type as t on o.org_id = t.org_id
-        where b.bstage_id = $1 AND O.is_active = 'true' AND t.bt_id = $2
+        where b.bstage_id = $1 AND O.bt_id =$2 AND O.is_active = 'true'
         ORDER BY bs_id ASC`, [bstageID, btID]
       );
       console.log(res.rows)
