@@ -13,9 +13,14 @@ const dao  = require('../DAO/org_dao');
  * @returns organizations of the system
  */
 router.get('/api/organizations', async (req,res) =>{
-  const organization = await dao.getOrganizations()
-  console.log(organization)
- res.send(organization)
+  const organizations = await dao.getOrganizations();
+  console.log(organizations)
+  for(var i = 0; i < organizations.length; i++) {
+    // const types = await dao.getOrganizationsTypes(organizations[i].org_id);
+    // organizations[i].types = types;
+  }
+  
+  res.send(organizations)
 });
 
 /**
@@ -90,6 +95,37 @@ router.put('/api/inactiveOrganization', (req, res) => {
   }
   else{
     res.status(404).send("Error: Missing Parameter")
+  }
+});
+
+//Including organizations_business_types function in here
+/**
+ * @route /api/businessType
+ * @description gather the business types for some organization orgID
+ * @returns all the business types associated to orgID
+ */
+router.get('/api/orgBusinessType/:orgID', async (req,res) =>{
+  const types = await dao.getOrganizationsTypes(req.params.orgID);
+    if(types instanceof Error){
+        res.status(400).send("Error");
+    }
+    else{
+        res.status(200).send(types);
+    }
+});
+
+/**
+* @route /api/businessType/:orgID
+* @description gather the missing business types for an organization
+* @returns all the business types missing for organization orgID
+*/
+router.get('/api/orgBusinessType/missing/:orgID', async (req,res) =>{
+const types = await dao.getOrganizationsMissingTypes(req.params.orgID);
+  if(types instanceof Error){
+      res.status(400).send("Error");
+  }
+  else{
+      res.status(200).send(types);
   }
 });
 

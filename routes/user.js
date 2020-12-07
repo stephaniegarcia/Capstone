@@ -63,8 +63,8 @@ router.post('/api/user/changePassword', (req, res) => {
     const email = req.body.email;
     console.log(email);
     passwordtoken = randomstring.generate();
-    host =  process.env.WebsiteUrl || req.get('host');
-    link="http://"+host+"/newPassword/user/" +email+ "?id="+passwordtoken;
+    host =  process.env.WebsiteUrl ||  "http://" +req.get('host')
+    link=host+"/newPassword/user/" +email+ "?id="+passwordtoken;
     let insertToken = dao.insertPasswordToken(email, passwordtoken);
     if(insertToken instanceof Error){
         res.status(404).send("User not found");
@@ -73,7 +73,12 @@ router.post('/api/user/changePassword', (req, res) => {
         from: 'capstonehelix@gmail.com',
         to : email,
         subject : "Cambio de contraseña",
-        html : "<br> Presione el enlace para cambiar su contraseña.<br><a href="+link+">Presione aqui.</a>"
+        html : "<br> Presione el enlace para cambiar su contraseña.<br><a href="+link+">Presione aqui.</a>",
+        attachments: [{
+            filename: 'colmena.png',
+            path: 'routes/colmena.png',
+            cid: 'test' //same cid value as in the html img src
+        }]
     }
     transporter.sendMail(mailOptions, (error, response) => {
         if(error){
@@ -112,7 +117,7 @@ router.get('/api/newPassword/user/:email', async (req,res) =>{
  * @route /api/user/password'
  * @description route to change the password on data base
  * @param email
- * @param password 
+ * @param password
  */
 router.put('/api/user/password', (req,res) => {
     const email = req.body.email;
@@ -177,13 +182,19 @@ router.post('/api/register', (req, res) => {
                 var registerToken = randomstring.generate();
                 hashedPassword = bcrypt.hashSync(password,saltRounds)
                 dao.createUser(firstname,lastname,email,hashedPassword, business_status, requested_assistance, phone_number, null, business_stage, 1, 0, registerToken);
-                var hostUrl = process.env.WebsiteUrl || req.get('host');
-                link="http://"+hostUrl+"/verify/" +email+ "?id="+registerToken;
+                var hostUrl = process.env.WebsiteUrl || "http://" +req.get('host');
+                link=hostUrl+"/verify/" +email+ "?id="+registerToken;
                 mailOptions={
                     from: 'capstonehelix@gmail.com',
                     to : email,
-                    subject : "Favor de confirmar su correo electronico",
-                    html : "<br> Presione el enlace para confirmar su cuenta.<br><a href="+link+">Click here to verify</a>" 
+                    subject : "Tu Camino Empresarial",
+                    html : `<img src="cid:test"> 
+                    <br> Te damos la bienvenida a Tu Camino Empresarial. Presione el enlace para confirmar su cuenta.<br><a href="+link+">Presiona aqui para verificar tu cuenta.</a>`,
+                    attachments: [{
+                        filename: 'colmena.png',
+                        path: 'routes/colmena.png',
+                        cid: 'test' //same cid value as in the html img src
+                    }]
                 }
                 console.log(mailOptions);
                 transporter.sendMail(mailOptions, function(error, response){
@@ -228,14 +239,13 @@ router.post('/api/login', async (req,res) => {
         if(validEmail(email)){
 
             hashedPassword = await dao.getPassword(email);
-            
             if(hashedPassword[0]){
                 const isMatchingPassword = bcrypt.compareSync(password, hashedPassword[0].user_password)
                 await dao.log(hashedPassword[0].user_id);
                 login = {
                     "Match" : isMatchingPassword,
                     "user_id": hashedPassword[0].user_id
-                } 
+                }
                 res.status(200).send(login);
             }
             else{

@@ -379,6 +379,7 @@ function UserProfile() {
         var ratingsResponse = await apiService.getRequest('ratings/'+profile.user_id);
         var ratings = ratingsResponse.data;
         apiService.getRequest('roadmap/'+profile.bt_id+'/'+profile.bstage_id).then(response => {
+          console.log(profile)
           //Handle organization response
           if(!response.data) {
             response.data = [];
@@ -551,8 +552,8 @@ function UserProfile() {
 
               <Paper className="paper-margin" elevation={10} >
                 <div>
-                  <h1>Aqui se muestran todas las organizaciones mencionadas en el recorrido: </h1>
-                  <h2>Organizaciones</h2>
+                  <h1>Organizaciones</h1>
+                  <h2>Aqui se muestran todas las organizaciones que forman parte del recorrido: </h2>
                   <div>
                     {!showLoadingOrgs && (
                       <div>

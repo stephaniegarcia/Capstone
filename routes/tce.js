@@ -190,6 +190,10 @@ router.get('/api/referred/contacted', async (req,res) =>{
 
 router.get('/api/roadmap/:btID/:bstageID', async (req,res) =>{
     const roadmap = await dao.getRoadMap(req.params.bstageID,req.params.btID)
+    for(var i = 0; i < roadmap.length; i++) {
+        // const types = await dao.getOrganizationsTypes(roadmap[i].org_id);
+        // roadmap[i].types = types;
+    }
     console.log(roadmap)
    res.send(roadmap)
 });

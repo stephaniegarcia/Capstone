@@ -22,6 +22,7 @@ import AdminForgotPassword from './components/adminForgotPassword';
 import VerifyAccount from './components/verifyAccount';
 import GAReports from './components/gaReports';
 import PdfOrgs from './components/printToPdfOrgs'
+import PdfReports from './components/printToPdfReports'
 import ReactGA from 'react-ga';
 
 function App() {
@@ -58,6 +59,8 @@ function App() {
           <Route exact path='/adminreports' component={AdminReports} />
           <Route exact path='/gareports' component={GAReports} />
           <Route exact path='/adminorgs' component={AdminOrganizations} />
+          <Route exact path='/pdfreports' component={PdfReports} />
+          
         </Switch>
 
 

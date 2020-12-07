@@ -38,7 +38,7 @@ function AdminReports() {
     const [loadingAccountsPerWeek, setLoadingAccountsPerWeek] = useState(true);
     const [loadingContactRate, setLoadingContactRate] = useState(true);
     const [loadingAverage, setLoadingAverage] = useState(true);
-    
+
     const [contactRate, setContactRate] = useState([]);
     const [averages, setAverages] = useState([]);
     const [topPerType, setTopPerType] = useState([]);
@@ -116,7 +116,7 @@ function AdminReports() {
                 response.data[index].count = parseInt(response.data[index].count);
             }
             setMostContacted(response.data);
-            
+
         }).catch(err =>{
             setLoadingMostContacted(false);
         });
@@ -173,35 +173,17 @@ function AdminReports() {
         const [open, setOpen] = React.useState(false);
         return (
             <React.Fragment>
-            <TableRow>
-                <TableCell>
-                    <IconButton aria-label="expand row" size="small" onClick={() => setOpen(!open)}>
-                        {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-                    </IconButton>
-                </TableCell>
-                <TableCell component="h5" scope="row">
-                    {row.name}
-                </TableCell>
-            </TableRow>
-            <TableRow>
-                <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
-                    <Collapse in={open} timeout="auto" unmountOnExit>
-                        <Box margin={1}>
-                        <Table size="small">
-                            <TableBody>
-                                {row.orgs && Array.isArray(row.orgs) && row.orgs.map((nameRow) => (
-                                    <TableRow>
-                                        <TableCell component="th" scope="row">
-                                            {nameRow.name}
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-                        </Box>
-                    </Collapse>
-                </TableCell>
-            </TableRow>
+            <div style={{ margin: "10px 40px 40px 40px" }}>
+              <h5>{row.name}</h5>
+              {row.orgs && Array.isArray(row.orgs) && row.orgs.map((nameRow) => (
+                  <div>
+                    <span>{nameRow.name}</span>
+                    {row.orgs[row.orgs.length-1] != nameRow && (
+                      <hr />
+                    )}
+                  </div>
+              ))}
+            </div>
             </React.Fragment>
         );
     }
@@ -212,35 +194,17 @@ function AdminReports() {
         const [open, setOpen] = React.useState(false);
         return (
             <React.Fragment>
-            <TableRow>
-                <TableCell>
-                    <IconButton aria-label="expand row" size="small" onClick={() => setOpen(!open)}>
-                        {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-                    </IconButton>
-                </TableCell>
-                <TableCell component="h5" scope="row">
-                    {row.name}
-                </TableCell>
-            </TableRow>
-            <TableRow>
-                <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
-                    <Collapse in={open} timeout="auto" unmountOnExit>
-                        <Box margin={1}>
-                        <Table size="small">
-                            <TableBody>
-                                {row.orgs && Array.isArray(row.orgs) && row.orgs.map((nameRow) => (
-                                    <TableRow>
-                                        <TableCell component="th" scope="row">
-                                            {nameRow.name}
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-                        </Box>
-                    </Collapse>
-                </TableCell>
-            </TableRow>
+            <div style={{ margin: "10px 40px 40px 40px" }}>
+              <h5>{row.name}</h5>
+              {row.orgs && Array.isArray(row.orgs) && row.orgs.map((nameRow) => (
+                <div>
+                  <span>{nameRow.name}</span>
+                    {row.orgs[row.orgs.length-1] != nameRow && (
+                      <hr />
+                    )}
+                </div>
+              ))}
+            </div>
             </React.Fragment>
         );
     }
@@ -251,7 +215,7 @@ function AdminReports() {
         const [rating, setRating] = React.useState(row.rating);
         return (
             <React.Fragment>
-                <TableRow>        
+                <TableRow>
                     <TableCell component="h5">
                         {row.name}
                     </TableCell>
@@ -270,7 +234,7 @@ function AdminReports() {
         const { row } = props;
         return (
             <React.Fragment>
-                <TableRow>        
+                <TableRow>
                     <TableCell component="h5">
                         {row.name}
                     </TableCell>
@@ -288,57 +252,23 @@ function AdminReports() {
     }, [shouldLoad]);
 
     return(
-        !apiService.isAdminAuthenticated() ? 
+        !apiService.isAdminAuthenticated() ?
         //If authenticated go to home page
         <Redirect to="/admin" /> :
 
         //Show login view
         <div className="top-margin">
-            <Paper ref={reportsRef} className="form form--wrapper paper-margin" elevation={10}> 
-                <h1>Reportes</h1>
-                <Grid container spacing={3}>
-                    <Grid item xs={6}>
-                        <Card variant="outlined">
-                            <div>
-                                <h3>
-                                    Average Ratings
-                                </h3>
-                                <TableContainer>
-                                    <Table aria-label="collapsible table">
-                                        <TableBody >
-                                            {averages.map((row) => (<RatingOrgRow key={'average'+row.id} row={row} />))}
-                                        </TableBody>
-                                    </Table>
-                                </TableContainer>
-                                <SmallSpinner isShown={loadingAverage} />
-                            </div>
-                        </Card>
-                    </Grid>
-                    <Grid item xs={6}>
-                        <Card variant="outlined">
-                            <div>
-                                <h3>
-                                    Contacted Rate
-                                </h3>
-                                <TableContainer>
-                                    <Table aria-label="collapsible table">
-                                        <TableBody >
-                                            {contactRate.map((row) => (<ContactedOrgRow key={'contacted'+row.id} row={row} />))}
-                                        </TableBody>
-                                    </Table>
-                                </TableContainer>
-                                <SmallSpinner isShown={loadingContactRate} />
-                            </div>
-                        </Card>
-                    </Grid>
-
+            <Paper className="form form--wrapper paper-margin" elevation={10}>
+                <div style={{margin: "30px"}} ref={reportsRef}>
+                  <h1>Reportes</h1>
+                  <Grid container spacing={3}>
                     <Grid item xs={6}>
                         <Card variant="outlined">
                             <div style={{
                                     width: '100%',
                                     height: '400px',
                                 }}>
-                                <h3>
+                                <h3 style={{margin: "15px"}}>
                                     Most Contacted
                                 </h3>
                                 <ResponsiveContainer width="100%" height="80%">
@@ -360,7 +290,7 @@ function AdminReports() {
                                     width: '100%',
                                     height: '400px',
                                 }}>
-                                <h3>
+                                <h3 style={{margin: "15px"}}>
                                     Poor Performing
                                 </h3>
                                 <ResponsiveContainer width="100%" height="80%">
@@ -382,7 +312,7 @@ function AdminReports() {
                                     width: '100%',
                                     height: '400px',
                                 }}>
-                                <h3>
+                                <h3 style={{margin: "15px"}}>
                                     Accounts Per Week
                                 </h3>
                                 <ResponsiveContainer width="100%" height="80%">
@@ -395,48 +325,89 @@ function AdminReports() {
                                     </BarChart>
                                 </ResponsiveContainer>
                                 <SmallSpinner isShown={loadingAccountsPerWeek} />
-                            </div>    
+                            </div>
                         </Card>
                     </Grid>
-                    <Grid item xs={6}>
+                    <Grid item xs={12}>
+                      <div style={{marginTop: "30px"}}></div>
+                    </Grid>
+                    <Grid item xs={12}>
                         <Card variant="outlined">
                             <div>
-                                <h3>
+                                <h3 style={{margin: "15px"}}>
                                     Top Per Type
                                 </h3>
-                                <TableContainer>
-                                    <Table aria-label="collapsible table">
-                                        <TableBody >
-                                            {topPerType.map((row) => (<CollapsibleTypeOrgRow  key={'type'+row.id} row={row} />))}
-                                        </TableBody>
-                                    </Table>
-                                </TableContainer>
+                                {topPerType.map((row) => (<CollapsibleTypeOrgRow  key={'type'+row.id} row={row} />))}
                                 <SmallSpinner isShown={loadingTopPerType} />
                             </div>
                         </Card>
                     </Grid>
-                    <Grid item xs={6}>
+                    <Grid item xs={12}>
                         <Card variant="outlined">
                             <div>
-                                <h3>
+                                <h3 style={{margin: "15px"}}>
                                     Top Per Stage
                                 </h3>
-                                <TableContainer>
-                                    <Table aria-label="collapsible table">
-                                        <TableBody >
-                                            {topPerStage.map((row) => (<CollapsibleStageOrgRow key={'stage'+row.id} row={row} />))}
-                                        </TableBody>
-                                    </Table>
-                                </TableContainer>
+                                {topPerStage.map((row) => (<CollapsibleStageOrgRow key={'stage'+row.id} row={row} />))}
                                 <SmallSpinner isShown={loadingTopPerStage} />
-                            </div>    
+                            </div>
+                        </Card>
+                    </Grid>
+
+                    <Grid item xs={12}>
+                        <Card variant="outlined">
+                            <div>
+                                <h3 style={{margin: "15px"}}>
+                                    Average Ratings
+                                </h3>
+                                {averages.map((row) => (
+                                  <div style={{margin: "0px 10px"}}>
+                                    <Grid container spacing={1}>
+                                      <Grid item xs={9}>
+                                        <h5 style={{textAlign:"start"}}>{row.name}</h5>  
+                                      </Grid>
+                                      <Grid item xs={1}>
+                                      <Rating
+                                        disabled={true}
+                                        value={row.rating} />
+                                      </Grid>
+                                    </Grid>
+                                    {averages[averages.length-1] != row && (<hr/>)}
+                                  </div>
+                                ))}
+                                <SmallSpinner isShown={loadingAverage} />
+                            </div>
+                        </Card>
+                    </Grid>
+                    <Grid item xs={12}>
+                        <Card variant="outlined">
+                            <div>
+                                <h3 style={{margin: "15px"}}>
+                                    Contacted Rate
+                                </h3>
+                                {contactRate.map((row) => (
+                                  <div style={{margin: "0px 10px"}}>
+                                    <Grid container spacing={1}>
+                                      <Grid item xs={10}>
+                                        <h5 style={{textAlign:"start"}}>{row.name}</h5>  
+                                      </Grid>
+                                      <Grid item xs={1}>
+                                        <p>{(row.percentage*100).toFixed(2)}%</p>
+                                      </Grid>
+                                    </Grid>
+                                    {contactRate[contactRate.length-1] != row && (<hr/>)}
+                                  </div>
+                                ))}
+                                <SmallSpinner isShown={loadingContactRate} />
+                            </div>
                         </Card>
                     </Grid>
                 </Grid>
+                </div>
             </Paper>
-            <Button style={{'margin':'15px'}} variant="contained" className="secondary-button" color="primary" href="/pdfreports">
-                Ver Versión imprimible
-            </Button>
+            <ReactToPrint
+                trigger={() => <Button style={{'margin':'15px'}} variant="contained" className="secondary-button" color="primary">Guardar a Pdf</Button>}
+                content={() => reportsRef.current} />
             <Alert
                 isOpen={showErrorAlert}
                 handleSubmit={onAlertClick}
