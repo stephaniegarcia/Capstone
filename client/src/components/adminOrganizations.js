@@ -24,6 +24,8 @@ import Skeleton from '@material-ui/lab/Skeleton';
 import IconButton from '@material-ui/core/IconButton';
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Checkbox from '@material-ui/core/Checkbox';
 import Collapse from '@material-ui/core/Collapse';
 import Grid from '@material-ui/core/Grid';
 
@@ -64,12 +66,12 @@ export default function Organizations() {
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [step, setStep] = useState('');
-  const [type, setType] = useState('');
   const [link, setLink] = useState('');
   const [description, setDescription] = useState('');
   const [isActive, setIsActive] = useState(false);
   
   const [orgTypes, setOrgTypes] = useState([]);
+  const [orgTypesCheck, setOrgTypesCheck] = useState({});
   const [orgStages, setOrgStages] = useState([]);
   const [orgSteps, setOrgSteps] = useState([]);
 
@@ -78,6 +80,7 @@ export default function Organizations() {
   const [validName, setValidName] = useState(true);
   const [validLink, setValidLink] = useState(true);
   const [validDescription, setValidDescription] = useState(true);
+  const [validType, setValidType] = useState(false);
   
   //email validation helper function
   //@param email - user email
@@ -142,13 +145,24 @@ export default function Organizations() {
     setName(!org.name || org.name == null ? '' : org.name);
     setPhone(!org.phone_number || org.phone_number == '' ? undefined : org.phone_number);
     setEmail(!org.email || org.email == null ? '' : org.email);
-    setType(org.bt_id);
     setStep(org.bs_id);
     setDescription(!org.description || org.description == null ? '' : org.description);
     setLink(!org.org_link || org.org_link == null ? '' : org.org_link);
   };
 
   //Event Handlers
+
+  const handleTypeCheckChange = (event) => {
+    orgTypesCheck[event.target.name] = event.target.checked;
+    var atleastOneChecked = false;
+    for(var i = 0; i < orgTypes.length; i ++) {
+      if(orgTypesCheck[String(orgTypes[i].bt_id)]) {
+        atleastOneChecked = true;
+      }
+    }
+    setValidType(atleastOneChecked);
+    setOrgTypesCheck({ ...orgTypesCheck, [event.target.name]: event.target.checked });
+  };
 
   const handleNameTextChange = (event) => {
     setValidName(isValidName(event.target.value));
@@ -162,14 +176,7 @@ export default function Organizations() {
     setValidPhone(isValidPhone(event.target.value.trim()));
     setPhone(event.target.value.trim());
   };
-  const handleTypeTextChange = (event) => {
-    setType(event.target.value);
-    var steps = apiService.getRoadmapSteps(event.target.value)
-    if(steps && steps.length>0) {
-      setOrgSteps(steps);
-      setStep(steps[0])
-    }
-  };
+
   const handleStepTextChange = (event) => {
     setStep(event.target.value);
   };
@@ -194,14 +201,21 @@ export default function Organizations() {
   
   const handleOpenAddOrgModalClickOpen = () => {
     if(orgTypes && orgTypes.length>0) {
-      newOrgModel.bt_id = orgTypes[0].bt_id;
-      if(orgSteps && orgSteps.length>0) {
-        newOrgModel.bs_id = orgSteps[0].bs_id;
+      for(var i = 0; i < orgTypes.length; i++) {
+        orgTypesCheck[String(orgTypes[i].bt_id)] = false;
+        orgTypes[i].description = apiService.getOrgType(orgTypes[i].bt_id);
+      }
+
+      var steps = apiService.getRoadmapSteps(orgTypes[0].bt_id)
+      if(steps && steps.length>0) {
+        setOrgSteps(steps);
+        setStep(steps[0])
       }
     }
     if(orgStages && orgStages.length>0) {
       newOrgModel.bstage_id = orgStages[0].bstage_id;
     }
+    setValidType(false);
     saveLastOrgSelected(newOrgModel);
     setOpenAddOrgModal(true);
   };
@@ -212,6 +226,21 @@ export default function Organizations() {
   };
 
   const handleOpenEditOrgModalClickOpen = (org) => {
+    if(orgTypes && orgTypes.length>0) {
+      for(var i = 0; i < orgTypes.length; i++) {
+        var containsType = org.types.filter(o => o.bt_id == orgTypes[i].bt_id);
+        orgTypesCheck[String(orgTypes[i].bt_id)] = containsType && containsType.length>0;
+        orgTypes[i].description = apiService.getOrgType(orgTypes[i].bt_id);
+      }
+
+      var steps = apiService.getRoadmapSteps(orgTypes[0].bt_id)
+      if(steps && steps.length>0) {
+        setOrgSteps(steps);
+        setStep(steps[0])
+      }
+    }
+
+    setValidType(true);
     saveLastOrgSelected(org);
     setOpenEditOrgModal(true);
   };
@@ -230,6 +259,7 @@ export default function Organizations() {
     var finalData = [];
     for(var i = 0; i < orgs.length; i++) {
       var org = orgs[i];
+      org.key = apiService.randomGuid();
       if(searchString && searchString.length > 0) {
         if(
             (org.name && String(org.name).toUpperCase().includes(searchString.toUpperCase())) ||
@@ -331,25 +361,51 @@ export default function Organizations() {
   }
   //adding an organization
   function addOrganization() {
+    var atleastOneChecked = false;
+    for(var i = 0; i < orgTypes.length; i ++) {
+      if(orgTypesCheck[String(orgTypes[i].bt_id)]) {
+        atleastOneChecked = true;
+      }
+    }
     if(!validEmail || !email || email == null || !email.length>0 || 
       !validDescription || !description || description == null || !description.length>0 || 
       !validPhone || !phone || phone == null || !phone.length>0 || 
       !validName || !name || name == null || !name.length>0 || 
-      !validLink || !link || link == null || !link.length>0) {
+      !validLink || !link || link == null || !link.length>0 ||
+      !validType || !atleastOneChecked) {
         return;
     }
     setShowLoading(true);
+    var types = [];
+    var tempSteps = [];
+    for(var i = 0; i < orgTypes.length; i++) {
+      if(orgTypesCheck[String(orgTypes[i].bt_id)]) {
+        types.push(orgTypes[i].bt_id);
+      }
+    }
+
+    var stepName = apiService.getOrgStep(step);
+    for(var i = 0; i < types.length; i++) {
+      var typeSteps = apiService.getRoadmapSteps(types[i])
+      var singleStep = typeSteps.filter(s => s.description == stepName.description);
+      if(singleStep && singleStep.length > 0) {
+        tempSteps.push(singleStep[0].bs_id);
+      }
+    }
+
     var data = {
       name: name.trim(),
       email: email.trim(),
       phone_number: phone.trim(),
       bs_id: step,
-      bt_id: type,
+      steps: tempSteps,
+      bt_id: types,
       org_link: link.trim(),
       is_active: true,
       description: description.trim()
     };
     handleOpenAddOrgModalClose();
+    console.log(data);
     apiService.postRequest("organization", data).then((addResponse) => {
       apiService.getRequest("organizations").then((organizationsResponse) => {
         setFullOrganizationList(organizationsResponse.data);
@@ -371,28 +427,54 @@ export default function Organizations() {
 
   //editing an organization
   function editOrganization() {
+    var atleastOneChecked = false;
+    for(var i = 0; i < orgTypes.length; i ++) {
+      if(orgTypesCheck[String(orgTypes[i].bt_id)]) {
+        atleastOneChecked = true;
+      }
+    }
     if(!validEmail || !email || email == null || !email.length>0 || 
       !validDescription || !description || description == null || !description.length>0 || 
       !validPhone || !phone || phone == null || !phone.length>0 || 
       !validName || !name || name == null || !name.length>0 || 
-      !validLink || !link || link == null || !link.length>0) {
+      !validLink || !link || link == null || !link.length>0 ||
+      !validType || !atleastOneChecked) {
         return;
     }
     setShowLoading(true);
     var id = lastSelectedOrg.org_id
+    var types = [];
+    var tempSteps = [];
+    for(var i = 0; i < orgTypes.length; i++) {
+      if(orgTypesCheck[String(orgTypes[i].bt_id)]) {
+        types.push(orgTypes[i].bt_id);
+      }
+    }
+    var stepName = apiService.getOrgStep(step);
+    for(var i = 0; i < types.length; i++) {
+      var typeSteps = apiService.getRoadmapSteps(types[i])
+      var singleStep = typeSteps.filter(s => s.description == stepName.description);
+      if(singleStep && singleStep.length > 0) {
+        tempSteps.push(singleStep[0].bs_id);
+      }
+    }
     var data = {
       org_id: id,
       name: name.trim(),
       email: email,
       phone_number: phone,
       bs_id: step,
-      bt_id: type,
+      steps: tempSteps,
+      bt_id: types,
       org_link: link.trim(),
-      is_active: isActive,
+      is_active: true,
       description: description.trim()
     };
     handleOpenEditOrgModalClose();
+    console.log(data);
     apiService.putRequest("organization", data).then((editResponse) => {
+      debugger;
+      console.log(editResponse.data);
       apiService.getRequest("organizations").then((organizationsResponse) => {
         setFullOrganizationList(organizationsResponse.data);
         filterOrganizations(organizationsResponse.data);
@@ -482,7 +564,10 @@ export default function Organizations() {
                     <Grid item xs={12} sm={6} md={6} lg={3}><h3 className="center-text"><span className="light-text">Teléfono: </span>{row.phone_number}</h3></Grid>
                     <Grid item xs={12} sm={6} md={6} lg={3}><h3 className="center-text"><span className="light-text">Correo electrónico: </span>{row.email}</h3></Grid>
                     <Grid item xs={12} sm={6} md={6} lg={3}><h3 className="center-text"><span className="light-text">Etapa: </span>{apiService.getOrgStage(row.bstage_id)}</h3></Grid>
-                    <Grid item xs={12} sm={6} md={6} lg={3}><h3 className="center-text"><span className="light-text">Tipo: </span>{apiService.getOrgType(row.bt_id)}</h3></Grid>
+                    <Grid item xs={12} sm={6} md={6} lg={3}>
+                      <h3 className="center-text"><span className="light-text">Tipo(s):</span></h3>
+                      {row.types.map((type) => ( <h3 className="center-text">{type.description}</h3> ))}
+                    </Grid>
                     <Grid item xs={12}>
                       <h3 className="light-text">Descripción: </h3>
                       <h3>{row.description}</h3>
@@ -492,22 +577,6 @@ export default function Organizations() {
               </Collapse>
           </TableCell>
         </TableRow>
-        {/* <TableRow className={classes.root}>
-          <TableCell scope="row">{row.name}</TableCell>
-          <TableCell align="center">{row.phone_number}</TableCell>
-          <TableCell align="center">{row.email}</TableCell>
-          <TableCell align="center">{apiService.getOrgStage(row.bstage_id)}</TableCell>
-          <TableCell align="center">{apiService.getOrgType(row.bt_id)}</TableCell>
-        </TableRow>
-        <TableRow>
-            <TableCell colSpan="6" style={{padding: "0 80px 30px 80px"}}>
-              <h4 style={{fontStyle:"italic", fontWeight: "bold"}}>Descripción:</h4>
-              <p>
-                {row.description}
-              </p>
-              {row.org_link && row.org_link.length > 0 && (<Link href={row.org_link} target='_blank'>Ver más información</Link>)}
-            </TableCell>
-        </TableRow> */}
       </React.Fragment>
     );
   }
@@ -565,7 +634,7 @@ export default function Organizations() {
           {!showLoadingOrgs && (
             <Table aria-label="collapsible table">
               <TableBody>
-                {organizationData.map((organization) => ( <OrganizationRow key={organization.name} row={organization} /> ))}
+                {organizationData.map((organization) => ( <OrganizationRow key={organization.key} row={organization} /> ))}
               </TableBody>
             </Table>
           )}
@@ -664,15 +733,12 @@ export default function Organizations() {
             </div>
             
             <div className="margin-25">
-              <TextField
-                  label="Tipo de Negocio"
-                  select
-                  style={{width:'100%', textAlign: "center"}}
-                  className="form-control"
-                  value={type}
-                  onChange={handleTypeTextChange}>
-                  {orgTypes.map((type) => ( <MenuItem key={type.bt_id} value={type.bt_id}>{type.description}</MenuItem> ))}
-              </TextField>
+                <small style={{display: "block", textAlign:"center"}}>Tipo(s) de Negocio</small>
+                {orgTypes.map((type) => (
+                  <FormControlLabel
+                    control={<Checkbox checked={orgTypesCheck[String(type.bt_id)]} onChange={handleTypeCheckChange} name={type.bt_id} />}
+                    label={type.description} />
+                ))}
             </div>
             <div className="margin-25">
               <TextField
@@ -730,7 +796,8 @@ export default function Organizations() {
             !validDescription || !description || description == null || !description.length>0 || 
             !validPhone || !phone || phone == null || !phone.length>0 || 
             !validName || !name || name == null || !name.length>0 || 
-            !validLink || !link || link == null || !link.length>0
+            !validLink || !link || link == null || !link.length>0 ||
+            !validType
           }
           autoFocus>
           Guardar
@@ -795,15 +862,12 @@ export default function Organizations() {
             </div>
 
             <div className="margin-25">
-              <TextField
-                  label="Tipo de Negocio"
-                  select
-                  style={{width:'100%', textAlign: "center"}}
-                  className="form-control"
-                  value={type}
-                  onChange={handleTypeTextChange}>
-                  {orgTypes.map((type) => ( <MenuItem key={type.bt_id} value={type.bt_id}>{type.description}</MenuItem> ))}
-              </TextField>
+              <small style={{display: "block", textAlign:"center"}}>Tipo(s) de Negocio</small>
+              {orgTypes.map((type) => (
+                <FormControlLabel
+                  control={<Checkbox checked={orgTypesCheck[String(type.bt_id)]} onChange={handleTypeCheckChange} name={type.bt_id} />}
+                  label={type.description} />
+              ))}
             </div>
             <div className="margin-25">
               <TextField
@@ -854,7 +918,7 @@ export default function Organizations() {
           Cancelar
         </Button>
         <Button onClick={editOrganization} color="primary" variant="contained" className="add-btn"
-          disabled= {!validEmail || !email.length>0 || !validPhone || !phone.length>0 || !validName || !name.length>0 || !validLink || !link.length>0}
+          disabled= {!validEmail || !email.length>0 || !validPhone || !phone.length>0 || !validName || !name.length>0 || !validLink || !link.length>0 || !validType}
           autoFocus>
           Guardar
         </Button>

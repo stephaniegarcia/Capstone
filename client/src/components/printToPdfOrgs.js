@@ -152,7 +152,10 @@ function PdfOrgs() {
                             <Grid item xs={6} sm={6} md={6} lg={3}><h3 className="center-text"><span className="light-text">Teléfono: </span>{row.phone_number}</h3></Grid>
                             <Grid item xs={6} sm={6} md={6} lg={3}><h3 className="center-text"><span className="light-text">Correo electrónico: </span>{row.email}</h3></Grid>
                             <Grid item xs={6} sm={6} md={6} lg={3}><h3 className="center-text"><span className="light-text">Etapa: </span>{orgStage}</h3></Grid>
-                            <Grid item xs={6} sm={6} md={6} lg={3}><h3 className="center-text"><span className="light-text">Tipo: </span>{apiService.getOrgType(businessType)}</h3></Grid>
+                            <Grid item xs={12} sm={6} md={6} lg={3}>
+                                <h3 className="center-text"><span className="light-text">Tipo(s):</span></h3>
+                                {row.types.map((type) => ( <h3 className="center-text">{type.description}</h3> ))}
+                            </Grid>
                             <Grid item xs={12}>
                                 <h3 className="light-text">Descripción: </h3>
                                 <h3>{row.description}</h3>
@@ -179,6 +182,11 @@ function PdfOrgs() {
                     if(!response.data) {
                         response.data = [];
                     }
+
+                    for(var i = 0; i < response.data.length; i++) {
+                        response.data[i].key = apiService.randomGuid();
+                    }
+
                     for(var i = 0; i < roadmapSteps.length; i++) {
                         var step = roadmapSteps[i];
                         step.index = i+1;
@@ -260,7 +268,7 @@ function PdfOrgs() {
                                         <TableContainer className="not-scrollable" style={{marginTop:"15px"}}>
                                             <Table aria-label="table" className={'rm-table'}>
                                             <TableBody>
-                                                {roadmap.map((row) => (<OrganizationRow  key={row.name} row={row} />))}
+                                                {roadmap.map((row) => (<OrganizationRow  key={row.key} row={row} />))}
                                             </TableBody>
                                             </Table>
                                         </TableContainer>

@@ -221,7 +221,7 @@ function UserProfile() {
           <TableContainer>
             <Table aria-label="collapsible table">
               <TableBody>
-                {row.orgs.map((row) => (<Row  key={row.name} row={row} />))}
+                {row.orgs.map((row) => (<Row  key={row.key} row={row} />))}
               </TableBody>
             </Table>
           </TableContainer>
@@ -271,7 +271,10 @@ function UserProfile() {
                 <Grid item xs={12} sm={6} md={6} lg={3}><h3 className="center-text"><span className="light-text">Teléfono: </span>{row.phone_number}</h3></Grid>
                 <Grid item xs={12} sm={6} md={6} lg={3}><h3 className="center-text"><span className="light-text">Correo electrónico: </span>{row.email}</h3></Grid>
                 <Grid item xs={12} sm={6} md={6} lg={3}><h3 className="center-text"><span className="light-text">Etapa: </span>{orgStage}</h3></Grid>
-                <Grid item xs={12} sm={6} md={6} lg={3}><h3 className="center-text"><span className="light-text">Tipo: </span>{apiService.getOrgType(businessType)}</h3></Grid>
+                <Grid item xs={12} sm={6} md={6} lg={3}>
+                  <h3 className="center-text"><span className="light-text">Tipo(s):</span></h3>
+                  {row.types.map((type) => ( <h3 className="center-text">{type.description}</h3> ))}
+                </Grid>
                 <Grid item xs={12}>
                   <h3 className="light-text">Descripción: </h3>
                   <h3>{row.description}</h3>
@@ -316,7 +319,6 @@ function UserProfile() {
     };
     const scrollTo = (step) => {
       var ref = refs["step"+step].current
-      console.log(ref);
       //window.scrollTo({0, ref.offsetTop});
       var headerOffset = 90;
       var elementPosition = ref.getBoundingClientRect().top;
@@ -379,11 +381,15 @@ function UserProfile() {
         var ratingsResponse = await apiService.getRequest('ratings/'+profile.user_id);
         var ratings = ratingsResponse.data;
         apiService.getRequest('roadmap/'+profile.bt_id+'/'+profile.bstage_id).then(response => {
-          console.log(profile)
           //Handle organization response
           if(!response.data) {
             response.data = [];
           }
+
+          for(var i = 0; i < response.data.length; i++) {
+            response.data[i].key = apiService.randomGuid();
+          }
+
           for(var i = 0; i < roadmapSteps.length; i++) {
             var step = roadmapSteps[i];
             step.index = i+1;

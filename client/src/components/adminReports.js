@@ -69,13 +69,6 @@ function AdminReports() {
         );
     };
 
-    const randomGuid = () => {
-        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-            var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-            return v.toString(16);
-          });
-    };
-
     //get profile from current session
     function getAnalytics() {
         apiService.refreshOrgTypes().then(async (response) => {
@@ -85,7 +78,7 @@ function AdminReports() {
                 const element = temp[index];
                 var test = await apiService.getRequest("topTenPerBT/"+element.bt_id);
                 if(test.data) {
-                    finalList.push({ id:randomGuid(), name: apiService.getOrgType(element.bt_id), orgs: test.data });
+                    finalList.push({ id:apiService.randomGuid(), name: apiService.getOrgType(element.bt_id), orgs: test.data });
                 }
             }
             setTopPerType(finalList);
@@ -101,7 +94,7 @@ function AdminReports() {
                 const element = temp[index];
                 var test = await apiService.getRequest("topTenPerBS/"+element.bstage_id);
                 if(test.data) {
-                    finalList.push({ id:randomGuid(), name: element.description, orgs: test.data });
+                    finalList.push({ id:apiService.randomGuid(), name: element.description, orgs: test.data });
                 }
             }
             setTopPerStage(finalList);
@@ -125,7 +118,7 @@ function AdminReports() {
             setLoadingAverage(false);
             for (let index = 0; index < response.data.length; index++) {
                 response.data[index].rating = parseInt(response.data[index].rating);
-                response.data[index].id = randomGuid()
+                response.data[index].id = apiService.randomGuid()
             }
             setAverages(response.data);
         }).catch(err =>{
@@ -142,7 +135,7 @@ function AdminReports() {
                     { name: 'Contactado', value: response.data[index].contacted },
                     { name: 'Referido', value: response.data[index].not_contacted_total }
                 ];
-                response.data[index].id = randomGuid();
+                response.data[index].id = apiService.randomGuid();
             }
             setContactRate(response.data);
         }).catch(err =>{

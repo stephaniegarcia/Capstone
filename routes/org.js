@@ -18,8 +18,8 @@ router.get('/api/organizations', async (req,res) =>{
   const organizations = await dao.getOrganizations();
   console.log(organizations)
   for(var i = 0; i < organizations.length; i++) {
-    // const types = await dao.getOrganizationsTypes(organizations[i].org_id);
-    // organizations[i].types = types;
+    const types = await dao.getOrganizationsTypes(organizations[i].org_id);
+    organizations[i].types = types;
   }
   
   res.send(organizations)
@@ -156,18 +156,21 @@ const types = await dao.getOrganizationsMissingTypes(req.params.orgID);
 
 
 function isIn(element, list) {
-  for(let i = 0; i < list.length; i++){ 
-    if(element == list[i].bt_id){
-      return true;
+  if(list) {
+    for(let i = 0; i < list.length; i++){ 
+      if(element == list[i].bt_id){
+        return true;
+      }
     }
   }
   return false;
 }
 function isInQ(element, list) {
-
-  for(let i = 0; i < list.length; i++){
-    if(element == list[i]){
-      return true;
+  if(list) {
+    for(let i = 0; i < list.length; i++){
+      if(element == list[i]){
+        return true;
+      }
     }
   }
   return false;
