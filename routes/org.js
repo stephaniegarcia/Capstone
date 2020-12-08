@@ -1,7 +1,5 @@
 
 const { Router } = require('express');
-const { type } = require('os');
-const { is } = require('type-is');
 const router = Router();
 
 const dao  = require('../DAO/org_dao');
@@ -90,9 +88,8 @@ router.put('/api/organization', async (req, res) => {
       for(let j = 0; j < types.rows.length; j++){
         if(!isInQ(types.rows[j].bt_id, bt_id)){
           // remove from
-          console.log(types.rows[j].bt_id)
           await dao.deletingOrgBusinessType(types.rows[j].bt_id, org_id)
-          //console.log(r)
+          
         }
       }
     dao.updateOrganization(name, description, email, phone_number, bs_id, org_link, org_id)
@@ -134,7 +131,7 @@ router.get('/api/orgBusinessType/:orgID', async (req,res) =>{
         res.status(400).send("Error");
     }
     else{
-        res.status(200).send(types);
+        res.status(200).send(types.rows);
     }
 });
 

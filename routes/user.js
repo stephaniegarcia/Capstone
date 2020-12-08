@@ -220,11 +220,6 @@ router.post('/api/register', (req, res) => {
     }
 });
 
-router.get('/api/users', async (req,res) =>{
-    const users = await dao.getUsers()
-    console.log(users)
-   res.send(users)
-});
 
 /**
  * @route /api/login
