@@ -78,17 +78,17 @@ router.put('/api/organization', async (req, res) => {
   const {name, description, email, phone_number, bt_id, bs_id, org_link, org_id} = req.body;
   if(name && email && phone_number && bt_id && bs_id && org_link && org_id){
     let types = await dao.getOrganizationsTypes(org_id);
-    //console.log(types.rows)
+    console.log(types)
       for(let j = 0; j < bt_id.length; j++){
-        if(!isIn(bt_id[j], types.rows)){
+        if(!isIn(bt_id[j], types)){
           dao.attachingOrgToBusinessType(bt_id[j],org_id)
           console.log(1)
         }
       }
-      for(let j = 0; j < types.rows.length; j++){
-        if(!isInQ(types.rows[j].bt_id, bt_id)){
+      for(let j = 0; j < types.length; j++){
+        if(!isInQ(types[j].bt_id, bt_id)){
           // remove from
-          await dao.deletingOrgBusinessType(types.rows[j].bt_id, org_id)
+          await dao.deletingOrgBusinessType(types[j].bt_id, org_id)
           
         }
       }
