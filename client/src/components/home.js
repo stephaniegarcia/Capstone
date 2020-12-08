@@ -18,27 +18,26 @@ function Home(props)
                     <Grid item xs={12}>
                         {/* <h1>Tu Camino Empresarial</h1> */}
                         <h1>
-                            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
+                            ¿Quieres conocer cómo recorrer Tu Camino Empresarial?
                         </h1>
                         <h2>
-                            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                            ¡Tenemos una herramienta para ti!
                         </h2>
                         <hr className="home-hr" />
                         <iframe src="https://www.youtube.com/embed/videoseries?list=PLpc-BRL4RhWChZwVywGethXrgUCMFtxkd" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>   
                         <hr className="home-hr" />
                         <p>
-                            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-                        </p>
+                            Tu Camino Empresarial es un mapa creado por Colmena66 donde podrás identificar fácilmente los recursos disponibles para comenzar o crecer tu negocio, de acuerdo al tipo de empresa y etapa de negocio en la que te encuentras.                        </p>
                     </Grid>
                 </Grid>
             </Paper>
 
             <Paper className="paper-margin" style={{padding: '30px', marginTop: "60px"}} elevation={10}>
                 <h1>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
+                    El proceso es simple
                 </h1>
                 <h2>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                Para ubicarte en el Camino, debes identificar qué tipo de empresa tienes y en qué etapa se encuentra tu negocio.
                 </h2>
                 <hr className="home-hr" />
                 <img src="images/banner1.png" className="drop-image" style={{width:"75%"}} />
@@ -51,7 +50,7 @@ function Home(props)
                         </h5>
                         <hr className="home-hr" />
                         <p>
-                            Presiona Iniciar Sesion en la barra navegadora y crea Tu Perfil.
+                            Presiona Iniciar Sesión en la barra navegadora y crea Tu Perfil.
                         </p>
                     </Grid>
                     <Grid item xs={12} sm={6} md={6} lg={3} style={{padding: "15px"}}>
@@ -61,7 +60,7 @@ function Home(props)
                         </h5>
                         <hr className="home-hr" />
                         <p>
-                            Con un breve cuestionario nos ayudaras a identificar tu tipo de negocio para brindarte recursos de tu interes.
+                            Con un breve cuestionario nos ayudarás a identificar tu tipo de negocio para brindarte recursos de tu interés.
                         </p>
                     </Grid>
                     <Grid item xs={12} sm={6} md={6} lg={3} style={{padding: "15px"}}>
@@ -71,7 +70,7 @@ function Home(props)
                         </h5>
                         <hr className="home-hr" />
                         <p>
-                            Te proveeremos una guia de los pasos a seguir para tu negocio.
+                            Te proveeremos una guía de los pasos a seguir para tu negocio.
                         </p>
                     </Grid>
                     <Grid item xs={12} sm={6} md={6} lg={3} style={{padding: "15px"}}>
@@ -81,7 +80,7 @@ function Home(props)
                         </h5>
                         <hr className="home-hr" />
                         <p>
-                            Marca con cuales organizaciones ya te has contactado y ofreceles una calificacion de como fueron sus servicios.
+                            Marca con cuáles organizaciones ya te has contactado y ofréceles una calificación de cómo fueron sus servicios.
                         </p>
                     </Grid>
                 </Grid>
@@ -91,16 +90,16 @@ function Home(props)
                 <Grid container spacing={3}>
                     <Grid item xs={12}>
                         <h1>
-                            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
+                        En Colmena66 estamos comprometidos
                         </h1>
                         <h2>
-                            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                        Trabajamos para  cultivar un ecosistema local que sea inclusivo, diverso y accesible para todos, independientemente de su origen demográfico o socioeconómico.
                         </h2>
                         <hr className="home-hr" />
                         <img src="images/about.jpg" className="drop-image" style={{width:"75%"}} />
                         <hr className="home-hr" />
                         <p>
-                            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                        Además de parear las necesidades de nuestros empresarios con los servicios de nuestra red de más de 240 organizaciones y programas de apoyo empresarial, también diseñamos herramientas como Tu Camino Empresarial para que empresarios como tú tengan acceso fácil a los recursos disponibles.
                         </p>
                     </Grid>
                 </Grid>

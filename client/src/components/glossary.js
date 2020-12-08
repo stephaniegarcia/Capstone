@@ -17,6 +17,7 @@ function Glossary() {
     <div className="top-margin">
       <Paper className="paper-margin" elevation={10}>
         <h1>Glosario</h1>
+        <h1> Aquí te compartimos las definiciones de los tipos de empresas y las etapas de negocios para que puedas saber cuáles te representan.</h1>
         <h2 style={{marginTop: "50px"}}>Tipos de Empresa</h2>
         <Accordion expanded={expanded === 'panel1'} onChange={handleChange('panel1')}>
           <AccordionSummary
