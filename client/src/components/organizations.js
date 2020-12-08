@@ -69,6 +69,7 @@ export default function Organizations() {
     var tempData = [];
     for(var i = 0; i < orgs.length; i++) {
       var org = orgs[i];
+      org.key = apiService.randomGuid();
       if(searchString && searchString.length > 0) {
         if(
             (org.name && String(org.name).toUpperCase().includes(searchString.toUpperCase())) ||
@@ -163,7 +164,10 @@ export default function Organizations() {
                     <Grid item xs={12} sm={6} md={6} lg={3}><h3 className="center-text"><span className="light-text">Teléfono: </span>{row.phone_number}</h3></Grid>
                     <Grid item xs={12} sm={6} md={6} lg={3}><h3 className="center-text"><span className="light-text">Correo electrónico: </span>{row.email}</h3></Grid>
                     <Grid item xs={12} sm={6} md={6} lg={3}><h3 className="center-text"><span className="light-text">Etapa: </span>{apiService.getOrgStage(row.bstage_id)}</h3></Grid>
-                    <Grid item xs={12} sm={6} md={6} lg={3}><h3 className="center-text"><span className="light-text">Tipo: </span>{apiService.getOrgType(row.bt_id)}</h3></Grid>
+                    <Grid item xs={12} sm={6} md={6} lg={3}>
+                      <h3 className="center-text"><span className="light-text">Tipo(s):</span></h3>
+                      {row.types.map((type) => ( <h3 className="center-text">{type.description}</h3> ))}
+                    </Grid>
                     <Grid item xs={12}>
                       <h3 className="light-text">Descripción: </h3>
                       <h3>{row.description}</h3>
@@ -245,7 +249,7 @@ export default function Organizations() {
           {!showLoadingOrgs && (
             <Table aria-label="collapsible table">
               <TableBody>
-                {organizationData.map((organization) => ( <Row key={organization.name} row={organization} /> ))}
+                {organizationData.map((organization) => ( <Row key={organization.key} row={organization} /> ))}
               </TableBody>
             </Table>
           )}

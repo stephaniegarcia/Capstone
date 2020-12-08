@@ -221,7 +221,7 @@ function UserProfile() {
           <TableContainer>
             <Table aria-label="collapsible table">
               <TableBody>
-                {row.orgs.map((row) => (<Row  key={row.name} row={row} />))}
+                {row.orgs.map((row) => (<Row  key={row.key} row={row} />))}
               </TableBody>
             </Table>
           </TableContainer>
@@ -271,7 +271,10 @@ function UserProfile() {
                 <Grid item xs={12} sm={6} md={6} lg={3}><h3 className="center-text"><span className="light-text">Teléfono: </span>{row.phone_number}</h3></Grid>
                 <Grid item xs={12} sm={6} md={6} lg={3}><h3 className="center-text"><span className="light-text">Correo electrónico: </span>{row.email}</h3></Grid>
                 <Grid item xs={12} sm={6} md={6} lg={3}><h3 className="center-text"><span className="light-text">Etapa: </span>{orgStage}</h3></Grid>
-                <Grid item xs={12} sm={6} md={6} lg={3}><h3 className="center-text"><span className="light-text">Tipo: </span>{apiService.getOrgType(businessType)}</h3></Grid>
+                <Grid item xs={12} sm={6} md={6} lg={3}>
+                  <h3 className="center-text"><span className="light-text">Tipo(s):</span></h3>
+                  {row.types.map((type) => ( <h3 className="center-text">{type.description}</h3> ))}
+                </Grid>
                 <Grid item xs={12}>
                   <h3 className="light-text">Descripción: </h3>
                   <h3>{row.description}</h3>
@@ -316,7 +319,6 @@ function UserProfile() {
     };
     const scrollTo = (step) => {
       var ref = refs["step"+step].current
-      console.log(ref);
       //window.scrollTo({0, ref.offsetTop});
       var headerOffset = 90;
       var elementPosition = ref.getBoundingClientRect().top;
@@ -383,6 +385,11 @@ function UserProfile() {
           if(!response.data) {
             response.data = [];
           }
+
+          for(var i = 0; i < response.data.length; i++) {
+            response.data[i].key = apiService.randomGuid();
+          }
+
           for(var i = 0; i < roadmapSteps.length; i++) {
             var step = roadmapSteps[i];
             step.index = i+1;
@@ -551,8 +558,8 @@ function UserProfile() {
 
               <Paper className="paper-margin" elevation={10} >
                 <div>
-                  <h1>Aqui se muestran todas las organizaciones mencionadas en el recorrido: </h1>
-                  <h2>Organizaciones</h2>
+                  <h1>Organizaciones</h1>
+                  <h2>Aqui se muestran todas las organizaciones que forman parte del recorrido: </h2>
                   <div>
                     {!showLoadingOrgs && (
                       <div>

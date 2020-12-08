@@ -166,7 +166,7 @@ const createRating =  (rating, user_id, organization_id, rating_comment) => {
 async function getRatingsPerUser(userID){
   try {
       const res = await pool.query(
-        `Select O.name, O.org_id, O.bt_id, R.user_id, R.rating, R.rating_comment
+        `Select O.name, O.org_id, R.user_id, R.rating, R.rating_comment
         From organization as O left outer Join organization_rating as R on O.org_id = R.organization_id
         where R.user_id =$1 and o.is_active = 'true'`, [userID]
       );

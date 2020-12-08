@@ -75,6 +75,49 @@ function PdfOrgs() {
         );
     }
 
+    function RoadmapRow(props) {
+        const { row } = props;
+        var orgTypeCss = apiService.getOrgTypeCssName(row.bt_id);
+        var className = orgTypeCss+" rm-curve ";
+        var buttonStyle = {};
+        var rowStyle = {};
+        var marginTop = row.index>1? "-4px" :"0px";
+        if(row.index%2==0) {
+          className += "rm-left-curve";
+          buttonStyle = {
+            left: "-36px",
+            top: "5px"
+          };
+          rowStyle = {
+            marginRight: "80px",
+            marginLeft: "40px",
+            marginTop: marginTop
+          }
+        }
+        else {
+          className += "rm-right-curve";
+          buttonStyle = {
+            right: "-36px",
+            top: "5px"
+          };
+          rowStyle = {
+            marginRight: "40px",
+            marginLeft: "80px",
+            marginTop: marginTop
+          }
+        }
+        return (
+          <React.Fragment>
+            <TableRow>
+                <div style={rowStyle} className={className}>
+                  <Button style={buttonStyle} variant="contained" color="primary"></Button>
+                  <h5>{row.description}</h5>
+                </div>
+            </TableRow>
+          </React.Fragment>
+        );
+      }
+
     //Organization row snippet
     function Row(props) {
         const { row } = props;
@@ -109,7 +152,10 @@ function PdfOrgs() {
                             <Grid item xs={6} sm={6} md={6} lg={3}><h3 className="center-text"><span className="light-text">Teléfono: </span>{row.phone_number}</h3></Grid>
                             <Grid item xs={6} sm={6} md={6} lg={3}><h3 className="center-text"><span className="light-text">Correo electrónico: </span>{row.email}</h3></Grid>
                             <Grid item xs={6} sm={6} md={6} lg={3}><h3 className="center-text"><span className="light-text">Etapa: </span>{orgStage}</h3></Grid>
-                            <Grid item xs={6} sm={6} md={6} lg={3}><h3 className="center-text"><span className="light-text">Tipo: </span>{apiService.getOrgType(businessType)}</h3></Grid>
+                            <Grid item xs={12} sm={6} md={6} lg={3}>
+                                <h3 className="center-text"><span className="light-text">Tipo(s):</span></h3>
+                                {row.types.map((type) => ( <h3 className="center-text">{type.description}</h3> ))}
+                            </Grid>
                             <Grid item xs={12}>
                                 <h3 className="light-text">Descripción: </h3>
                                 <h3>{row.description}</h3>
@@ -136,6 +182,11 @@ function PdfOrgs() {
                     if(!response.data) {
                         response.data = [];
                     }
+
+                    for(var i = 0; i < response.data.length; i++) {
+                        response.data[i].key = apiService.randomGuid();
+                    }
+
                     for(var i = 0; i < roadmapSteps.length; i++) {
                         var step = roadmapSteps[i];
                         step.index = i+1;
@@ -193,19 +244,35 @@ function PdfOrgs() {
         <div className="top-margin">
             <Paper className="paper-margin" elevation={10}> 
                 <div className="paper-margin" ref={organizationsRef}>
-                    <h1>Aqui se muestran todas las organizaciones mencionadas en el recorrido: </h1>
-                    <h2>Organizaciones</h2>
+
                     <div>
                         {!showLoadingOrgs && (
                             <div>
                                 {roadmap && roadmap.length>0 && (
-                                    <TableContainer className="not-scrollable" style={{marginTop:"15px"}}>
-                                        <Table aria-label="table" className={'rm-table'}>
-                                        <TableBody>
-                                            {roadmap.map((row) => (<OrganizationRow  key={row.name} row={row} />))}
-                                        </TableBody>
-                                        </Table>
-                                    </TableContainer>
+                                    <div>
+                                        <h1>Este sera tu camino a recorrer:</h1>
+                                        <TableContainer className="not-scrollable" style={{marginTop:"15px"}}>
+                                            <Table aria-label="table" className={'rm-table'}>
+                                                <TableBody >
+                                                {roadmap.map((row) => (<RoadmapRow  key={row.name} row={row} />))}
+                                                </TableBody>
+                                            </Table>
+                                        </TableContainer>
+                                        <hr/>
+                                    </div>
+                                )}
+                                {roadmap && roadmap.length>0 && (
+                                    <div>
+                                        <h1>Organizaciones</h1>
+                                        <h2>Aqui se muestran todas las organizaciones que forman parte del recorrido: </h2>
+                                        <TableContainer className="not-scrollable" style={{marginTop:"15px"}}>
+                                            <Table aria-label="table" className={'rm-table'}>
+                                            <TableBody>
+                                                {roadmap.map((row) => (<OrganizationRow  key={row.key} row={row} />))}
+                                            </TableBody>
+                                            </Table>
+                                        </TableContainer>
+                                    </div>
                                 )}
                                 {roadmap && roadmap.length==0 && (
                                     <h4>

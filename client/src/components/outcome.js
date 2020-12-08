@@ -102,6 +102,11 @@ function Outcome() {
               if(!response.data) {
                 response.data = [];
               }
+
+              for(var i = 0; i < response.data.length; i++) {
+                response.data[i].key = apiService.randomGuid();
+              }
+
               for(var i = 0; i < roadmapSteps.length; i++) {
                 var step = roadmapSteps[i];
                 step.index = i+1;
@@ -174,8 +179,8 @@ function Outcome() {
       //Organization Segment row snippet
       function OrganizationRow(props) {
         const { row } = props;
-        console.log(row);
-        var currentRef = refs[String("step"+row.index)];
+        var stepIndex = String("step"+row.index);
+        var currentRef = refs[stepIndex];
         return (
           <React.Fragment>
             <div ref={currentRef}>
@@ -225,7 +230,10 @@ function Outcome() {
                     <Grid item xs={12} sm={6} md={6} lg={3}><h3 className="center-text"><span className="light-text">Teléfono: </span>{row.phone_number}</h3></Grid>
                     <Grid item xs={12} sm={6} md={6} lg={3}><h3 className="center-text"><span className="light-text">Correo electrónico: </span>{row.email}</h3></Grid>
                     <Grid item xs={12} sm={6} md={6} lg={3}><h3 className="center-text"><span className="light-text">Etapa: </span>{orgStage}</h3></Grid>
-                    <Grid item xs={12} sm={6} md={6} lg={3}><h3 className="center-text"><span className="light-text">Tipo: </span>{apiService.getOrgType(businessType)}</h3></Grid>
+                    <Grid item xs={12} sm={6} md={6} lg={3}>
+                      <h3 className="center-text"><span className="light-text">Tipo(s):</span></h3>
+                      {row.types.map((type) => ( <h3 className="center-text">{type.description}</h3> ))}
+                    </Grid>
                     <Grid item xs={12}>
                       <h3 className="light-text">Descripción: </h3>
                       <h3>{row.description}</h3>
@@ -263,7 +271,14 @@ function Outcome() {
           setAnchorEl(null);
         };
         const scrollTo = (step) => {
-          window.scrollTo(0, refs["step"+step].current.offsetTop);
+          var ref = refs["step"+step].current
+          var headerOffset = 90;
+          var elementPosition = ref.getBoundingClientRect().top;
+          var offsetPosition = elementPosition - headerOffset;
+          window.scrollTo({
+            top: offsetPosition,
+            behavior: "smooth"
+          });
         };
         const open = Boolean(anchorEl);
         const id = open ? 'rm-popover'+row.index : undefined;
@@ -292,7 +307,7 @@ function Outcome() {
                   <Button style={buttonStyle} aria-describedby={id} variant="contained" color="primary" onClick={()=>{ scrollTo(row.index); }}>
                     <img style={{maxWidth:"30px"}} src="images/touch_icon.png" />
                   </Button>
-                  <h5>{row.description}</h5>
+                  <h5>{row.description.trim()}</h5>
                 </div>
             </TableRow>
           </React.Fragment>
@@ -375,7 +390,7 @@ function Outcome() {
                         <TableContainer style={{marginTop:"15px"}}>
                           <Table aria-label="table" className={'rm-table'}>
                             <TableBody >
-                              {roadmap.map((row) => (<OrganizationRow  key={row.name} row={row} />))}
+                              {roadmap.map((row) => (<OrganizationRow  key={row.key} row={row} />))}
                             </TableBody>
                           </Table>
                         </TableContainer>

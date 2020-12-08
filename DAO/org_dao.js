@@ -11,8 +11,9 @@ const pool = new Pool({
 async function getOrganizations(){
     try {
         const res = await pool.query(
-          `SELECT o.org_id, o.name, o.description, o.email, o.phone_number, t.bt_id, o.bs_id, o.is_active, o.org_link
+          `SELECT o.org_id, o.name, o.description, o.email, o.phone_number, B.bstage_id, t.bt_id, o.bs_id, o.is_active, o.org_link
           FROM public.organization as o inner join organization_business_type as t on o.org_id = t.org_id
+          INNER JOIN public.business_step as B ON O.bs_id = B.bs_id
           where o.is_active = 'true'
           ORDER BY o.org_id ASC`
         );
@@ -92,7 +93,7 @@ async function getOrganizationsTypes(orgID){
           where o.org_id = $1
           Order by t.bt_id asc`, [orgID]
         );
-        return res;
+        return res.rows;
       } catch (err) {
         return err.stack;
       }
