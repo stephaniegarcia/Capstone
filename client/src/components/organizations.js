@@ -75,11 +75,15 @@ export default function Organizations() {
             (org.name && String(org.name).toUpperCase().includes(searchString.toUpperCase())) ||
             (org.email && String(org.email).toUpperCase().includes(searchString.toUpperCase()))
         ) {
-          finalData.push(org);    
+          if(finalData.filter(o => o.org_id == org.org_id).length == 0) {
+            finalData.push(org);
+          } 
         }
       }
       else {
-        finalData.push(org);  
+        if(finalData.filter(o => o.org_id == org.org_id).length == 0) {
+          finalData.push(org);
+        }
       }
     }
 
@@ -161,9 +165,18 @@ export default function Organizations() {
           <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
               <Collapse in={open} timeout="auto" unmountOnExit>
                   <Grid container spacing={1}>
-                    <Grid item xs={12} sm={6} md={6} lg={3}><h3 className="center-text"><span className="light-text">Teléfono: </span>{row.phone_number}</h3></Grid>
-                    <Grid item xs={12} sm={6} md={6} lg={3}><h3 className="center-text"><span className="light-text">Correo electrónico: </span>{row.email}</h3></Grid>
-                    <Grid item xs={12} sm={6} md={6} lg={3}><h3 className="center-text"><span className="light-text">Etapa: </span>{apiService.getOrgStage(row.bstage_id)}</h3></Grid>
+                  <Grid item xs={12} sm={6} md={6} lg={3}>
+                      <h3 className="center-text light-text">Teléfono: </h3>
+                      <h3 className="center-text">{row.phone_number}</h3>
+                    </Grid>
+                    <Grid item xs={12} sm={6} md={6} lg={3}>
+                      <h3 className="center-text light-text">Correo electrónico: </h3>
+                      <h3 className="center-text">{row.email}</h3>
+                    </Grid>
+                    <Grid item xs={12} sm={6} md={6} lg={3}>
+                      <h3 className="center-text light-text">Etapa:</h3>
+                      <h3 className="center-text">{apiService.getOrgStage(row.bstage_id)}</h3>
+                    </Grid>
                     <Grid item xs={12} sm={6} md={6} lg={3}>
                       <h3 className="center-text"><span className="light-text">Tipo(s):</span></h3>
                       {row.types.map((type) => ( <h3 className="center-text">{type.description}</h3> ))}

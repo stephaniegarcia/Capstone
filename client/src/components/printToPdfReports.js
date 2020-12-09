@@ -38,6 +38,7 @@ function AdminReports() {
     const [loadingAccountsPerWeek, setLoadingAccountsPerWeek] = useState(true);
     const [loadingContactRate, setLoadingContactRate] = useState(true);
     const [loadingAverage, setLoadingAverage] = useState(true);
+    const [today, setToday] = React.useState('');
 
     const [contactRate, setContactRate] = useState([]);
     const [averages, setAverages] = useState([]);
@@ -159,7 +160,7 @@ function AdminReports() {
         apiService.getRequest("accountsCreated").then(response => {
             setLoadingAccountsPerWeek(false);
             for(var i = 0; i < response.data.length; i++) {
-                response.data[i].key = String(response.data[i].year) + ' - ' + String(response.data[i].week);
+                response.data[i].key = String(response.data[i].month) + '/' + String(response.data[i].week);
             }
             setAccountsPerWeek(response.data);
         }).catch(err =>{
@@ -248,6 +249,13 @@ function AdminReports() {
 
     //Load profile into view
     React.useEffect(()=> {
+        var tempToday = new Date();
+        var dd = String(tempToday.getDate()).padStart(2, '0');
+        var mm = String(tempToday.getMonth() + 1).padStart(2, '0'); //January is 0!
+        var yyyy = tempToday.getFullYear();
+        console.log(tempToday)
+        tempToday = mm + '/' + dd + '/' + yyyy;
+        setToday(tempToday);
         getAnalytics();
     }, [shouldLoad]);
 
@@ -260,13 +268,18 @@ function AdminReports() {
         <div className="top-margin">
             <Paper className="form form--wrapper paper-margin" elevation={10}>
                 <div style={{margin: "30px"}} ref={reportsRef}>
-                  <h1>Reportes</h1>
+                  <div style={{display: "flex"}}>
+                    <img className="report-logo-img" src="/images/colmena_dark.png" />
+                  </div>
+                  <div style={{marginTop: "15px"}}>
+                  <h1>Reporte administrativos creado en {today}</h1>
                   <Grid container spacing={3}>
                     <Grid item xs={6}>
                         <Card variant="outlined">
                             <div style={{
-                                    width: '100%',
-                                    height: '400px',
+                                    width: '330px',
+                                    height: '330px',
+                                    margin: "auto"
                                 }}>
                                 <h3 style={{margin: "15px"}}>
                                     Most Contacted
@@ -277,7 +290,7 @@ function AdminReports() {
                                         <XAxis dataKey="name" />
                                         <YAxis label="#" />
                                         <Tooltip />
-                                        <Bar label="Count" dataKey="count" fill="#8884d8" />
+                                        <Bar label="Count" dataKey="count" fill="#9eb2f7" />
                                     </BarChart>
                                 </ResponsiveContainer>
                                 <SmallSpinner isShown={loadingMostContacted} />
@@ -287,8 +300,9 @@ function AdminReports() {
                     <Grid item xs={6}>
                         <Card variant="outlined">
                             <div style={{
-                                    width: '100%',
-                                    height: '400px',
+                                    width: '330px',
+                                    height: '330px',
+                                    margin: "auto"
                                 }}>
                                 <h3 style={{margin: "15px"}}>
                                     Poor Performing
@@ -299,7 +313,7 @@ function AdminReports() {
                                         <XAxis dataKey="name" />
                                         <YAxis />
                                         <Tooltip />
-                                        <Bar dataKey="rating" fill="#8884d8" />
+                                        <Bar dataKey="rating" fill="#d67ade" />
                                     </BarChart>
                                 </ResponsiveContainer>
                                 <SmallSpinner isShown={loadingPoorPerforming} />
@@ -309,8 +323,9 @@ function AdminReports() {
                     <Grid item xs={12}>
                         <Card variant="outlined">
                             <div style={{
-                                    width: '100%',
-                                    height: '400px',
+                                    width: '660px',
+                                    height: '330px',
+                                    margin: "auto"
                                 }}>
                                 <h3 style={{margin: "15px"}}>
                                     Accounts Per Week
@@ -321,7 +336,7 @@ function AdminReports() {
                                         <XAxis dataKey="key" />
                                         <YAxis label="#" />
                                         <Tooltip />
-                                        <Bar dataKey="count" fill="#8884d8" />
+                                        <Bar dataKey="count" fill="#89d171" />
                                     </BarChart>
                                 </ResponsiveContainer>
                                 <SmallSpinner isShown={loadingAccountsPerWeek} />
@@ -403,6 +418,7 @@ function AdminReports() {
                         </Card>
                     </Grid>
                 </Grid>
+                  </div>
                 </div>
             </Paper>
             <ReactToPrint

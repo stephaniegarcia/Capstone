@@ -1,6 +1,7 @@
 import React, { useRef } from 'react';
 import { Redirect } from 'react-router-dom';
 import Paper from '@material-ui/core/Paper'
+import Link from '@material-ui/core/Link';
 import ReactToPrint from "react-to-print";
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
@@ -40,6 +41,7 @@ function PdfOrgs() {
     const [organizations, setOrganizations] = React.useState([]);
     const [refs, setRefs] = React.useState({});
     const [zoomRefs, setZoomRefs] = React.useState({});
+    const [today, setToday] = React.useState('');
 
     const GreenCheckbox = withStyles({
         root: {
@@ -56,28 +58,9 @@ function PdfOrgs() {
         setShowErrorAlert(false);
     };
 
-    //Organization step row snippet
-    function OrganizationRow(props) {
-        const { row } = props;
-        return (
-            <React.Fragment>
-                <div>
-                    <h3 style={{textAlign: "left"}} >{row.index}. {row.description}</h3>
-                    <TableContainer>
-                        <Table aria-label="collapsible table">
-                            <TableBody>
-                                {row.orgs.map((row) => (<Row  key={row.name} row={row} />))}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
-                </div>
-            </React.Fragment>
-        );
-    }
-
     function RoadmapRow(props) {
         const { row } = props;
-        var orgTypeCss = apiService.getOrgTypeCssName(row.bt_id);
+        var orgTypeCss = apiService.getOrgTypeCssName(apiService.profile().bt_id);
         var className = orgTypeCss+" rm-curve ";
         var buttonStyle = {};
         var rowStyle = {};
@@ -147,12 +130,21 @@ function PdfOrgs() {
                     </TableCell>
                     </TableRow>
                     <TableRow>
-                    <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
+                    <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={10}>
                         <Grid container spacing={1}>
-                            <Grid item xs={6} sm={6} md={6} lg={3}><h3 className="center-text"><span className="light-text">Teléfono: </span>{row.phone_number}</h3></Grid>
-                            <Grid item xs={6} sm={6} md={6} lg={3}><h3 className="center-text"><span className="light-text">Correo electrónico: </span>{row.email}</h3></Grid>
-                            <Grid item xs={6} sm={6} md={6} lg={3}><h3 className="center-text"><span className="light-text">Etapa: </span>{orgStage}</h3></Grid>
-                            <Grid item xs={12} sm={6} md={6} lg={3}>
+                        <Grid item xs={6} sm={6} md={6} lg={3}>
+                            <h3 className="center-text light-text">Teléfono: </h3>
+                            <h3 className="center-text">{row.phone_number}</h3>
+                        </Grid>
+                        <Grid item xs={6} sm={6} md={6} lg={3}>
+                            <h3 className="center-text light-text">Correo electrónico: </h3>
+                            <h3 className="center-text">{row.email}</h3>
+                        </Grid>
+                        <Grid item xs={6} sm={6} md={6} lg={3}>
+                      <h3 className="center-text light-text">Etapa:</h3>
+                      <h3 className="center-text">{orgStage}</h3>
+                    </Grid>
+                            <Grid item xs={6} sm={6} md={6} lg={3}>
                                 <h3 className="center-text"><span className="light-text">Tipo(s):</span></h3>
                                 {row.types.map((type) => ( <h3 className="center-text">{type.description}</h3> ))}
                             </Grid>
@@ -160,6 +152,7 @@ function PdfOrgs() {
                                 <h3 className="light-text">Descripción: </h3>
                                 <h3>{row.description}</h3>
                             </Grid>
+                            {row.org_link && row.org_link.length>0 && (<Grid item xs={12}><h3><span className="light-text">Más información: </span>{row.org_link}</h3></Grid>)}
                         </Grid>                
                     </TableCell>
                 </TableRow>
@@ -176,7 +169,10 @@ function PdfOrgs() {
             setBusinessStatus(String(profile.business_status));
             setBusinessType(profile.bt_id);
             if(profile.bt_id && profile.bt_id != null) {
-                var roadmapSteps = apiService.getRoadmapSteps(profile.bt_id, profile.bstage_id);
+                
+                var roadmapSteps = apiService.getRoadmapSteps(profile.bstage_id);
+                var ratingsResponse = await apiService.getRequest('ratings/'+profile.user_id);
+                var ratings = ratingsResponse.data;
                 apiService.getRequest('roadmap/'+profile.bt_id+'/'+profile.bstage_id).then(response => {
                     //Handle organization response
                     if(!response.data) {
@@ -192,7 +188,28 @@ function PdfOrgs() {
                         step.index = i+1;
                         refs[String("step"+step.index)] = React.createRef();
                         zoomRefs[String("step"+step.index)] = false;
-                        step.orgs = response.data.filter(o => o.bs_id == step.bs_id);
+                        step.orgs = [];
+                        for(var j = 0; j < response.data.length; j++) {
+                            if(response.data[j].bs_id == step.bs_id && step.orgs.filter(o => o.org_id == response.data[j].org_id).length == 0) {
+                                step.orgs.push(response.data[j]);
+                            }
+                        }
+                    }
+                    if(ratings) {
+                        for(var i = 0; i < response.data.length; i++) {
+                            var org = response.data[i];
+                            var orgRating = ratings.filter(r => r.org_id == org.org_id);
+                            if(orgRating && orgRating.length>0) {
+                            response.data[i].had_rating = true;
+                            response.data[i].rating = orgRating[0].rating;
+                            response.data[i].comments = orgRating[0].rating_comment;
+                            }
+                            else {
+                            response.data[i].had_rating = false;
+                            response.data[i].rating = 0;
+                            response.data[i].comments = '';
+                            }
+                        } 
                     }
                     setRefs(refs);
                     setZoomRefs(zoomRefs);
@@ -213,6 +230,14 @@ function PdfOrgs() {
 
     //Load orgs into view
     React.useEffect(async ()=> {
+        var tempToday = new Date();
+        var dd = String(tempToday.getDate()).padStart(2, '0');
+        var mm = String(tempToday.getMonth() + 1).padStart(2, '0'); //January is 0!
+        var yyyy = tempToday.getFullYear();
+        console.log(tempToday)
+        tempToday = mm + '/' + dd + '/' + yyyy;
+        setToday(tempToday);
+
         setShowLoadingOrgs(true);
         setShowLoading(true);
         var orgTypesResponse = await apiService.refreshOrgTypes();
@@ -244,17 +269,30 @@ function PdfOrgs() {
         <div className="top-margin">
             <Paper className="paper-margin" elevation={10}> 
                 <div className="paper-margin" ref={organizationsRef}>
-
-                    <div>
+                    <div style={{display: "flex"}}>
+                        <img className="report-logo-img" src="/images/colmena_dark.png" />
+                    </div>
+                    <div style={{marginTop: "15px"}}>
                         {!showLoadingOrgs && (
                             <div>
+                                <h1>Camino Empresarial para</h1>
+                                <h1>{apiService.profile().first_name} {apiService.profile().last_name}</h1>
+                                <h1>creado en {today}</h1>
+                                <hr/>
+                                <p>
+                                    En este documento tienes todas las organizaciones recomendadas basadas en tu tipo de negocio y etapa en la que te encuentras. Recuerda contactarlas y marcar tu progreso para que puedas recorrer Tu Camino Empresarial de manera más organizada y fácil. Si deseas conocer si hay alguna organización nueva, puedes visitar la página de Tu Camino Empresarial para ver la versión más actualizada.
+                                </p>
+                                <hr/>
+                                <h1>Nos indicaste que tu negocio esta en etapa de {apiService.getOrgStage(apiService.profile().bstage_id)}</h1>
+                                <h2>Este sera tu camino a recorrer:</h2>
+                                <img className="org-type-icon" src={"images/"+apiService.getOrgTypeIcon(businessType)} />
+                                <h2>{apiService.getOrgType(businessType)}</h2>
                                 {roadmap && roadmap.length>0 && (
                                     <div>
-                                        <h1>Este sera tu camino a recorrer:</h1>
                                         <TableContainer className="not-scrollable" style={{marginTop:"15px"}}>
                                             <Table aria-label="table" className={'rm-table'}>
                                                 <TableBody >
-                                                {roadmap.map((row) => (<RoadmapRow  key={row.name} row={row} />))}
+                                                    {roadmap.map((row) => (<RoadmapRow  key={row.name} row={row} />))}
                                                 </TableBody>
                                             </Table>
                                         </TableContainer>
@@ -265,13 +303,18 @@ function PdfOrgs() {
                                     <div>
                                         <h1>Organizaciones</h1>
                                         <h2>Aqui se muestran todas las organizaciones que forman parte del recorrido: </h2>
-                                        <TableContainer className="not-scrollable" style={{marginTop:"15px"}}>
-                                            <Table aria-label="table" className={'rm-table'}>
-                                            <TableBody>
-                                                {roadmap.map((row) => (<OrganizationRow  key={row.key} row={row} />))}
-                                            </TableBody>
-                                            </Table>
-                                        </TableContainer>
+                                        <div className="not-scrollable" style={{marginTop:"15px"}}>
+                                            {roadmap.map((row) => (
+                                                <div>
+                                                    <h3 style={{textAlign: "left"}} >{row.index}. {row.description}</h3>
+                                                    {row.orgs.length > 0 && (
+                                                        <div>
+                                                            {row.orgs.map((row) => (<Row  key={row.name} row={row} />))}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            ))}
+                                        </div>
                                     </div>
                                 )}
                                 {roadmap && roadmap.length==0 && (
@@ -281,24 +324,10 @@ function PdfOrgs() {
                                 )}
                             </div>
                             )}
-                            {showLoadingOrgs && (
-                            <div>
-                                <Skeleton style={{marginBottom: "10px"}} variant="rect" height={100} />
-                                <Skeleton style={{marginBottom: "10px"}} variant="rect" height={100} />
-                                <Skeleton style={{marginBottom: "10px"}} variant="rect" height={100} />
-                                <Skeleton style={{marginBottom: "10px"}} variant="rect" height={100} />
-                                <Skeleton style={{marginBottom: "10px"}} variant="rect" height={100} />
-                                <Skeleton style={{marginBottom: "10px"}} variant="rect" height={100} />
-                                <Skeleton style={{marginBottom: "10px"}} variant="rect" height={100} />
-                                <Skeleton style={{marginBottom: "10px"}} variant="rect" height={100} />
-                                <Skeleton style={{marginBottom: "10px"}} variant="rect" height={100} />
-                                <Skeleton style={{marginBottom: "10px"}} variant="rect" height={100} />
-                            </div>
-                            )}
                     </div>
                 </div>
                 <ReactToPrint
-                    trigger={() => <Button style={{'margin':'15px'}} variant="contained" color="primary">Guardar a Pdf</Button>}
+                    trigger={() => <Button style={{'margin':'45px 15px 15px 15px'}} variant="contained" color="primary">Guardar a Pdf</Button>}
                     content={() => organizationsRef.current} />
             </Paper>
             <Alert

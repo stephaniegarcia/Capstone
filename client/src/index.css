@@ -73,6 +73,20 @@ code {
   height: 50px;
 }
 
+#view-selector-container > table, #view-selector-container > button {
+  opacity: 0 !important;
+  height: 0px !important;
+}
+
+.gapi-analytics-data-chart >div > div {
+  margin: auto !important;
+}
+
+.report-logo-img {
+  height: 75px;
+  float: left;
+}
+
 .top-margin {
   margin-top: 9%;
 }

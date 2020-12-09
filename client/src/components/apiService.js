@@ -150,15 +150,10 @@ const apiService = {
         }
         return '';
     },
-    getRoadmapSteps: (bt_id, bstage_id) => {
+    getRoadmapSteps: (bstage_id) => {
         var orgSteps = JSON.parse(localStorage.getItem('col-org-steps'));
         if(orgSteps && orgSteps != null) {
-            if(bstage_id) {
-                orgSteps = orgSteps.filter(o => o.bt_id == bt_id && o.bstage_id == bstage_id);
-            }
-            else {
-                orgSteps = orgSteps.filter(o => o.bt_id == bt_id);
-            }
+            orgSteps = orgSteps.filter(o => o.bstage_id == bstage_id);
             if(orgSteps.length>0) {
                 return orgSteps;
             }

@@ -206,7 +206,7 @@ export default function Organizations() {
         orgTypes[i].description = apiService.getOrgType(orgTypes[i].bt_id);
       }
 
-      var steps = apiService.getRoadmapSteps(orgTypes[0].bt_id)
+      var steps = apiService.getRoadmapSteps(orgStages[0].bstage_id)
       if(steps && steps.length>0) {
         setOrgSteps(steps);
         setStep(steps[0])
@@ -233,7 +233,7 @@ export default function Organizations() {
         orgTypes[i].description = apiService.getOrgType(orgTypes[i].bt_id);
       }
 
-      var steps = apiService.getRoadmapSteps(orgTypes[0].bt_id)
+      var steps = apiService.getRoadmapSteps(orgStages[0].bstage_id)
       if(steps && steps.length>0) {
         setOrgSteps(steps);
         setStep(steps[0])
@@ -265,11 +265,15 @@ export default function Organizations() {
             (org.name && String(org.name).toUpperCase().includes(searchString.toUpperCase())) ||
             (org.email && String(org.email).toUpperCase().includes(searchString.toUpperCase()))
         ) {
-          finalData.push(org);    
+          if(finalData.filter(o => o.org_id == org.org_id).length == 0) {
+            finalData.push(org);
+          }
         }
       }
       else {
-        finalData.push(org);  
+        if(finalData.filter(o => o.org_id == org.org_id).length == 0) {
+          finalData.push(org);
+        }
       }
     }
     setOrganizationData(finalData)
@@ -384,21 +388,11 @@ export default function Organizations() {
       }
     }
 
-    var stepName = apiService.getOrgStep(step);
-    for(var i = 0; i < types.length; i++) {
-      var typeSteps = apiService.getRoadmapSteps(types[i])
-      var singleStep = typeSteps.filter(s => s.description == stepName.description);
-      if(singleStep && singleStep.length > 0) {
-        tempSteps.push(singleStep[0].bs_id);
-      }
-    }
-
     var data = {
       name: name.trim(),
       email: email.trim(),
       phone_number: phone.trim(),
       bs_id: step,
-      steps: tempSteps,
       bt_id: types,
       org_link: link.trim(),
       is_active: true,
@@ -450,21 +444,12 @@ export default function Organizations() {
         types.push(orgTypes[i].bt_id);
       }
     }
-    var stepName = apiService.getOrgStep(step);
-    for(var i = 0; i < types.length; i++) {
-      var typeSteps = apiService.getRoadmapSteps(types[i])
-      var singleStep = typeSteps.filter(s => s.description == stepName.description);
-      if(singleStep && singleStep.length > 0) {
-        tempSteps.push(singleStep[0].bs_id);
-      }
-    }
     var data = {
       org_id: id,
       name: name.trim(),
       email: email,
       phone_number: phone,
       bs_id: step,
-      steps: tempSteps,
       bt_id: types,
       org_link: link.trim(),
       is_active: true,
@@ -561,11 +546,20 @@ export default function Organizations() {
           <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
               <Collapse in={open} timeout="auto" unmountOnExit>
                   <Grid container spacing={1}>
-                    <Grid item xs={12} sm={6} md={6} lg={3}><h3 className="center-text"><span className="light-text">Teléfono: </span>{row.phone_number}</h3></Grid>
-                    <Grid item xs={12} sm={6} md={6} lg={3}><h3 className="center-text"><span className="light-text">Correo electrónico: </span>{row.email}</h3></Grid>
-                    <Grid item xs={12} sm={6} md={6} lg={3}><h3 className="center-text"><span className="light-text">Etapa: </span>{apiService.getOrgStage(row.bstage_id)}</h3></Grid>
                     <Grid item xs={12} sm={6} md={6} lg={3}>
-                      <h3 className="center-text"><span className="light-text">Tipo(s):</span></h3>
+                      <h3 className="center-text light-text">Teléfono: </h3>
+                      <h3 className="center-text">{row.phone_number}</h3>
+                    </Grid>
+                    <Grid item xs={12} sm={6} md={6} lg={3}>
+                      <h3 className="center-text light-text">Correo electrónico: </h3>
+                      <h3 className="center-text">{row.email}</h3>
+                    </Grid>
+                    <Grid item xs={12} sm={6} md={6} lg={3}>
+                      <h3 className="center-text light-text">Etapa:</h3>
+                      <h3 className="center-text">{apiService.getOrgStage(row.bstage_id)}</h3>
+                    </Grid>
+                    <Grid item xs={12} sm={6} md={6} lg={3}>
+                      <h3 className="center-text light-text">Tipo(s):</h3>
                       {row.types.map((type) => ( <h3 className="center-text">{type.description}</h3> ))}
                     </Grid>
                     <Grid item xs={12}>

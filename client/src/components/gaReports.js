@@ -141,15 +141,15 @@ function GAReports() {
                     {authorized && (
                         <div>
                             <Grid container spacing={3}>
-                            <Grid item xs={12}>
-                                <Card variant="outlined">
-                                    <div>
+                            <Grid item xs={12} style={{height:"0px"}}>
+                                <Card style={{height:"0px"}}>
+                                    <div style={{opacity: "0", height:"0px"}}>
                                         <div id={viewSelectorContainerId} />
                                         <button onClick={() => signOut()}>Sign Out</button>
                                     </div>
                                 </Card>
                             </Grid>
-                                <Grid item xs={6}>
+                                <Grid item xs={12} sm={6}>
                                     <Card variant="outlined">
                                         <div>
                                             <h3>
@@ -161,7 +161,7 @@ function GAReports() {
                                         </div>
                                     </Card>
                                 </Grid>
-                                <Grid item xs={6}>
+                                <Grid item xs={12} sm={6}>
                                     <Card variant="outlined">
                                         <div>
                                             <h3>
@@ -171,7 +171,7 @@ function GAReports() {
                                         </div>
                                     </Card>
                                 </Grid>
-                                <Grid item xs={12}>
+                                <Grid item xs={12} sm={6}>
                                     <Card variant="outlined">
                                         <div>
                                             <h3>
@@ -181,7 +181,7 @@ function GAReports() {
                                         </div>
                                     </Card>
                                 </Grid>
-                                <Grid item xs={12}>
+                                <Grid item xs={12} sm={6}>
                                     <Card variant="outlined">
                                         <div>
                                             <h3>
@@ -191,7 +191,8 @@ function GAReports() {
                                         </div>
                                     </Card>
                                 </Grid>
-                                <Grid item xs={12}>
+                                <Grid item xs={0} sm={3}></Grid>
+                                <Grid item xs={12} sm={6}>
                                     <Card variant="outlined">
                                         <div>
                                             <h3>

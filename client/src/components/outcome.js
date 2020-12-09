@@ -95,7 +95,7 @@ function Outcome() {
           var bt_id = updatedProfile.bt_id;
           setBusinessType(bt_id);
           if(bt_id && bt_id != null) {
-            var roadmapSteps = apiService.getRoadmapSteps(bt_id, tempProfile.bstage_id);
+            var roadmapSteps = apiService.getRoadmapSteps(tempProfile.bstage_id);
 
             apiService.getRequest('roadmap/'+bt_id +'/'+tempProfile.bstage_id).then(response => {
               //Handle organization response
@@ -110,7 +110,12 @@ function Outcome() {
               for(var i = 0; i < roadmapSteps.length; i++) {
                 var step = roadmapSteps[i];
                 step.index = i+1;
-                step.orgs = response.data.filter(o => o.bs_id == step.bs_id);
+                step.orgs = [];
+                for(var j = 0; j < response.data.length; j++) {
+                  if(response.data[j].bs_id == step.bs_id && step.orgs.filter(o => o.org_id == response.data[j].org_id).length == 0) {
+                    step.orgs.push(response.data[j]);
+                  }
+                }
                 refs[String("step"+step.index)] = React.createRef();
                 zoomRefs[String("step"+step.index)] = false;
               }
@@ -227,9 +232,18 @@ function Outcome() {
               <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
                 <Collapse in={open} timeout="auto" unmountOnExit>
                   <Grid container spacing={1}>
-                    <Grid item xs={12} sm={6} md={6} lg={3}><h3 className="center-text"><span className="light-text">Teléfono: </span>{row.phone_number}</h3></Grid>
-                    <Grid item xs={12} sm={6} md={6} lg={3}><h3 className="center-text"><span className="light-text">Correo electrónico: </span>{row.email}</h3></Grid>
-                    <Grid item xs={12} sm={6} md={6} lg={3}><h3 className="center-text"><span className="light-text">Etapa: </span>{orgStage}</h3></Grid>
+                  <Grid item xs={12} sm={6} md={6} lg={3}>
+                      <h3 className="center-text light-text">Teléfono: </h3>
+                      <h3 className="center-text">{row.phone_number}</h3>
+                    </Grid>
+                    <Grid item xs={12} sm={6} md={6} lg={3}>
+                      <h3 className="center-text light-text">Correo electrónico: </h3>
+                      <h3 className="center-text">{row.email}</h3>
+                    </Grid>
+                    <Grid item xs={12} sm={6} md={6} lg={3}>
+                      <h3 className="center-text light-text">Etapa:</h3>
+                      <h3 className="center-text">{orgStage}</h3>
+                    </Grid>
                     <Grid item xs={12} sm={6} md={6} lg={3}>
                       <h3 className="center-text"><span className="light-text">Tipo(s):</span></h3>
                       {row.types.map((type) => ( <h3 className="center-text">{type.description}</h3> ))}
@@ -282,7 +296,7 @@ function Outcome() {
         };
         const open = Boolean(anchorEl);
         const id = open ? 'rm-popover'+row.index : undefined;
-        var orgTypeCss = apiService.getOrgTypeCssName(row.bt_id);
+        var orgTypeCss = apiService.getOrgTypeCssName(apiService.profile().bt_id);
         var className = orgTypeCss+" rm-curve ";
         var buttonStyle = {};
         if(row.index%2==0) {
@@ -345,6 +359,7 @@ function Outcome() {
                 <iframe src={apiService.getOrgTypeVideo(businessType)} frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
               )}
               <img className="org-type-icon" src={"images/"+apiService.getOrgTypeIcon(businessType)} />  
+              <h2>{apiService.getOrgType(businessType)}</h2>
               {!showLoadingOrgs && (
                 <div>
                   {roadmap && roadmap.length>0 && (

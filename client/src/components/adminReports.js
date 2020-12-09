@@ -53,7 +53,6 @@ function AdminReports() {
     const onAlertClick = () => {
         setShowErrorAlert(false);
     };
-    const COLORS = ['#fcc449', '#ed4628'];
     const RADIAN = Math.PI / 180;
     const renderCustomizedLabel = ({
         cx, cy, midAngle, innerRadius, outerRadius, percent, index,
@@ -152,7 +151,7 @@ function AdminReports() {
         apiService.getRequest("accountsCreated").then(response => {
             setLoadingAccountsPerWeek(false);
             for(var i = 0; i < response.data.length; i++) {
-                response.data[i].key = String(response.data[i].year) + ' - ' + String(response.data[i].week);
+                response.data[i].key = String(response.data[i].month) + '/' + String(response.data[i].week);
             }
             setAccountsPerWeek(response.data);
         }).catch(err =>{
@@ -340,7 +339,7 @@ function AdminReports() {
                                         <XAxis dataKey="name" />
                                         <YAxis label="#" />
                                         <Tooltip />
-                                        <Bar label="Count" dataKey="count" fill="#8884d8" />
+                                        <Bar label="Count" dataKey="count" fill="#9eb2f7" />
                                     </BarChart>
                                 </ResponsiveContainer>
                                 <SmallSpinner isShown={loadingMostContacted} />
@@ -362,7 +361,7 @@ function AdminReports() {
                                         <XAxis dataKey="name" />
                                         <YAxis />
                                         <Tooltip />
-                                        <Bar dataKey="rating" fill="#8884d8" />
+                                        <Bar dataKey="rating" fill="#d67ade" />
                                     </BarChart>
                                 </ResponsiveContainer>
                                 <SmallSpinner isShown={loadingPoorPerforming} />
@@ -384,7 +383,7 @@ function AdminReports() {
                                         <XAxis dataKey="key" />
                                         <YAxis label="#" />
                                         <Tooltip />
-                                        <Bar dataKey="count" fill="#8884d8" />
+                                        <Bar dataKey="count" fill="#89d171" />
                                     </BarChart>
                                 </ResponsiveContainer>
                                 <SmallSpinner isShown={loadingAccountsPerWeek} />
