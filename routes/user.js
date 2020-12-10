@@ -58,10 +58,13 @@ let transporter = nodemailer.createTransport({
  * @description route to change the password
  * @param email
  */
-router.post('/api/user/changePassword', (req, res) => {
+router.post('/api/user/changePassword', async (req, res) => {
 
     const email = req.body.email;
-    console.log(email);
+    exist = await dao.userExists(email);
+    if(exist[0].case == 1){
+       
+    
     passwordtoken = randomstring.generate();
     host =  process.env.WebsiteUrl ||  "http://" +req.get('host')
     link=host+"/newPassword/user/" +email+ "?id="+passwordtoken;
@@ -73,11 +76,13 @@ router.post('/api/user/changePassword', (req, res) => {
         from: 'capstonehelix@gmail.com',
         to : email,
         subject : "Cambio de contraseña",
-        html : "<br> Presione el enlace para cambiar su contraseña.<br><a href="+link+">Presione aqui.</a>",
+        html : `<br> <img src="cid:idForReset"> <br> ¿Quieres cambiar la contraseña de Tu Camino Empresarial? Hemos recibido una solicitud para restablecer tu contraseña. Presiona el enlace para cambiarla y comenzar a utilizar una nueva.<br>
+        
+        <br>En caso de no haber solicitado un cambio de contraseña, puedes ignorar este correo electrónico. Solo una persona con acceso a este correo electrónico puede cambiarla.<br><a href=${link}>Presione aquí para cambiar tu contraseña.</a>`,
         attachments: [{
             filename: 'colmena.png',
-            path: 'routes/colmena.png',
-            cid: 'test' //same cid value as in the html img src
+            path: 'routes/Colmena-66.png',
+            cid: 'idForReset' //same cid value as in the html img src
         }]
     }
     transporter.sendMail(mailOptions, (error, response) => {
@@ -90,6 +95,10 @@ router.post('/api/user/changePassword', (req, res) => {
             res.status(200).send("sent");
         }
     });
+}
+else{
+    res.status(400).send("Email no se encuentra registrado en Tu Camino Empresarial.")
+}
 });
 
 /**
@@ -172,13 +181,17 @@ router.get('/api/verify/:email', async (req,res) => {
  * @params firstname, lastname, business_status, business_stage, email, phone_number, requested_assistance, password
  * 
  */
-router.post('/api/register', (req, res) => {
+router.post('/api/register', async (req, res) => {
 
     const {firstname, lastname, business_status, business_stage, email, phone_number, requested_assistance, password} = req.body;
 
-    if (firstname && lastname && business_status && email && password){
-        //insert query should be here
-            if(validName(firstname) && validName(lastname) && validEmail(email) && validPhone(phone_number)){
+    if (firstname && lastname && business_status && email && password ){
+                exist = await dao.userExists(email);
+                console.log(exist)
+                if(exist[0].case == 1){
+                    res.status(400).send("Este correo electrónico ya tiene una cuenta creada en Tu Camino Empresarial.")
+                }
+                else{
                 var registerToken = randomstring.generate();
                 hashedPassword = bcrypt.hashSync(password,saltRounds)
                 dao.createUser(firstname,lastname,email,hashedPassword, business_status, requested_assistance, phone_number, null, business_stage, 1, 0, registerToken);
@@ -189,14 +202,16 @@ router.post('/api/register', (req, res) => {
                     to : email,
                     subject : "Tu Camino Empresarial",
                     html : `<img src="cid:test"> 
-                    <br> Te damos la bienvenida a Tu Camino Empresarial. Presione el enlace para confirmar su cuenta.<br><a href="${link}">Presiona aqui para verificar tu cuenta.</a>`,
+                    <br> ¡Gracias por crear una cuenta en Tu Camino Empresarial!<br>
+
+                    <br>Te damos la bienvenida a esta herramienta en la cual podrás identificar fácilmente los recursos disponibles para comenzar o crecer tu negocio.  Presione el enlace para verificar tu cuenta y poder comenzar a utilizarla.<br>
+                    <a href=${link}>Presiona aqui para verificar tu cuenta.</a>`,
                     attachments: [{
                         filename: 'colmena.png',
                         path: 'routes/colmena.png',
                         cid: 'test' //same cid value as in the html img src
                     }]
                 }
-                console.log(mailOptions);
                 transporter.sendMail(mailOptions, function(error, response){
                     if(error){
                         console.log(error);
@@ -209,9 +224,6 @@ router.post('/api/register', (req, res) => {
                 });
 
                 res.status(200).send("User registered");
-            }
-            else{
-                res.status(400).send("Error");
             }
 
     }
@@ -278,52 +290,21 @@ router.put('/api/user/:userId', async (req, res) => {
     
     const {firstname, lastname, business_status, phone_number, bstage_id, requested_assistance} = req.body;
     
-    
-    if (firstname && lastname && business_status && bstage_id && requested_assistance){ 
-            if(validName(firstname) && validName(lastname) && validPhone(phone_number)){
-                
-                let value = await dao.updateUser(req.params.userId, firstname, lastname, business_status, phone_number, bstage_id, requested_assistance);
-                console.log(value)
-                if(value instanceof Error){
-                    res.status(400).send("Error in query");
-                }
-                else{
-                    res.status(200).send(value);
-                }
-            }
-            else{
-                res.status(400).send("Error in validation");
-            }
-    }
-    else{
-        res.status(400).send("Error in values");
-    }
+   
+        let value = await dao.updateUser(req.params.userId, firstname, lastname, business_status, phone_number, bstage_id, requested_assistance);
+        console.log(value)
+        if(value instanceof Error){
+            res.status(400).send("Error in query");
+        }
+        else{
+            res.status(200).send(value);
+        }
+           
+   
 
 });
 
 
 
-
-
-// Validates email address of course.
-function validEmail(email) {
-    var filter = /^\s*[\w\-\+_]+(\.[\w\-\+_]+)*\@[\w\-\+_]+\.[\w\-\+_]+(\.[\w\-\+_]+)*\s*$/;
-    return String(email).search (filter) != -1;
-}
-
-function validPhone(phone) {
-    if(phone){
-        var filter = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/im;
-        return String(phone).search (filter) != -1;
-    }
-    else{
-        return " "
-    }
-}
-
-function validName(name) {
-    var filter = /^[\w'\-,.][^0-9_!¡?÷?¿/\\+=@#$%ˆ&*(){}|~<>;:[\]]{2,}$/
-    return String(name).search (filter) != -1;
-}
 
 module.exports = router;

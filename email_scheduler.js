@@ -32,10 +32,18 @@ const sender = async (transporter) => {
             from: 'capstonehelix@gmail.com',
             to : users.rows[i].email,
             subject : "Recuerda seguir Tu Camino Empresarial",
-            html : `<img src="cid:test"> <br> Llevas tiempo sin seguir tu camino empresarial. Recuerda visitarnos para que asi tu empresa pueda seguir creciendo.<br>`,
+            html : `<img src="cid:test"> <br> ¡Hola!<br>
+
+            <br> Hemos notado que hace tiempo no visitas Tu Camino Empresarial. Recuerda visitarnos para que consigas los recursos que necesitas para comenzar o crecer tu negocio.<br>
+            <br>1.	Accede a tu cuenta<br>
+            <br>2.	Si no lo has hecho, contesta unas preguntas para que puedas identificar el tipo de negocio que tienes<br>
+            <br>3.	Recibirás una guía con los pasos a seguir para tu negocio<br>
+            <br>4.	Contacta las organizaciones que te recomendamos y déjanos saber cómo te fue<br>
+            
+            <br>Estamos aquí para ayudarte a recorrer Tu Camino Empresarial.<br>`,
             attachments: [{
                 filename: 'colmena.png',
-                path: 'routes/colmena.png',
+                path: 'routes/Colmena-66.png',
                 cid: 'test' //same cid value as in the html img src
             }]
         }
