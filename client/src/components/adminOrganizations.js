@@ -74,7 +74,7 @@ export default function Organizations() {
   const [orgTypesCheck, setOrgTypesCheck] = useState({});
   const [orgStages, setOrgStages] = useState([]);
   const [orgSteps, setOrgSteps] = useState([]);
-
+  const [orgStage, setOrgStage] = useState('');
   const [validPhone, setValidPhone] = useState(true);
   const [validEmail, setValidEmail] = useState(true);
   const [validName, setValidName] = useState(true);
@@ -199,17 +199,27 @@ export default function Organizations() {
     setOpenDeleteAlert(false);
   };
   
+  const handleOrgStageChange = (event) => {
+    setOrgStage(event.target.value);
+    var steps = apiService.getRoadmapSteps(event.target.value)
+    if(steps && steps.length>0) {
+      setOrgSteps(steps);
+      setStep(steps[0].bs_id)
+    }
+  };
+
   const handleOpenAddOrgModalClickOpen = () => {
     if(orgTypes && orgTypes.length>0) {
       for(var i = 0; i < orgTypes.length; i++) {
         orgTypesCheck[String(orgTypes[i].bt_id)] = false;
         orgTypes[i].description = apiService.getOrgType(orgTypes[i].bt_id);
       }
-
+      setOrgStage(orgStages[0].bstage_id);
       var steps = apiService.getRoadmapSteps(orgStages[0].bstage_id)
       if(steps && steps.length>0) {
         setOrgSteps(steps);
-        setStep(steps[0])
+        setStep(steps[0].bs_id)
+        newOrgModel.bs_id = steps[0].bs_id
       }
     }
     if(orgStages && orgStages.length>0) {
@@ -231,6 +241,12 @@ export default function Organizations() {
         var containsType = org.types.filter(o => o.bt_id == orgTypes[i].bt_id);
         orgTypesCheck[String(orgTypes[i].bt_id)] = containsType && containsType.length>0;
         orgTypes[i].description = apiService.getOrgType(orgTypes[i].bt_id);
+      }
+
+      for(var i = 0; i < orgStages.length; i++) {
+        if(orgStages[i].bstage_id == org.bstage_id) {
+          setOrgStage(orgStages[i].bstage_id);
+        }
       }
 
       var steps = apiService.getRoadmapSteps(orgStages[0].bstage_id)
@@ -265,13 +281,13 @@ export default function Organizations() {
             (org.name && String(org.name).toUpperCase().includes(searchString.toUpperCase())) ||
             (org.email && String(org.email).toUpperCase().includes(searchString.toUpperCase()))
         ) {
-          if(finalData.filter(o => o.org_id == org.org_id).length == 0) {
+          if(finalData.filter(o => o.org_id == org.org_id).length == 0 && org.is_active) {
             finalData.push(org);
           }
         }
       }
       else {
-        if(finalData.filter(o => o.org_id == org.org_id).length == 0) {
+        if(finalData.filter(o => o.org_id == org.org_id).length == 0 && org.is_active) {
           finalData.push(org);
         }
       }
@@ -381,13 +397,12 @@ export default function Organizations() {
     }
     setShowLoading(true);
     var types = [];
-    var tempSteps = [];
     for(var i = 0; i < orgTypes.length; i++) {
       if(orgTypesCheck[String(orgTypes[i].bt_id)]) {
         types.push(orgTypes[i].bt_id);
       }
     }
-
+    var selectedStage = orgStage;
     var data = {
       name: name.trim(),
       email: email.trim(),
@@ -399,18 +414,28 @@ export default function Organizations() {
       description: description.trim()
     };
     handleOpenAddOrgModalClose();
-    console.log(data);
     apiService.postRequest("organization", data).then((addResponse) => {
-      apiService.getRequest("organizations").then((organizationsResponse) => {
-        setFullOrganizationList(organizationsResponse.data);
-        filterOrganizations(organizationsResponse.data);
-        setShowLoading(false);
-        
-      }).catch(err =>{
-        setShowLoading(false);
-        setErrorMessage(err ? (err.response ? (err.response.data? String(err.response.data) : String(err.response)) : String(err)) : 'Ocurrio un error');
-        setShowErrorAlert(true);
-      });
+      var newOrg = { };
+      console.log(addResponse.data);
+      newOrg.org_id = addResponse.data[0].org_id;
+      newOrg.bstage_id = selectedStage;
+      newOrg.name = data.name;
+      newOrg.email = data.email;
+      newOrg.bs_id = data.bs_id;
+      newOrg.description = data.description;
+      newOrg.org_link = data.org_link;
+      newOrg.phone_number = data.phone_number;
+      var finalTypes = [];
+      for(var tempIndex = 0; tempIndex < types.length; tempIndex++) {
+        var btId = types[tempIndex];
+        finalTypes.push({ bt_id: btId, description: apiService.getOrgType(btId) })
+      }
+      newOrg.types = finalTypes;
+      newOrg.is_active = true;
+      fullOrganizationList.push(newOrg);
+      setFullOrganizationList(fullOrganizationList);
+      filterOrganizations(fullOrganizationList);
+      setShowLoading(false);
     }).catch(err =>{
       setShowLoading(false);
       setErrorMessage(err ? (err.response ? (err.response.data? String(err.response.data) : String(err.response)) : String(err)) : 'Ocurrio un error');
@@ -438,7 +463,6 @@ export default function Organizations() {
     setShowLoading(true);
     var id = lastSelectedOrg.org_id
     var types = [];
-    var tempSteps = [];
     for(var i = 0; i < orgTypes.length; i++) {
       if(orgTypesCheck[String(orgTypes[i].bt_id)]) {
         types.push(orgTypes[i].bt_id);
@@ -456,19 +480,26 @@ export default function Organizations() {
       description: description.trim()
     };
     handleOpenEditOrgModalClose();
-    console.log(data);
     apiService.putRequest("organization", data).then((editResponse) => {
-      debugger;
-      console.log(editResponse.data);
-      apiService.getRequest("organizations").then((organizationsResponse) => {
-        setFullOrganizationList(organizationsResponse.data);
-        filterOrganizations(organizationsResponse.data);
-        setShowLoading(false);
-      }).catch(err =>{
-        setShowLoading(false);
-        setErrorMessage(err ? (err.response ? (err.response.data? String(err.response.data) : String(err.response)) : String(err)) : 'Ocurrio un error');
-        setShowErrorAlert(true);
-      });
+      for(var i = 0; i < fullOrganizationList.length; i++) {
+        if(fullOrganizationList[i].org_id == data.org_id) {
+          fullOrganizationList[i].name = data.name;
+          fullOrganizationList[i].email = data.email;
+          fullOrganizationList[i].bs_id = data.bs_id;
+          fullOrganizationList[i].description = data.description;
+          fullOrganizationList[i].org_link = data.org_link;
+          fullOrganizationList[i].phone_number = data.phone_number;
+          var finalTypes = [];
+          for(var tempIndex = 0; tempIndex < types.length; tempIndex++) {
+            var btId = types[tempIndex];
+            finalTypes.push({ bt_id: btId, description: apiService.getOrgType(btId) })
+          }
+          fullOrganizationList[i].types = finalTypes;
+        }
+      }
+      setFullOrganizationList(fullOrganizationList);
+      filterOrganizations(fullOrganizationList);
+      setShowLoading(false);
     }).catch(err =>{
       setShowLoading(false);
       setErrorMessage(err ? (err.response ? (err.response.data? String(err.response.data) : String(err.response)) : String(err)) : 'Ocurrio un error');
@@ -483,28 +514,28 @@ export default function Organizations() {
     setShowLoading(true);
     lastSelectedOrg.is_active = !lastSelectedOrg.is_active;
     var data = { is_active: String(lastSelectedOrg.is_active), org_id: lastSelectedOrg.org_id };
-    apiService.putRequest("inactiveOrganization", data).then((organizationsResponse) => {
-      apiService.getRequest("organizations").then((organizationsResponse) => {
-        setFullOrganizationList(organizationsResponse.data);
-        filterOrganizations(organizationsResponse.data);
-        setShowLoading(false);
-      }).catch(err =>{
-        setShowLoading(false);
-        setErrorMessage(err ? (err.response ? (err.response.data? String(err.response.data) : String(err.response)) : String(err)) : 'Ocurrio un error');
-        setShowErrorAlert(true);
-      });
+    apiService.putRequest("inactiveOrganization", data).then((removeResponse) => {
+      for(var i = 0; i< fullOrganizationList.length; i++) {
+        if(fullOrganizationList[i].org_id == lastSelectedOrg.org_id) {
+          fullOrganizationList[i].is_active = lastSelectedOrg.is_active;
+        }
+      }
+      setFullOrganizationList(fullOrganizationList);
+      filterOrganizations(fullOrganizationList);
+      setShowLoading(false);
+      // apiService.getRequest("organizations").then((organizationsResponse) => {
+        
+      // }).catch(err =>{
+      //   setShowLoading(false);
+      //   setErrorMessage(err ? (err.response ? (err.response.data? String(err.response.data) : String(err.response)) : String(err)) : 'Ocurrio un error');
+      //   setShowErrorAlert(true);
+      // });
     }).catch(err =>{
       setShowLoading(false);
       setErrorMessage(err ? (err.response ? (err.response.data? String(err.response.data) : String(err.response)) : String(err)) : 'Ocurrio un error');
       setShowErrorAlert(true);
     });
-    for(var i = 0; i< fullOrganizationList.length; i++) {
-      if(fullOrganizationList[i].org_id == lastSelectedOrg.org_id) {
-        fullOrganizationList[i].is_active = lastSelectedOrg.is_active;
-      }
-      setFullOrganizationList(fullOrganizationList);
-      filterOrganizations(fullOrganizationList);
-    }
+    
     saveLastOrgSelected(newOrgModel);
   }
 
@@ -593,6 +624,7 @@ export default function Organizations() {
     apiService.orgSteps(orgStepsTemp);
     searchOrganizations();
   },[initialLoad])
+
 
   return (
     !apiService.isAdminAuthenticated() ?
@@ -734,6 +766,21 @@ export default function Organizations() {
                     label={type.description} />
                 ))}
             </div>
+            
+            
+            <div className="margin-25">
+              <TextField
+                  label="Etapa de Negocio"
+                  select
+                  style={{width:'100%', textAlign: "center"}}
+                  className="form-control"
+                  value={orgStage}
+                  onChange={handleOrgStageChange}>
+                  {orgStages.map((type) => ( <MenuItem key={'stage'+type.bstage_id} value={type.bstage_id}>{type.description}</MenuItem> ))}
+              </TextField>
+            </div>
+            
+            
             <div className="margin-25">
               <TextField
                   label="Paso de Negocio"
@@ -862,6 +909,17 @@ export default function Organizations() {
                   control={<Checkbox checked={orgTypesCheck[String(type.bt_id)]} onChange={handleTypeCheckChange} name={type.bt_id} />}
                   label={type.description} />
               ))}
+            </div>
+            <div className="margin-25">
+              <TextField
+                  label="Etapa de Negocio"
+                  select
+                  style={{width:'100%', textAlign: "center"}}
+                  className="form-control"
+                  value={orgStage}
+                  onChange={handleOrgStageChange}>
+                  {orgStages.map((type) => ( <MenuItem key={'stage'+type.bstage_id} value={type.bstage_id}>{type.description}</MenuItem> ))}
+              </TextField>
             </div>
             <div className="margin-25">
               <TextField

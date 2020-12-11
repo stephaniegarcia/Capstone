@@ -120,7 +120,7 @@ function AdminLogin() {
         //Show login view
         <div className="top-margin">
             <Paper className="form form--wrapper paper-margin" elevation={10}> 
-                <h1>Portal de Adminitradores</h1>
+                <h1>Portal de Administradores</h1>
                 <div className="margin-25">
                     <TextField
                         InputLabelProps={{

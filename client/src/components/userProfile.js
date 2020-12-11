@@ -158,14 +158,14 @@ function UserProfile() {
   
   //first name change event callback
   const handleFirstNameChange = (event) => {
-    setFirstName(event.target.value.trim());
-    setValidFirstName((isValidName(event.target.value.trim())));
+    setFirstName(event.target.value);
+    setValidFirstName((isValidName(event.target.value)));
   };
   
   //last name change event callback
   const handleLastNameChange = (event) => {
-    setLastName(event.target.value.trim());
-    setValidLastName((isValidName(event.target.value.trim())));
+    setLastName(event.target.value);
+    setValidLastName((isValidName(event.target.value)));
   };
   
   //email change event callback
@@ -383,7 +383,7 @@ function UserProfile() {
       setPhone(profile.phone_number);
       setBusinessStage(profile.bstage_id);
       setBusinessStatus(String(profile.business_status));
-      setRequiredAssistance(profile.requested_assistance && profile.requested_assistance != null ? profile.requested_assistance : 'Ninguna');
+      setRequiredAssistance(profile.assistance_required && profile.assistance_required != null ? profile.assistance_required : 'Ninguna');
 
       setBusinessType(profile.bt_id);
       if(profile.bt_id && profile.bt_id != null) {
@@ -462,7 +462,7 @@ function UserProfile() {
       requested_assistance: requiredAssistance,
       business_status: String(businessStatus)
     };
-
+    console.log(JSON.stringify(data));
     var profile = apiService.profile();
     setShowLoading(true);
     apiService.putRequest("user/"+profile.user_id, data).then(async (response) => {

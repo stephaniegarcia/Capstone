@@ -120,7 +120,7 @@ function PdfOrgs() {
             <Card variant="outlined" style={{marginBottom:"20px"}}>
                 <TableRow>
                     <TableCell scope="row" className="collapse-header-buttons">
-                        <h5>{row.name}</h5>
+                        <h5>Nombre de Organizacion: {row.name}</h5>
                         <div>
                             <FormControlLabel
                                 control={<GreenCheckbox checked={row.had_rating}

@@ -78,6 +78,7 @@ router.post('/api/organization', async (req, res) => {
             res.status(200).send("Organization updated.");
             
           }
+
           else{
             let org = await dao.createOrg(name, description, email, phone_number, bs_id, is_active, org_link)
             for(let i =0; i<bt_id.length;i++)
@@ -86,6 +87,7 @@ router.post('/api/organization', async (req, res) => {
             }
             res.status(200).send("Organization registered");
         }
+
   }
   else{
       res.status(404).send("Error: Some parameters are missing")

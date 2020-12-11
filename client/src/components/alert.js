@@ -39,7 +39,7 @@ export default function Alert({
             {'CANCEL'}
           </Button>
         ) : null}
-        <Button onClick={handleSubmit} color="primary">
+        <Button onClick={handleSubmit} variant="contained" color="primary">
           {submitButtonText}
         </Button>
       </DialogActions>

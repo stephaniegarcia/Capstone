@@ -68,7 +68,7 @@ function AdminForgotPassword() {
       //Perform login request
       apiService.postRequest("admin/changePassword", { email: email }).then(response => {
         setShowLoading(false);  
-        showMessageAlert(true);
+        setShowMessageAlert(true);
       }).catch(err =>{
           //Handle error
           setShowLoading(false);
