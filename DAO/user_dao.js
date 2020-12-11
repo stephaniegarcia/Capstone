@@ -9,14 +9,29 @@ const pool = new Pool({
     port: 5432
 })
 
+const userExists = async (email) => {
+    try{
+
+        const res = await pool.query(
+            `SELECT CASE WHEN EXISTS (
+                SELECT *
+                FROM users
+                WHERE email = $1
+            )
+            THEN CAST(1 AS BIT)
+            ELSE CAST(0 AS BIT) END`, [email]
+        );
+        return res.rows;
+
+    }catch(err){
+        return err;
+    }
+}
 
 
 const createUser =  async (first_name, last_name, email, user_password, business_status,requested_assistance, phone_number, bt_id, business_stage, is_active, is_verified, token) => {
 
     pool.query('INSERT INTO public.users(first_name, last_name, email, user_password, business_status,assistance_required, phone_number, bt_id, bstage_id, is_active, is_verified, verify_token) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)', [first_name, last_name, email, user_password, business_status, requested_assistance, phone_number, bt_id, business_stage, is_active, is_verified, token], (error, results) => {
-        if (error) {
-            throw error
-        }
 
         if (error) {
             throw error
@@ -194,5 +209,6 @@ module.exports = {
     insertPasswordToken,
     getPasswordToken,
     log,
-    getPassword
+    getPassword,
+    userExists
 }
