@@ -15,6 +15,7 @@ async function getAverageEvaluations(){
         const res = await pool.query(
           `SELECT ROUND(AVG(R.rating)) as rating, O.name
           FROM organization_rating as R INNER JOIN organization as O ON O.org_id = R.organization_id
+          WHERE O.is_active = 'true'
           GROUP BY O.name`
         );
         console.log(res.rows)
@@ -138,6 +139,7 @@ async function getContactedCount(){
         O.name, COUNT(R.rating) as count
         FROM
             organization_rating as R INNER JOIN organization as O ON O.org_id = R.organization_id
+            where O.is_active = 'true'
         group by
             O.name
         Order by count DESC
