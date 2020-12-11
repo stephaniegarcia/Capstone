@@ -108,22 +108,33 @@ router.put('/api/organization', async (req, res) => {
   const {name, description, email, phone_number, bt_id, bs_id, org_link, org_id} = req.body;
   if(name && email && phone_number && bt_id && bs_id && org_link && org_id){
     let types = await dao.getOrganizationsTypes(org_id);
-      console.log(types)
       for(let j = 0; j < bt_id.length; j++){
         if(!isIn(bt_id[j], types)){
           dao.attachingOrgToBusinessType(bt_id[j],org_id)
-          console.log(1)
         }
       }
       for(let j = 0; j < types.length; j++){
         if(!isInQ(types[j].bt_id, bt_id)){
-          // remove from
           await dao.deletingOrgBusinessType(types[j].bt_id, org_id)
           
         }
       }
-      dao.updateOrganization(name, description, email, phone_number, bs_id, org_link, org_id)
-      res.status(200).send("Organization updated.");
+
+      let id = await dao.getOrganizationIDByEmail(email);
+      
+      if(!id[0]){
+        dao.updateOrganization(name, description, email, phone_number, bs_id, org_link, org_id)
+        res.status(200).send("Organization updated.");
+      }
+      else if(id[0].org_id==org_id){
+        dao.updateOrganization(name, description, email, phone_number, bs_id, org_link, org_id)
+        res.status(200).send("Organization updated.");
+      }
+      else{
+        res.status(400).send("Este correo ya existe en Tu Camino Empresarial.");
+      }
+      
+      
   }
   else{
     res.status(404).send("Error: Missing Parameter")
