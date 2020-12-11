@@ -75,7 +75,7 @@ router.post('/api/organization', async (req, res) => {
               }
             }  
             dao.updateOrganization(name, description, email, phone_number, bs_id, org_link, org_id)
-            res.status(200).send("Organization updated.");
+            res.status(200).send(org);
             
           }
 
@@ -85,7 +85,7 @@ router.post('/api/organization', async (req, res) => {
             {
                 dao.attachingOrgToBusinessType(bt_id[i], org[0].org_id)
             }
-            res.status(200).send("Organization registered");
+            res.status(200).send(org);
         }
 
   }
@@ -108,7 +108,7 @@ router.put('/api/organization', async (req, res) => {
   const {name, description, email, phone_number, bt_id, bs_id, org_link, org_id} = req.body;
   if(name && email && phone_number && bt_id && bs_id && org_link && org_id){
     let types = await dao.getOrganizationsTypes(org_id);
-    console.log(types)
+      console.log(types)
       for(let j = 0; j < bt_id.length; j++){
         if(!isIn(bt_id[j], types)){
           dao.attachingOrgToBusinessType(bt_id[j],org_id)
@@ -122,8 +122,8 @@ router.put('/api/organization', async (req, res) => {
           
         }
       }
-    dao.updateOrganization(name, description, email, phone_number, bs_id, org_link, org_id)
-    res.status(200).send("Organization updated.");
+      dao.updateOrganization(name, description, email, phone_number, bs_id, org_link, org_id)
+      res.status(200).send("Organization updated.");
   }
   else{
     res.status(404).send("Error: Missing Parameter")

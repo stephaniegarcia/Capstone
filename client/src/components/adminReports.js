@@ -17,7 +17,7 @@ import IconButton from '@material-ui/core/IconButton';
 import Spinner from './loading'
 import SmallSpinner from './smallLoading'
 import Alert from './alert'
-import { BarChart, Bar, PieChart, Pie, Sector, Cell, CartesianGrid, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, PieChart, Pie, Sector, Cell, Label, LabelList, CartesianGrid, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import Grid from '@material-ui/core/Grid';
 import Card from '@material-ui/core/Card';
 import '../index.css';
@@ -340,9 +340,13 @@ function AdminReports() {
                                     <BarChart data={mostContacted}>
                                         <CartesianGrid strokeDasharray="3 3" />
                                         <XAxis dataKey="name" />
-                                        <YAxis label="#" />
+                                        <YAxis>
+                                            <Label angle={-90} value='# de Veces Contactadas' position='insideLeft' style={{textAnchor: 'middle', fontWeight: "bold", letterSpacing: "1"}} />
+                                        </YAxis>
                                         <Tooltip />
-                                        <Bar label="Count" dataKey="count" fill="#9eb2f7" />
+                                        <Bar label="Count" dataKey="count" fill="#9eb2f7">
+                                            {/* <LabelList dataKey="name" style={{fontSize: "xx-small"}} angle={-90} position="inside" /> */}
+                                        </Bar>
                                     </BarChart>
                                 </ResponsiveContainer>
                                 <SmallSpinner isShown={loadingMostContacted} />
@@ -365,7 +369,9 @@ function AdminReports() {
                                     <BarChart data={poorPerforming}>
                                         <CartesianGrid strokeDasharray="3 3" />
                                         <XAxis dataKey="name" />
-                                        <YAxis />
+                                        <YAxis>
+                                            <Label angle={-90} value='Calificación Media' position='insideLeft' style={{textAnchor: 'middle', fontWeight: "bold", letterSpacing: "1"}} />
+                                        </YAxis>
                                         <Tooltip />
                                         <Bar dataKey="rating" fill="#d67ade" />
                                     </BarChart>
@@ -391,7 +397,9 @@ function AdminReports() {
                                     <BarChart data={accountsPerWeek}>
                                         <CartesianGrid strokeDasharray="3 3" />
                                         <XAxis dataKey="key" />
-                                        <YAxis label="#" />
+                                        <YAxis>
+                                            <Label angle={-90} value='# de Cuentas Nuevas' position='insideLeft' style={{textAnchor: 'middle', fontWeight: "bold", letterSpacing: "1"}} />
+                                        </YAxis>
                                         <Tooltip />
                                         <Bar dataKey="count" fill="#89d171" />
                                     </BarChart>

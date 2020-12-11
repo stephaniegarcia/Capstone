@@ -104,8 +104,12 @@ export default function Organizations() {
       finalData = [];
       for(var i = 0; i < tempData.length; i++) {
         var org = tempData[i];
-        var found = org.types.some(r=> selectedTypes.indexOf(r.bt_id) >= 0)
-        if(found) {
+        var containsAllTypesSelected = true;
+        for(var selectedTypeIndex = 0; selectedTypeIndex < selectedTypes.length; selectedTypeIndex ++) {
+          var found = org.types.map(t=>t.bt_id).includes(selectedTypes[selectedTypeIndex]);
+          containsAllTypesSelected = containsAllTypesSelected && found;
+        }
+        if(containsAllTypesSelected) {
           if(finalData.filter(o => o.org_id == org.org_id).length == 0) {
             finalData.push(org);
           }

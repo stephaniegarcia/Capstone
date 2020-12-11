@@ -152,7 +152,7 @@ function UserProfile() {
   
   //name validation helper function
   function isValidName(text) {
-    const re = /^[a-zA-ZáÁéÉíÍóÓúÚñÑüÜ ]+(([',. -][a-zA-ZáÁéÉíÍóÓúÚñÑüÜ ])?[a-zA-ZáÁéÉíÍóÓúÚñÑüÜ ]*)*$/g;
+    const re = /^[a-zA-ZáÁéÉíÍóÓúÚñÑüÜ '.-]+(([',. -][a-zA-ZáÁéÉíÍóÓúÚñÑüÜ '.-])?[a-zA-ZáÁéÉíÍóÓúÚñÑüÜ '.-]*)*$/g;
     return text.length >= 2 && re.test(String(text))
   }
   

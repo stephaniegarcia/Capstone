@@ -17,6 +17,7 @@ function Register() {
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [phone, setPhone] = useState('');
+    const [tempProfile, setTempProfile] = useState({});
     const [orgStages, setOrgStages] = useState([]);
     const [businessStage, setBusinessStage] = useState('');
     const [businessStatus, setBusinessStatus] = useState('true');
@@ -28,6 +29,7 @@ function Register() {
     const [validLastName, setValidLastName] = useState(true);
     const [validPhone, setValidPhone] = useState(true);
     const [showErrorAlert, setShowErrorAlert] = useState(false);
+    const [showSuccessAlert, setShowSuccessAlert] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
     const [showLoading, setShowLoading] = useState(false);
     const [initialLoad, setInitialLoad] = useState(true);
@@ -69,7 +71,7 @@ function Register() {
      //@param text - new user name
     //@return if it's valid or not
     function isValidName(text) {
-        const re = /^[a-zA-ZáÁéÉíÍóÓúÚñÑüÜ ]+(([',. -][a-zA-ZáÁéÉíÍóÓúÚñÑüÜ ])?[a-zA-ZáÁéÉíÍóÓúÚñÑüÜ ]*)*$/g;
+        const re = /^[a-zA-ZáÁéÉíÍóÓúÚñÑüÜ '.-]+(([',. -][a-zA-ZáÁéÉíÍóÓúÚñÑüÜ '.-])?[a-zA-ZáÁéÉíÍóÓúÚñÑüÜ '.-]*)*$/g;
         return text.length >= 2 && re.test(String(text))
     }
     
@@ -173,6 +175,23 @@ function Register() {
         setShowErrorAlert(false);
     };
 
+    const onSuccessAlertClick = () => {
+        setShowLoading(true);
+        //Handle register
+        if(tempProfile.is_verified) {
+            apiService.profile(tempProfile);
+            if(tempProfile.bt_id && tempProfile.bt_id > 0) {
+                window.location.href = "/userprofile";    
+            }
+            else {
+                window.location.href = "/tce";
+            }
+        }
+        else {
+            window.location.href = "/login";
+        }
+    };
+
     //register button click event callback
     const handleRegisterClick = () => {
         if(!validEmail || !email.length>0 || !validPassword || !password.length>0 || !validConfirmPassword || !confirmPassword.length>0 || !validPhone || !phone.length>0 || !validFirstName || !firstName.length>0 || !validLastName || !lastName.length>0) {
@@ -196,20 +215,9 @@ function Register() {
         };
         //Perform register request
         apiService.postRequest("register", data).then(response => {
-            //Handle register
-            if(response.data[0].is_verified) {
-                apiService.profile(response.data[0]);
-                setShowLoading(false);
-                if(response.data[0].bt_id && response.data[0].bt_id > 0) {
-                    window.location.href = "/";    
-                }
-                else {
-                    window.location.href = "/tce";
-                }
-            }
-            else {
-                window.location.href = "/";
-            }
+            setShowLoading(false);
+            setShowSuccessAlert(true);
+            setTempProfile(response.data[0]);
         }).catch(err =>{
             //Handle error
             setShowLoading(false);
@@ -382,8 +390,13 @@ function Register() {
                 handleSubmit={onAlertClick}
                 title="Error"
                 text={errorMessage}
-                submitButtonText="Ok"
-            />
+                submitButtonText="Ok" />
+            <Alert
+                isOpen={showSuccessAlert}
+                handleSubmit={onSuccessAlertClick}
+                title=""
+                text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+                submitButtonText="Ok" />
             <Spinner isShown={showLoading} />
         </div>
     );

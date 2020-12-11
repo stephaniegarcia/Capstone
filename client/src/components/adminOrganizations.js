@@ -249,7 +249,7 @@ export default function Organizations() {
         }
       }
 
-      var steps = apiService.getRoadmapSteps(orgStages[0].bstage_id)
+      var steps = apiService.getRoadmapSteps(org.bstage_id)
       if(steps && steps.length>0) {
         setOrgSteps(steps);
         setStep(steps[0])
