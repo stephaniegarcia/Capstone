@@ -33,7 +33,7 @@ router.get('/api/topTenPerBT/:btID', async (req,res) =>{
  * @returns the top 10 organizations per stage
  */
 router.get('/api/topTenPerBS/:bstageID', async (req,res) =>{
-    const ratings = await dao.getTopTenBS(req.params.bstageID)
+   const ratings = await dao.getTopTenBS(req.params.bstageID)
    res.send(ratings)
 });
 
@@ -93,7 +93,7 @@ router.get('/api/organizationsContacted', async (req,res) =>{
  */
 router.post('/api/ratings', (req, res) => {
     const {rating, user_id, organization_id, rating_comment} = req.body;
-    if(rating && user_id && organization_id && rating_comment){
+    if(rating && user_id && organization_id){
         dao.createRating(rating, user_id, organization_id, rating_comment)
         res.status(200).send("Rating added")
     }
