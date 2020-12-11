@@ -68,7 +68,7 @@ function ForgotPassword() {
       //Perform login request
       apiService.postRequest("user/changePassword", { email: email }).then(response => {
         setShowLoading(false);  
-        showMessageAlert(true);
+        setShowMessageAlert(true);
       }).catch(err =>{
           //Handle error
           setShowLoading(false);

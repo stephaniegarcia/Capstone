@@ -68,15 +68,15 @@ function AdminPasswordReset() {
   const handlePasswordChange = (event) => {
     setPassword(event.target.value);
     setValidPassword((isValidPass(event.target.value)));
+    if(confirmPass && confirmPass.length>0) {
+      setValidConfirmPassword(event.target.value == confirmPass);    
+    }
   };
 
   //confirm password change event callback
   const handleConfirmPasswordChange = (event) => {
     setConfirmPass(event.target.value);
-    setValidConfirmPassword((isValidPass(event.target.value)));
-    if(confirmPass && confirmPass.length>0) {
-      setValidConfirmPassword(event.target.value == confirmPass);    
-    }
+    setValidConfirmPassword((isValidPass(event.target.value) && event.target.value == password));
   };
 
   //submit button click event callback

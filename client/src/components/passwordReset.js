@@ -76,7 +76,7 @@ function PasswordReset() {
   //confirm password change event callback
   const handleConfirmPasswordChange = (event) => {
     setConfirmPass(event.target.value);
-    setValidConfirmPassword((isValidPass(event.target.value)));
+    setValidConfirmPassword((isValidPass(event.target.value) && event.target.value == password));
   };
 
   //submit button click event callback

@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-
 import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableContainer from '@material-ui/core/TableContainer';
-import TableHead from '@material-ui/core/TableHead';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Checkbox from '@material-ui/core/Checkbox';
 import Skeleton from '@material-ui/lab/Skeleton';
 import TableRow from '@material-ui/core/TableRow';
 import Link from '@material-ui/core/Link';
@@ -33,6 +33,7 @@ export default function Organizations() {
   const [orgTypes, setOrgTypes] = useState([]);
   const [orgStages, setOrgStages] = useState([]);
   const [orgType, setOrgType] = useState('');
+  const [orgTypesCheck, setOrgTypesCheck] = useState({});
   const [orgStage, setOrgStage] = useState('');
   const [searchString, setsearchString] = useState('');
   const [initialLoad, setInitialLoad] = useState(true);
@@ -48,7 +49,12 @@ export default function Organizations() {
           searchOrganizations();
         }
     }
-};
+  };
+
+  const handleTypeCheckChange = (event) => {
+    orgTypesCheck[event.target.name] = event.target.checked;
+    setOrgTypesCheck({ ...orgTypesCheck, [event.target.name]: event.target.checked });
+  };
 
   const onAlertClick = () => {
     setShowErrorAlert(false);
@@ -87,13 +93,22 @@ export default function Organizations() {
       }
     }
 
-    if(orgType && String(orgType).length>0) {
+    var selectedTypes = [];
+    for(var i = 0; i < orgTypes.length; i ++) {
+      if(orgTypesCheck[String(orgTypes[i].bt_id)]) {
+        selectedTypes.push(orgTypes[i].bt_id);
+      }
+    }
+    if(selectedTypes.length>0) {
       tempData = [...finalData];
       finalData = [];
       for(var i = 0; i < tempData.length; i++) {
         var org = tempData[i];
-        if(org && String(org.bt_id) == String(orgType)) {
-          finalData.push(org);
+        var found = org.types.some(r=> selectedTypes.indexOf(r.bt_id) >= 0)
+        if(found) {
+          if(finalData.filter(o => o.org_id == org.org_id).length == 0) {
+            finalData.push(org);
+          }
         }
       }
     }
@@ -104,7 +119,9 @@ export default function Organizations() {
       for(var i = 0; i < tempData.length; i++) {
         var org = tempData[i];
         if(org && String(org.bstage_id) == String(orgStage)) {
-          finalData.push(org);
+          if(finalData.filter(o => o.org_id == org.org_id).length == 0) {
+            finalData.push(org);
+          }
         }
       }
     }
@@ -236,14 +253,12 @@ export default function Organizations() {
           </div>
           <div>
             <FormControl className={classes.formControl} style={{'margin':'15px'}}>
-              <InputLabel>Tipo</InputLabel>
-              <Select
-                style={{'width':'150px'}}
-                value={orgType}
-                onChange={handleOrgTypeChange}>
-                  <MenuItem value=''>Todos</MenuItem>
-                  {orgTypes.map((type) => ( <MenuItem key={type.bt_id} value={type.bt_id}>{type.description}</MenuItem> ))}
-              </Select>
+              <small style={{display: "block", textAlign:"center"}}>Tipo(s) de Negocio</small>
+                {orgTypes.map((type) => (
+                  <FormControlLabel
+                    control={<Checkbox checked={orgTypesCheck[String(type.bt_id)]} onChange={handleTypeCheckChange} name={type.bt_id} />}
+                    label={type.description} />
+                ))}
             </FormControl>
             <FormControl className={classes.formControl} style={{'margin':'15px'}}>
               <InputLabel>Etapa</InputLabel>

@@ -284,6 +284,9 @@ function AdminReports() {
                                 <h3 style={{margin: "15px"}}>
                                     Most Contacted
                                 </h3>
+                                <small>
+                                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                                </small>
                                 <ResponsiveContainer width="100%" height="80%">
                                     <BarChart data={mostContacted}>
                                         <CartesianGrid strokeDasharray="3 3" />
@@ -307,6 +310,9 @@ function AdminReports() {
                                 <h3 style={{margin: "15px"}}>
                                     Poor Performing
                                 </h3>
+                                <small>
+                                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                                </small>
                                 <ResponsiveContainer width="100%" height="80%">
                                     <BarChart data={poorPerforming}>
                                         <CartesianGrid strokeDasharray="3 3" />
@@ -330,6 +336,9 @@ function AdminReports() {
                                 <h3 style={{margin: "15px"}}>
                                     Accounts Per Week
                                 </h3>
+                                <small>
+                                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                                </small>
                                 <ResponsiveContainer width="100%" height="80%">
                                     <BarChart data={accountsPerWeek}>
                                         <CartesianGrid strokeDasharray="3 3" />

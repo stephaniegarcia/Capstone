@@ -57,7 +57,7 @@ router.post('/api/organization', async (req, res) => {
           {
               dao.attachingOrgToBusinessType(bt_id[i], org[0].org_id)
           }
-          res.status(200).send("Organization registered");
+          res.status(200).send(org);
   }
   else{
       res.status(404).send("Error: Some parameters are missing")
