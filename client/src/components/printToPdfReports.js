@@ -272,7 +272,7 @@ function AdminReports() {
                     <img className="report-logo-img" src="/images/colmena_dark.png" />
                   </div>
                   <div style={{marginTop: "15px"}}>
-                  <h1>Reporte administrativos creado en {today}</h1>
+                  <h1>Reportes administrativos creado en {today}</h1>
                   <Grid container spacing={3}>
                     <Grid item xs={6}>
                         <Card variant="outlined">
@@ -282,10 +282,10 @@ function AdminReports() {
                                     margin: "auto"
                                 }}>
                                 <h3 style={{margin: "15px"}}>
-                                    Most Contacted
+                                Organizaciones Más Contactadas
                                 </h3>
                                 <small>
-                                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                                Número de Veces Contactadas vs Organización
                                 </small>
                                 <ResponsiveContainer width="100%" height="80%">
                                     <BarChart data={mostContacted}>
@@ -308,10 +308,10 @@ function AdminReports() {
                                     margin: "auto"
                                 }}>
                                 <h3 style={{margin: "15px"}}>
-                                    Poor Performing
+                                Organizaciones de Bajo Rendimiento
                                 </h3>
                                 <small>
-                                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                                Número de Calificación vs Organización
                                 </small>
                                 <ResponsiveContainer width="100%" height="80%">
                                     <BarChart data={poorPerforming}>
@@ -334,10 +334,11 @@ function AdminReports() {
                                     margin: "auto"
                                 }}>
                                 <h3 style={{margin: "15px"}}>
-                                    Accounts Per Week
+                                    Cuentas por Semana
                                 </h3>
                                 <small>
-                                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                                Número de Cuentas vs Mes/Semana
+                                (No se mostrará la semana si no tiene data)  
                                 </small>
                                 <ResponsiveContainer width="100%" height="80%">
                                     <BarChart data={accountsPerWeek}>
@@ -359,7 +360,7 @@ function AdminReports() {
                         <Card variant="outlined">
                             <div>
                                 <h3 style={{margin: "15px"}}>
-                                    Top Per Type
+                                Mejores Organizaciones por Tipo
                                 </h3>
                                 {topPerType.map((row) => (<CollapsibleTypeOrgRow  key={'type'+row.id} row={row} />))}
                                 <SmallSpinner isShown={loadingTopPerType} />
@@ -370,7 +371,7 @@ function AdminReports() {
                         <Card variant="outlined">
                             <div>
                                 <h3 style={{margin: "15px"}}>
-                                    Top Per Stage
+                                Mejores Organizaciones por Etapa
                                 </h3>
                                 {topPerStage.map((row) => (<CollapsibleStageOrgRow key={'stage'+row.id} row={row} />))}
                                 <SmallSpinner isShown={loadingTopPerStage} />
@@ -382,7 +383,7 @@ function AdminReports() {
                         <Card variant="outlined">
                             <div>
                                 <h3 style={{margin: "15px"}}>
-                                    Average Ratings
+                                    Calificaciones Promedio
                                 </h3>
                                 {averages.map((row) => (
                                   <div style={{margin: "0px 10px"}}>
@@ -407,7 +408,7 @@ function AdminReports() {
                         <Card variant="outlined">
                             <div>
                                 <h3 style={{margin: "15px"}}>
-                                    Contacted Rate
+                                    Tasa de Contacto
                                 </h3>
                                 {contactRate.map((row) => (
                                   <div style={{margin: "0px 10px"}}>

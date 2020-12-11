@@ -185,7 +185,7 @@ function Login() {
                     className="form-control secondary-button">
                         Restablecer la contraseña
                 </Button>
-                <p>Nuevo Usuario? </p>
+                <p>¿Eres un Usuario Nuevo? </p>
                 <Button
                     className="form-control"
                     type="submit"
@@ -193,7 +193,7 @@ function Login() {
                     color="primary"
                     href="/register"
                     style={{ margin: '16px' }}>
-                    Regístrate!
+                    ¡Regístrate!
                 </Button>
             </Paper>
             

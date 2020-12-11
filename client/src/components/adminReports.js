@@ -293,7 +293,7 @@ function AdminReports() {
                         <Card variant="outlined">
                             <div>
                                 <h3>
-                                    Average Ratings
+                                    Calificación Promedio
                                 </h3>
                                 <TableContainer>
                                     <Table aria-label="collapsible table">
@@ -310,7 +310,7 @@ function AdminReports() {
                         <Card variant="outlined">
                             <div>
                                 <h3>
-                                    Contacted Rate
+                                    Tasa de Contacto
                                 </h3>
                                 <TableContainer>
                                     <Table aria-label="collapsible table">
@@ -331,10 +331,10 @@ function AdminReports() {
                                     height: '400px',
                                 }}>
                                 <h3>
-                                    Most Contacted
+                                    Organizaciones Más Contactadas
                                 </h3>
                                 <small>
-                                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                                    Número de Veces Contactadas vs Organización
                                 </small>
                                 <ResponsiveContainer width="100%" height="80%">
                                     <BarChart data={mostContacted}>
@@ -356,10 +356,10 @@ function AdminReports() {
                                     height: '400px',
                                 }}>
                                 <h3>
-                                    Poor Performing
+                                    Organizaciones de Bajo Rendimiento
                                 </h3>
                                 <small>
-                                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                                    Número de Calificación vs Organización
                                 </small>
                                 <ResponsiveContainer width="100%" height="80%">
                                     <BarChart data={poorPerforming}>
@@ -381,10 +381,11 @@ function AdminReports() {
                                     height: '400px',
                                 }}>
                                 <h3>
-                                    Accounts Per Week
+                                    Cuentas por Semana
                                 </h3>
                                 <small>
-                                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                                    Número de Cuentas vs Mes/Semana
+                                    (No se mostrará la semana si no tiene data)
                                 </small>
                                 <ResponsiveContainer width="100%" height="80%">
                                     <BarChart data={accountsPerWeek}>
@@ -403,7 +404,7 @@ function AdminReports() {
                         <Card variant="outlined">
                             <div>
                                 <h3>
-                                    Top Per Type
+                                    Mejores Organizaciones por Tipo
                                 </h3>
                                 <TableContainer>
                                     <Table aria-label="collapsible table">
@@ -420,7 +421,7 @@ function AdminReports() {
                         <Card variant="outlined">
                             <div>
                                 <h3>
-                                    Top Per Stage
+                                    Mejores Organizaciones por Etapa
                                 </h3>
                                 <TableContainer>
                                     <Table aria-label="collapsible table">
@@ -436,7 +437,7 @@ function AdminReports() {
                 </Grid>
             </Paper>
             <Button style={{'margin':'15px'}} variant="contained" className="secondary-button" color="primary" href="/pdfreports">
-                Ver Versión imprimible
+                Ver Versión Imprimible
             </Button>
             <Alert
                 isOpen={showErrorAlert}

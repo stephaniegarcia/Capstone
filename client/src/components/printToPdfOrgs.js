@@ -120,7 +120,7 @@ function PdfOrgs() {
             <Card variant="outlined" style={{marginBottom:"20px"}}>
                 <TableRow>
                     <TableCell scope="row" className="collapse-header-buttons">
-                        <h5>Nombre de Organizacion: {row.name}</h5>
+                        <h5>Nombre de Organización: {row.name}</h5>
                         <div>
                             <FormControlLabel
                                 control={<GreenCheckbox checked={row.had_rating}
@@ -283,8 +283,8 @@ function PdfOrgs() {
                                     En este documento tienes todas las organizaciones recomendadas basadas en tu tipo de negocio y etapa en la que te encuentras. Recuerda contactarlas y marcar tu progreso para que puedas recorrer Tu Camino Empresarial de manera más organizada y fácil. Si deseas conocer si hay alguna organización nueva, puedes visitar la página de Tu Camino Empresarial para ver la versión más actualizada.
                                 </p>
                                 <hr/>
-                                <h1>Nos indicaste que tu negocio esta en etapa de {apiService.getOrgStage(apiService.profile().bstage_id)}</h1>
-                                <h2>Este sera tu camino a recorrer:</h2>
+                                <h1>Nos indicaste que tu negocio está en etapa de {apiService.getOrgStage(apiService.profile().bstage_id)}</h1>
+                                <h2>Éste sera tu camino a recorrer:</h2>
                                 <img className="org-type-icon" src={"images/"+apiService.getOrgTypeIcon(businessType)} />
                                 <h2>{apiService.getOrgType(businessType)}</h2>
                                 {roadmap && roadmap.length>0 && (
@@ -302,7 +302,7 @@ function PdfOrgs() {
                                 {roadmap && roadmap.length>0 && (
                                     <div>
                                         <h1>Organizaciones</h1>
-                                        <h2>Aqui se muestran todas las organizaciones que forman parte del recorrido: </h2>
+                                        <h2>Aquí se muestran todas las organizaciones que forman parte del recorrido: </h2>
                                         <div className="not-scrollable" style={{marginTop:"15px"}}>
                                             {roadmap.map((row) => (
                                                 <div>

@@ -342,25 +342,25 @@ function Register() {
                  </div>
                 <div className="margin-25">
                     <TextField
-                        label="Tipo de Asistencia"
+                        label="¿Qué Tipo de Asistencia Necesitas?"
                         select
                         className="form-control"
                         value={requiredAssistance}
                         onChange={handleRequiredAssistanceChange}>
                             <MenuItem value='Ninguna'>Ninguna</MenuItem>
                             <MenuItem value='Asuntos Legales'>Asuntos Legales</MenuItem>
-                            <MenuItem value='Prestamos'>Prestamos</MenuItem>
-                            <MenuItem value='Mentoria'>Mentoria</MenuItem>
+                            <MenuItem value='Prestamos'>Préstamos</MenuItem>
+                            <MenuItem value='Mentoria'>Mentoría</MenuItem>
                     </TextField>
                  </div>
                  <div className="margin-25">
                     <TextField
-                        label="Negocio está Operando Actualmente"
+                        label="¿Tu Negocio está Operando Actualmente?"
                         select
                         className="form-control"
                         value={businessStatus}
                         onChange={handleBusinessStatusChange}>
-                        <MenuItem value='true'>Si</MenuItem>
+                        <MenuItem value='true'>Sí</MenuItem>
                         <MenuItem value='false'>No</MenuItem>
                     </TextField>
                  </div>

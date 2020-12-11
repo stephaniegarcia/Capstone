@@ -337,7 +337,7 @@ function Outcome() {
         <div style={{'padding-top': '50px'}}></div>
         <Paper className="paper-margin" elevation={10} >
         <div>
-            <h1>Segun tus respuestas tu tipo de negocio es:</h1>
+            <h1>Según tus respuestas tu tipo de negocio es:</h1>
             <h2>{apiService.getOrgType(businessType)}</h2>
             <h3>¡Sigue tu camino!</h3>
           <div>
@@ -353,8 +353,8 @@ function Outcome() {
           <Paper className="paper-margin" elevation={10} >
           <div>
             <div>
-               <h1>Nos indicaste que tu negocio esta en etapa de {apiService.getOrgStage(profile.bstage_id)}</h1>
-              <h2>Este sera tu camino a recorrer:</h2>
+               <h1>Nos indicaste que tu negocio está en etapa de {apiService.getOrgStage(profile.bstage_id)}</h1>
+              <h2>Éste será tu camino a recorrer:</h2>
               {apiService.getOrgTypeVideo(businessType) && apiService.getOrgTypeVideo(businessType) != null && (
                 <iframe src={apiService.getOrgTypeVideo(businessType)} frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
               )}
@@ -397,7 +397,7 @@ function Outcome() {
           </Paper>  
             <Paper className="paper-margin" elevation={10} >
               <div>
-                  <h1>Aqui se muestran todas las organizaciones mencionadas en el recorrido: </h1>
+                  <h1>Aquí se muestran todas las organizaciones mencionadas en el recorrido: </h1>
                   <h2>Organizaciones</h2>
                   {!showLoadingOrgs && (
                     <div>

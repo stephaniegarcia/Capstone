@@ -529,8 +529,8 @@ function UserProfile() {
             <div>
               <Paper className="paper-margin" elevation={10} >
                 <div>
-                  <h1>Nos indicaste que tu negocio esta en etapa de {apiService.getOrgStage(apiService.profile().bstage_id)}</h1>
-                  <h2>Este sera tu camino a recorrer:</h2>
+                  <h1>Nos indicaste que tu negocio está en etapa de {apiService.getOrgStage(apiService.profile().bstage_id)}</h1>
+                  <h2>Éste será tu camino a recorrer:</h2>
                   
                   {apiService.getOrgTypeVideo(businessType) && apiService.getOrgTypeVideo(businessType) != null && (
                     <iframe src={apiService.getOrgTypeVideo(businessType)} frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
@@ -575,7 +575,7 @@ function UserProfile() {
               <Paper className="paper-margin" elevation={10} >
                 <div>
                   <h1>Organizaciones</h1>
-                  <h2>Aqui se muestran todas las organizaciones que forman parte del recorrido: </h2>
+                  <h2>Aquí se muestran todas las organizaciones que forman parte del recorrido: </h2>
                   <div>
                     {!showLoadingOrgs && (
                       <div>
@@ -621,13 +621,13 @@ function UserProfile() {
         <Paper className="paper-margin" elevation={10} >
           <div>
             <h1>Tu camino empresarial</h1>
-            <h2>Completa tu Camino empresarial para ver más información.</h2>
+            <h2>Completa tu Camino Empresarial para ver más información.</h2>
           </div>
         </Paper>
       )}
 
       <Paper className="paper-margin" elevation={10}>
-        <h1>Tu información</h1>
+        <h1>Tu Información</h1>
         <form noValidate autoComplete="off">
           <div className="margin-25">
             <TextField
@@ -703,24 +703,24 @@ function UserProfile() {
               InputLabelProps={{
                   shrink: true,
               }}
-              label="Tipo de Asistencia"
+              label="¿Qué Tipo de Asistencia Necesitas?"
               className="form-control"
               value={requiredAssistance}
               onChange={handleRequiredAssistanceChange}>
               <MenuItem value='Ninguna'>Ninguna</MenuItem>
               <MenuItem value='Asuntos Legales'>Asuntos Legales</MenuItem>
-              <MenuItem value='Prestamos'>Prestamos</MenuItem>
-              <MenuItem value='Mentoria'>Mentoria</MenuItem>
+              <MenuItem value='Prestamos'>Préstamos</MenuItem>
+              <MenuItem value='Mentoria'>Mentoría</MenuItem>
             </TextField>
           </div>
           <div className="margin-25">
             <TextField
-              label="Negocio está Operando Actualmente"
+              label="¿Tu Negocio está Operando Actualmente?"
               select
               className="form-control"
               value={businessStatus}
               onChange={handleBusinessStatusChange}>
-              <MenuItem value='true'>Si</MenuItem>
+              <MenuItem value='true'>Sí</MenuItem>
               <MenuItem value='false'>No</MenuItem>
             </TextField>
           </div>
@@ -750,7 +750,7 @@ function UserProfile() {
             color="primary"
             variant="contained"
             className="form-control secondary-button">
-              Cambiar Contrasena
+              Cambiar Contraseña
           </Button>
         </form> 
       </Paper>
@@ -771,7 +771,7 @@ function UserProfile() {
           <DialogTitle id="form-dialog-title">Calificar</DialogTitle>
           <DialogContent>
             <DialogContentText>
-              Déjanos saber como ha sido la calidad del servicio y tu experiencia con esta organización
+              Déjanos saber como ha sido la calidad del servicio y tu experiencia con ésta organización
             </DialogContentText>
             <Rating
                 disabled={hadRating}

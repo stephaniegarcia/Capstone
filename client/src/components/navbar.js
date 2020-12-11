@@ -75,7 +75,7 @@ function Navbar() {
                       <Button href="/adminreports" color="inherit" >Reportes</Button>
                       <Button href="/gareports" color="inherit" >Google Analytics</Button>
                       <Button href="/adminorgs" color="inherit" >Manejar Organizaciones</Button>
-                      <Button onClick={() => {adminLogout()}} color="inherit" >Cerrar sesion admin</Button>
+                      <Button onClick={() => {adminLogout()}} color="inherit" >Cerrar sesión admin</Button>
                     </div>
                   ) : (
 
@@ -84,7 +84,7 @@ function Navbar() {
                         <Button href="/organizaciones" color="inherit" >Organizaciones</Button>
                         <Button href="/tce" color="inherit" >Comienza Tu Camino Empresarial</Button>
                         <Button href="/userprofile" color="inherit" >Tu Perfil</Button>
-                        <Button onClick={() => {logout()}} color="inherit" >Cerrar sesion</Button>
+                        <Button onClick={() => {logout()}} color="inherit" >Cerrar sesión</Button>
                       </div>
                     )
 
@@ -114,7 +114,7 @@ function Navbar() {
                   <Button href="/adminreports" color="inherit" >Reportes</Button>
                   <Button href="/gareports" color="inherit" >Google Analytics</Button>
                   <Button href="/adminorgs" color="inherit" >Manejar Organizaciones</Button>
-                  <Button onClick={() => {adminLogout()}} color="inherit" >Cerrar sesion admin</Button>
+                  <Button onClick={() => {adminLogout()}} color="inherit" >Cerrar sesión admin</Button>
                 </div>
               ) : (
 

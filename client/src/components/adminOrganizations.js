@@ -643,7 +643,7 @@ export default function Organizations() {
                     InputLabelProps={{
                       shrink: true,
                     }}
-                    label="Busqueda"
+                    label="Búsqueda"
                     className="form-control"
                     onKeyDown={(e)=>{onEnterPress(e, "filter")}}
                     onChange={handleSearchStringChange}
