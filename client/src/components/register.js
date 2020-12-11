@@ -395,7 +395,7 @@ function Register() {
                 isOpen={showSuccessAlert}
                 handleSubmit={onSuccessAlertClick}
                 title=""
-                text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+                text="¡Gracias por Registrarte! Recibirás un correo electrónico con instrucciones para validar tu cuenta."
                 submitButtonText="Ok" />
             <Spinner isShown={showLoading} />
         </div>

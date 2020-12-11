@@ -442,6 +442,7 @@ function UserProfile() {
           setShowLoadingOrgs(false);
         });
       }
+      setShowLoading(false);
     }
   }
 
