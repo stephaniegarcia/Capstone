@@ -8,6 +8,46 @@ const pool = new Pool({
     port: 5432
 })
 
+
+const inactiveOrganizationExists = async (email) => {
+  try{
+
+      const res = await pool.query(
+          `SELECT CASE WHEN EXISTS (
+              SELECT *
+              FROM organization
+              WHERE email = $1 and is_active = 'false'
+          )
+          THEN CAST(1 AS BIT)
+          ELSE CAST(0 AS BIT) END`, [email]
+      );
+      return res.rows;
+
+  }catch(err){
+      return err;
+  }
+}
+
+
+const organizationExists = async (email) => {
+  try{
+
+      const res = await pool.query(
+          `SELECT CASE WHEN EXISTS (
+              SELECT *
+              FROM organization
+              WHERE email = $1 and is_active = 'true'
+          )
+          THEN CAST(1 AS BIT)
+          ELSE CAST(0 AS BIT) END`, [email]
+      );
+      return res.rows;
+
+  }catch(err){
+      return err;
+  }
+}
+
 async function getOrganizations(){
     try {
         const res = await pool.query(
@@ -39,6 +79,19 @@ async function getOrganizationByID(id){
       }
 }
 
+async function getOrganizationIDByEmail(email){
+  try {
+      const res = await pool.query(
+          `SELECT org_id
+          FROM public.organization 
+          where email = $1`, [email]
+      );
+      return res.rows;
+    } catch (err) {
+      return err.stack;
+    }
+}
+
 //Deleted bt_id from function, added returning values
 const createOrg =  async (name, description, email, phone_number, bs_id, is_active, org_link) => {
     try {
@@ -57,7 +110,7 @@ const createOrg =  async (name, description, email, phone_number, bs_id, is_acti
 //Deleted bt_id from function
 function updateOrganization(name, description, email, phone, bs_id, org_link, org_id) {
     pool.query(
-        'UPDATE public.organization	SET name =$1, description=$2, email =$3, phone_number =$4, bs_id=$5, org_link=$6 WHERE org_id =$7',
+        'UPDATE public.organization	SET name =$1, description=$2, email =$3, phone_number =$4, bs_id=$5, org_link=$6, is_active = true WHERE org_id =$7',
         [name, description, email, phone, bs_id, org_link, org_id],
         (error, results) => {
             if (error)
@@ -154,5 +207,8 @@ module.exports = {
     getOrganizationsTypes,
     getOrganizationsMissingTypes,
     attachingOrgToBusinessType,
-    deletingOrgBusinessType
+    deletingOrgBusinessType,
+    organizationExists,
+    inactiveOrganizationExists,
+    getOrganizationIDByEmail
 }

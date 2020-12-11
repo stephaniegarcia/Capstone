@@ -187,7 +187,7 @@ router.post('/api/register', async (req, res) => {
 
     if (firstname && lastname && business_status && email && password ){
                 exist = await dao.userExists(email);
-                console.log(exist)
+                
                 if(exist[0].case == 1){
                     res.status(400).send("Este correo electrónico ya tiene una cuenta creada en Tu Camino Empresarial.")
                 }
@@ -243,7 +243,6 @@ router.post('/api/login', async (req,res) => {
     const {email, password} = req.body;
 
     if(email && password){
-        if(validEmail(email)){
 
             hashedPassword = await dao.getPassword(email);
             if(hashedPassword[0]){
@@ -258,10 +257,7 @@ router.post('/api/login', async (req,res) => {
             else{
                 res.status(400).send("Esta cuenta no existe o no esta verificada.");
             }
-        }
-        else{
-            res.status(400).send("Error: Invalid Email!");
-        }
+      
     }
     else{
         res.status(400).send("Error: Missing parameters!");
