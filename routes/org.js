@@ -51,13 +51,41 @@ router.post('/api/organization', async (req, res) => {
 
   const {name, description, email, phone_number, bt_id, bs_id, is_active, org_link} = req.body;
   if(name && description && email && phone_number && bs_id && is_active && org_link){
-          let org = await dao.createOrg(name, description, email, phone_number, bs_id, is_active, org_link)
-          console.log(org)
-          for(let i =0; i<bt_id.length;i++)
-          {
-              dao.attachingOrgToBusinessType(bt_id[i], org[0].org_id)
+          exists = await dao.organizationExists(email);
+          inactive = await dao.inactiveOrganizationExists(email);
+          
+          if(exists[0].case == 1){
+              res.status(400).send("Esta organizacion ya se encuentra creada en Tu Camino Empresarial.")
           }
-          res.status(200).send("Organization registered");
+          else if(inactive[0].case == 1){
+            let id = await dao.getOrganizationIDByEmail(email)
+            org_id = id[0].org_id
+            
+            //console.log(org_id)
+            let types = await dao.getOrganizationsTypes(org_id);
+            
+            for(let j = 0; j < bt_id.length; j++){
+              if(!isIn(bt_id[j], types)){
+                dao.attachingOrgToBusinessType(bt_id[j],org_id)          
+              }
+            }     
+            for(let j = 0; j < types.length; j++){
+              if(!isInQ(types[j].bt_id, bt_id)){
+              await dao.deletingOrgBusinessType(types[j].bt_id, org_id)          
+              }
+            }  
+            dao.updateOrganization(name, description, email, phone_number, bs_id, org_link, org_id)
+            res.status(200).send("Organization updated.");
+            
+          }
+          else{
+            let org = await dao.createOrg(name, description, email, phone_number, bs_id, is_active, org_link)
+            for(let i =0; i<bt_id.length;i++)
+            {
+                dao.attachingOrgToBusinessType(bt_id[i], org[0].org_id)
+            }
+            res.status(200).send("Organization registered");
+        }
   }
   else{
       res.status(404).send("Error: Some parameters are missing")
