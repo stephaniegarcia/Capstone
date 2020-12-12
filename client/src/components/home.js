@@ -1,5 +1,4 @@
 import React from 'react';
-import Carousel from 'react-material-ui-carousel'
 import { Paper, Grid, Card } from '@material-ui/core'
 import FacebookIcon from '@material-ui/icons/Facebook';
 import InstagramIcon from '@material-ui/icons/Instagram';
@@ -7,8 +6,9 @@ import TwitterIcon from '@material-ui/icons/Twitter';
 import LinkedInIcon from '@material-ui/icons/LinkedIn';
 import AlternateEmailIcon from '@material-ui/icons/AlternateEmail';
 import LanguageIcon from '@material-ui/icons/Language';
-import { Link } from 'react-router-dom';
 
+
+//Post Home Page Data 
 function Home(props)
 {
     return (
@@ -16,7 +16,7 @@ function Home(props)
             <Paper className="paper-margin" style={{padding: '30px'}} elevation={10}>
                 <Grid container spacing={3}>
                     <Grid item xs={12}>
-                        {/* <h1>Tu Camino Empresarial</h1> */}
+    
                         <h1>
                             ¿Quieres conocer cómo recorrer Tu Camino Empresarial?
                         </h1>

@@ -50,26 +50,29 @@ export default function Organizations() {
         }
     }
   };
-
+//Organization Type Checkbox event callback
   const handleTypeCheckChange = (event) => {
     orgTypesCheck[event.target.name] = event.target.checked;
     setOrgTypesCheck({ ...orgTypesCheck, [event.target.name]: event.target.checked });
   };
-
+//Aler event callback
   const onAlertClick = () => {
     setShowErrorAlert(false);
   };
-
+//Organization Type event callback
   const handleOrgTypeChange = (event) => {
     setOrgType(event.target.value);
   };
+  //Organization Stage event callback
   const handleOrgStageChange = (event) => {
     setOrgStage(event.target.value);
   };
+  //Search event callback
   const handleSearchStringChange = (event) => {
     setsearchString(event.target.value);
   };
-
+//Filter Organizations
+//@param organizations
   function filterOrganizations(orgs) {
     var finalData = [];
     var tempData = [];

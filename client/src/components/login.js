@@ -6,7 +6,6 @@ import Button from '@material-ui/core/Button';
 import Spinner from './loading'
 import Alert from './alert'
 import '../index.css';
-//import apiService from "./mockApiService";
 import apiService from "./apiService";
 
 function Login() {

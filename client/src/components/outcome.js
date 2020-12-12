@@ -397,7 +397,11 @@ function Outcome() {
           </Paper>  
             <Paper className="paper-margin" elevation={10} >
               <div>
-                  <h1>Aquí se muestran todas las organizaciones mencionadas en el recorrido: </h1>
+                
+{apiService.profile().bstage_id != 4 && apiService.profile().bt_id == 4 && (
+                    <small>No Existen Organizaciones Para Tu Etapa de Negocio. Comunícate con Colmena66 para más Información.</small>
+                  )}  
+                <h1>Aquí se muestran todas las organizaciones mencionadas en el recorrido: </h1>
                   <h2>Organizaciones</h2>
                   {!showLoadingOrgs && (
                     <div>

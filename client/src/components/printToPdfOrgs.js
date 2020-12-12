@@ -57,7 +57,7 @@ function PdfOrgs() {
     const onAlertClick = () => {
         setShowErrorAlert(false);
     };
-
+//Roadmap
     function RoadmapRow(props) {
         const { row } = props;
         var orgTypeCss = apiService.getOrgTypeCssName(apiService.profile().bt_id);
@@ -303,6 +303,10 @@ function PdfOrgs() {
                                     <div>
                                         <h1>Organizaciones</h1>
                                         <h2>Aquí se muestran todas las organizaciones que forman parte del recorrido: </h2>
+                                       
+{apiService.profile().bstage_id != 4 && apiService.profile().bt_id == 4 && (
+                    <small>No Existen Organizaciones Para Tu Etapa de Negocio. Comunícate con Colmena66 para más Información.</small>
+                  )}
                                         <div className="not-scrollable" style={{marginTop:"15px"}}>
                                             {roadmap.map((row) => (
                                                 <div>

@@ -128,7 +128,7 @@ export default function Organizations() {
   }
  //drescription validation helper function
   //@param text - organization description
-    //@return if it's valid or not
+  //@return if it's valid or not
   function isValidDescription(text) {
     if(!text || text == null) {
       return false;
@@ -152,6 +152,7 @@ export default function Organizations() {
 
   //Event Handlers
 
+  //Organization Type Checkbox event handler
   const handleTypeCheckChange = (event) => {
     orgTypesCheck[event.target.name] = event.target.checked;
     var atleastOneChecked = false;
@@ -164,41 +165,46 @@ export default function Organizations() {
     setOrgTypesCheck({ ...orgTypesCheck, [event.target.name]: event.target.checked });
   };
 
+  //Organization Name event handler
   const handleNameTextChange = (event) => {
     setValidName(isValidName(event.target.value));
     setName(event.target.value);
   };
+   //Organization Email event handler
   const handleEmailTextChange = (event) => {
     setValidEmail(isValidEmail(event.target.value.trim()));
     setEmail(event.target.value.trim());
   };
+   //Organization Phone event handler
   const handlePhoneTextChange = (event) => {
     setValidPhone(isValidPhone(event.target.value.trim()));
     setPhone(event.target.value.trim());
   };
-
+ //Organization Step event handler
   const handleStepTextChange = (event) => {
     setStep(event.target.value);
   };
-  
+   //Organization Link event handler
   const handleLinkTextChange = (event) => {
     setValidLink(isValidLink(event.target.value));
     setLink(event.target.value);
   };
+   //Organization Description event handler
   const handleDescriptionTextChange = (event) => {
     setValidDescription(isValidDescription(event.target.value));
     setDescription(event.target.value);
   };
+   //Organization open delete modal event handler
   const handleOpenDeleteAlertClickOpen = (org) => {
     saveLastOrgSelected(org);
     setOpenDeleteAlert(true);
   };
-
+ //Organization close Delete modal event handler
   const handleOpenDeleteAlertClose = () => {
     saveLastOrgSelected(newOrgModel);
     setOpenDeleteAlert(false);
   };
-  
+   //Organization Stage event handler
   const handleOrgStageChange = (event) => {
     setOrgStage(event.target.value);
     var steps = apiService.getRoadmapSteps(event.target.value)
@@ -207,7 +213,7 @@ export default function Organizations() {
       setStep(steps[0].bs_id)
     }
   };
-
+ //Organization Name event handler
   const handleOpenAddOrgModalClickOpen = () => {
     if(orgTypes && orgTypes.length>0) {
       for(var i = 0; i < orgTypes.length; i++) {
@@ -229,12 +235,12 @@ export default function Organizations() {
     saveLastOrgSelected(newOrgModel);
     setOpenAddOrgModal(true);
   };
-
+ //Organization open Add modal event handler
   const handleOpenAddOrgModalClose = () => {
     saveLastOrgSelected(newOrgModel);
     setOpenAddOrgModal(false);
   };
-
+ //Organization open Edit modal event handler
   const handleOpenEditOrgModalClickOpen = (org) => {
     if(orgTypes && orgTypes.length>0) {
       for(var i = 0; i < orgTypes.length; i++) {
@@ -260,12 +266,12 @@ export default function Organizations() {
     saveLastOrgSelected(org);
     setOpenEditOrgModal(true);
   };
-
+ //Organization close Edit modal event handler
   const handleOpenEditOrgModalClose = () => {
     saveLastOrgSelected(newOrgModel);
     setOpenEditOrgModal(false);
   };
-
+ //Search bar event handler
   const handleSearchStringChange = (event) => {
     setsearchString(event.target.value);
   };
@@ -523,13 +529,7 @@ export default function Organizations() {
       setFullOrganizationList(fullOrganizationList);
       filterOrganizations(fullOrganizationList);
       setShowLoading(false);
-      // apiService.getRequest("organizations").then((organizationsResponse) => {
-        
-      // }).catch(err =>{
-      //   setShowLoading(false);
-      //   setErrorMessage(err ? (err.response ? (err.response.data? String(err.response.data) : String(err.response)) : String(err)) : 'Ocurrio un error');
-      //   setShowErrorAlert(true);
-      // });
+    
     }).catch(err =>{
       setShowLoading(false);
       setErrorMessage(err ? (err.response ? (err.response.data? String(err.response.data) : String(err.response)) : String(err)) : 'Ocurrio un error');

@@ -511,9 +511,7 @@ function UserProfile() {
     var orgStepsTemp = orgStepsResponse.data;
     apiService.orgSteps(orgStepsTemp);
 
-    // setTimeout(()=>{
-    //   getProfile();
-    // }, 1000);
+  
     getProfile();
   }, [shouldLoad]);
 
@@ -577,6 +575,10 @@ function UserProfile() {
                 <div>
                   <h1>Organizaciones</h1>
                   <h2>Aquí se muestran todas las organizaciones que forman parte del recorrido: </h2>
+                  
+{apiService.profile().bstage_id != 4 && apiService.profile().bt_id == 4 && (
+                    <small>No Existen Organizaciones Para Tu Etapa de Negocio. Comunícate con Colmena66 para más Información.</small>
+                  )}
                   <div>
                     {!showLoadingOrgs && (
                       <div>
