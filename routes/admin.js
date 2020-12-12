@@ -73,8 +73,8 @@ router.post('/api/admin/changePassword', async (req, res) => {
   exist = await dao.adminExists(email);
   if(exist[0].case == 1){
     passwordtoken = randomstring.generate();
-    host =  process.env.WebsiteUrl || req.get('host');
-    link="http://"+host+"/newPassword/admin/" +email+ "?id="+passwordtoken;
+    host =  process.env.WebsiteUrl || "http://" + req.get('host');
+    link=host+"/newPassword/admin/" +email+ "?id="+passwordtoken;
     let insertToken = dao.insertPasswordToken(email, passwordtoken);
     if(insertToken instanceof Error){
         res.status(404).send("User not found");
