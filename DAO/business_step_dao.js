@@ -8,6 +8,10 @@ const pool = new Pool({
     port: 5432
 })
 
+/**
+ * @description function that returns information of business steps on DB. Used mainly for testing purposes.
+ * @return all the information from business_step table.
+ */
 async function getSteps(){
     try {
         const res = await pool.query(
