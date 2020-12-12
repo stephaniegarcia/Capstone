@@ -228,6 +228,14 @@ a.MuiButton-containedPrimary.secondary-button:disabled, button.MuiButton-contain
   color: #333333 !important;
 }
 
+.MuiButton-containedSecondary {
+  background-color: #ff1638 !important;
+  font-weight: bolder !important;
+}
+.MuiButton-containedSecondary > span{
+  font-weight: bolder !important;
+}
+
 .MuiDrawer-paper {
   background-color: #333333 !important;
   color: white !important;

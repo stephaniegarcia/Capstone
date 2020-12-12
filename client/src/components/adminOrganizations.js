@@ -597,7 +597,7 @@ export default function Organizations() {
                       <h3 className="light-text">Descripción: </h3>
                       <h3>{row.description}</h3>
                     </Grid>
-                    {row.org_link && row.org_link.length>0 && (<Grid item xs={12}><Link href={row.org_link} target='_blank'>Ver más información</Link></Grid>)}
+                    {row.org_link && row.org_link.length>0 && (<Grid item xs={12}><Link href={row.org_link} target='_blank' style={{color: "#333333", textDecoration: "underline"}}>Ver más información</Link></Grid>)}
                   </Grid>
               </Collapse>
           </TableCell>
