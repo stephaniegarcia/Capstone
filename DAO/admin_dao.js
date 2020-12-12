@@ -9,18 +9,25 @@ const pool = new Pool({
     port: 5432
 })
 
-async function getAdmins(){
-    try {
+const adminExists = async (email) => {
+    try{
+
         const res = await pool.query(
-          `SELECT A.admin_id, U.first_name
-          from admin as A inner join users as U ON A.user_id = U.user_id`
+            `SELECT CASE WHEN EXISTS (
+                SELECT *
+                FROM admin_test
+                WHERE email = $1
+            )
+            THEN CAST(1 AS BIT)
+            ELSE CAST(0 AS BIT) END`, [email]
         );
-        console.log(res.rows)
         return res.rows;
-      } catch (err) {
-        return err.stack;
-      }
+
+    }catch(err){
+        return err;
+    }
 }
+
 
 async function getAdminByID(id){
     try {
@@ -108,11 +115,11 @@ const changePassword = async (email, password) => {
 
 
 module.exports = {
-    getAdmins,
     getAdminByID,
     loginAdmin,
     insertPasswordToken,
     getPasswordToken,
     changePassword,
-    getPassword
+    getPassword,
+    adminExists
 }

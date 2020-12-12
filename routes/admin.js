@@ -67,34 +67,45 @@ router.post('/api/admin', async (req, res) => {
  * @returns an email with the link to change the password
  * 
  */
-router.post('/api/admin/changePassword', (req, res) => {
+router.post('/api/admin/changePassword', async (req, res) => {
 
   const email = req.body.email;
-  console.log(email);
-  passwordtoken = randomstring.generate();
-  host =  process.env.WebsiteUrl || req.get('host');
-  link="http://"+host+"/newPassword/admin/" +email+ "?id="+passwordtoken;
-  let insertToken = dao.insertPasswordToken(email, passwordtoken);
-  if(insertToken instanceof Error){
-      res.status(404).send("User not found");
+  exist = await dao.adminExists(email);
+  if(exist[0].case == 1){
+    passwordtoken = randomstring.generate();
+    host =  process.env.WebsiteUrl || "http://" + req.get('host');
+    link=host+"/newPassword/admin/" +email+ "?id="+passwordtoken;
+    let insertToken = dao.insertPasswordToken(email, passwordtoken);
+    if(insertToken instanceof Error){
+        res.status(404).send("User not found");
+    }
+    mailOptions={
+        from: 'capstonehelix@gmail.com',
+        to : email,
+        subject : "Cambio de contraseña",
+        html : `<br> <img src="cid:idForReset"> <br> ¿Quieres cambiar la contraseña de Tu Camino Empresarial? Hemos recibido una solicitud para restablecer tu contraseña. Presiona el enlace para cambiarla y comenzar a utilizar una nueva.<br>
+        
+        <br>En caso de no haber solicitado un cambio de contraseña, puedes ignorar este correo electrónico. Solo una persona con acceso a este correo electrónico puede cambiarla.<br><a href=${link}>Presione aquí para cambiar tu contraseña.</a>`,
+        attachments: [{
+            filename: 'colmena.png',
+            path: 'routes/Colmena-66.png',
+            cid: 'idForReset' //same cid value as in the html img src
+        }]
+    }
+    transporter.sendMail(mailOptions, (error, response) => {
+        if(error){
+            console.log(error);
+            res.status(400).send("error");
+        }
+        else{
+            console.log("Message sent: " + response.message);
+            res.status(200).send("sent");
+        }
+    });
   }
-  mailOptions={
-      from: 'capstonehelix@gmail.com',
-      to : email,
-      subject : "Cambio de contraseña",
-      html : "<br> Presione el enlace para cambiar su contraseña.<br><a href="+link+">Presione aqui.</a>"
+  else{
+    res.status(400).send("Este correo no pertenece al administrador.");
   }
-  console.log(mailOptions);
-  transporter.sendMail(mailOptions, (error, response) => {
-      if(error){
-          console.log(error);
-          res.status(400).send("error");
-      }
-      else{
-          console.log("Message sent: " + response.message);
-          res.status(200).send("sent");
-      }
-});
 });
 
 /**
