@@ -28,18 +28,6 @@ const adminExists = async (email) => {
     }
 }
 
-async function getAdmins(){
-    try {
-        const res = await pool.query(
-          `SELECT A.admin_id, U.first_name
-          from admin as A inner join users as U ON A.user_id = U.user_id`
-        );
-        console.log(res.rows)
-        return res.rows;
-      } catch (err) {
-        return err.stack;
-      }
-}
 
 async function getAdminByID(id){
     try {
@@ -127,7 +115,6 @@ const changePassword = async (email, password) => {
 
 
 module.exports = {
-    getAdmins,
     getAdminByID,
     loginAdmin,
     insertPasswordToken,
