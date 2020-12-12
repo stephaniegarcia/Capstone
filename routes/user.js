@@ -208,7 +208,7 @@ router.post('/api/register', async (req, res) => {
                     <a href=${link}>Presiona aqui para verificar tu cuenta.</a>`,
                     attachments: [{
                         filename: 'colmena.png',
-                        path: 'routes/colmena.png',
+                        path: 'routes/Colmena-66.png',
                         cid: 'test' //same cid value as in the html img src
                     }]
                 }
