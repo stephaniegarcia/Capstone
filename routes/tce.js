@@ -137,6 +137,13 @@ router.get('/api/referred/contacted', async (req,res) =>{
    res.send(organizations)
 });
 
+/**
+* @route /api/roadmap/:btID/:bstageID
+ * @description return the organizations by type and stage
+ * @param btID
+ * @param bstageID
+ * @returns organization 
+ */
 router.get('/api/roadmap/:btID/:bstageID', async (req,res) =>{
     const roadmap = await dao.getRoadMap(req.params.bstageID,req.params.btID)
     console.log(roadmap)
