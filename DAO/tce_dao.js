@@ -9,7 +9,10 @@ const pool = new Pool({
     port: 5432,
 })
 
-
+/**
+ * @description function that returns questions
+ * @returns description (questions in DB)
+ */
 const getQuestions = async () => {
     try {
         const res = await pool.query(
@@ -24,7 +27,12 @@ const getQuestions = async () => {
 
 };
 
-//aun falta definir bien como se va a filtrar
+/**
+ * @description function that gets organizations filtered by stage and type.
+ * @param stage
+ * @param type
+ * @return Org_name, Org_Type, Org_stage
+ */
 const getOrganizationsFiltered = async (stage, type) => {
     try {
         const res = await pool.query(
@@ -43,6 +51,12 @@ const getOrganizationsFiltered = async (stage, type) => {
 
 };
 
+/**
+ * @description function that gets organizations filtered by type.
+ * @param stage
+ * @param type
+ * @return org_id, name, description, email, phone_number, bt_id, bs_id, bstage_id, org_link, is_active
+ */
 const getOrganizationsByType = async (type) => {
     try {
         const res = await pool.query(
@@ -57,7 +71,22 @@ const getOrganizationsByType = async (type) => {
       }
 }
 
-
+/**
+ * @description function that inserts user's answer to DB
+ * @param user_id 
+ * @param a1 
+ * @param a2 
+ * @param a3 
+ * @param a4 
+ * @param a5 
+ * @param a6 
+ * @param a7 
+ * @param a8 
+ * @param a9 
+ * @param a10 
+ * @param a11 
+ * @returns successful if no error is found, otherwise error (missing parameters most likely)
+ */
 const saveAnswers = async (user_id,a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11) => {
   try {
     const res = await pool.query(
@@ -72,6 +101,11 @@ const saveAnswers = async (user_id,a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11) => {
   }
 }
 
+/**
+ * @description function that returns percentage of organizations contacted versus referred. Example, if an organization has been contacted 
+ * 1 time but referred 10 times, percentage will be 10%.
+ * @returns name (organization's name), not contacted (users that have not contacted org), percentage
+ */
 const getOrganizationsReferredVersusContacted = async () => {
   try {
       const res = await pool.query(
@@ -91,6 +125,21 @@ const getOrganizationsReferredVersusContacted = async () => {
     }
 }
 
+/**
+ * @description function that updates user's answers if already user has answered questions.
+ * @param user_id 
+ * @param a1 
+ * @param a2 
+ * @param a3 
+ * @param a4 
+ * @param a5 
+ * @param a6 
+ * @param a7 
+ * @param a8 
+ * @param a9 
+ * @param a10 
+ * @param a11 
+ */
 const changeAnswers = async (user_id,a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11) => {
   try {
     const res = await pool.query(
@@ -105,6 +154,11 @@ const changeAnswers = async (user_id,a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11) => {
   }
 }
 
+/**
+ * @description function that inserts type into user after answering questions
+ * @param user_id 
+ * @param type 
+ */
 const setType = async (user_id, type) => {
   try {
     const res = await pool.query(
@@ -120,6 +174,11 @@ const setType = async (user_id, type) => {
 };
 
 
+/**
+ * @description function that returns rating done by user with id userID
+ * @param user_id 
+ * @return rating, user_id, organization_id, rating_comment, name
+ */
 const organizationsByUser = async (user_id) => {
   try {
     const res = await pool.query(
@@ -136,6 +195,12 @@ const organizationsByUser = async (user_id) => {
 
 }
 
+/**
+ *@description function that gathers all the organizations for the user with business type btID and business stage bstageID
+ * @param bstageID 
+ * @param btID 
+ * @return org_id, name, description, email, phone_number, bs_id, is_active, org_link, bt_id, bstage_id
+ */
 async function getRoadMap(bstageID, btID){
   try {
       const res = await pool.query(
@@ -152,6 +217,11 @@ async function getRoadMap(bstageID, btID){
     }
 }
 
+/**
+ * @description function that gets all the business type of organization with orgID. Mostly used for troubleshooting
+ * @param orgID 
+ * @return t.bt_id, b.description
+ */
 async function getOrganizationsTypes(orgID){
   try {
       const res = await pool.query(
@@ -168,6 +238,7 @@ async function getOrganizationsTypes(orgID){
     }
 }
 
+//Functions used for this DAO
 module.exports = {
     getQuestions,
     getOrganizationsFiltered,

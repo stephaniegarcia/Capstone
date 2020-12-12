@@ -8,6 +8,10 @@ const pool = new Pool({
     port: 5432
 })
 
+/**
+ * @description function that returns information of business types on DB. Used mainly for testing purposes.
+ * @return all the information from business_type table.
+ */
 async function getTypes(){
     try {
         const res = await pool.query(

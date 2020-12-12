@@ -8,6 +8,10 @@ const pool = new Pool({
     port: 5432
 })
 
+/**
+ * @description function that returns information of stages on DB. Used mainly for testing purposes.
+ * @return all the information from business_stage table.
+ */
 async function getStages(){
     try {
         const res = await pool.query(
@@ -21,6 +25,7 @@ async function getStages(){
       }
 }
 
+//Function used for this DAO
 module.exports = {
     getStages
 }
