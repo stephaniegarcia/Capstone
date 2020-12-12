@@ -9,6 +9,25 @@ const pool = new Pool({
     port: 5432
 })
 
+const adminExists = async (email) => {
+    try{
+
+        const res = await pool.query(
+            `SELECT CASE WHEN EXISTS (
+                SELECT *
+                FROM admin_test
+                WHERE email = $1
+            )
+            THEN CAST(1 AS BIT)
+            ELSE CAST(0 AS BIT) END`, [email]
+        );
+        return res.rows;
+
+    }catch(err){
+        return err;
+    }
+}
+
 async function getAdmins(){
     try {
         const res = await pool.query(
@@ -114,5 +133,6 @@ module.exports = {
     insertPasswordToken,
     getPasswordToken,
     changePassword,
-    getPassword
+    getPassword,
+    adminExists
 }
