@@ -32,18 +32,6 @@ const pool = new Pool({
 
 
 
-/**
- * 
- * @constructor Pool
- * 
- * 
- * @augments service
- * @augments auth
- * @augments user
- * @augments pass
- * 
- * @description Constructor for nodemailer
- */
 let transporter = nodemailer.createTransport({
     service: 'gmail',
  auth: {
