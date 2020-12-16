@@ -149,10 +149,10 @@ function PdfOrgs() {
                                 {row.types.map((type) => ( <h3 className="center-text">{type.description}</h3> ))}
                             </Grid>
                             <Grid item xs={12}>
-                                <h3 className="light-text">Descripción: </h3>
+                                <h3 className="light-text" style={{marginTop: "-15px"}}>Descripción: </h3>
                                 <h3>{row.description}</h3>
                             </Grid>
-                            {row.org_link && row.org_link.length>0 && (<Grid item xs={12}><h3><span className="light-text">Más información: </span>{row.org_link}</h3></Grid>)}
+                            {row.org_link && row.org_link.length>0 && (<Grid style={{marginBottom: "20px"}} item xs={12}><h3><span className="light-text">Más información: </span>{row.org_link}</h3></Grid>)}
                         </Grid>                
                     </TableCell>
                 </TableRow>

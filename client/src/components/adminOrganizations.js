@@ -556,12 +556,12 @@ export default function Organizations() {
     return (
       <React.Fragment>
         <TableRow>
-          <TableCell>
+          <TableCell style={{paddingRight: "0px", width:"40px"}}>
               <IconButton aria-label="expand row" size="small" onClick={() => setOpen(!open)}>
                   {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
               </IconButton>
           </TableCell>
-          <TableCell scope="row" className="collapse-header-buttons">
+          <TableCell style={{paddingLeft: "0px"}} scope="row" className="collapse-header-buttons">
               <h5>{row.name}</h5>
               <div>
                 <Button style={{'margin':'15px'}} variant="contained" color="primary" onClick={()=>{ handleOpenEditOrgModalClickOpen(row); }}>
@@ -594,10 +594,10 @@ export default function Organizations() {
                       {row.types.map((type) => ( <h3 className="center-text">{type.description}</h3> ))}
                     </Grid>
                     <Grid item xs={12}>
-                      <h3 className="light-text">Descripción: </h3>
+                      <h3 className="light-text" style={{marginTop: "-15px"}}>Descripción: </h3>
                       <h3>{row.description}</h3>
                     </Grid>
-                    {row.org_link && row.org_link.length>0 && (<Grid item xs={12}><Link href={row.org_link} target='_blank' style={{color: "#333333", textDecoration: "underline"}}>Ver más información</Link></Grid>)}
+                    {row.org_link && row.org_link.length>0 && (<Grid style={{marginBottom: "20px"}} item xs={12}><Link href={row.org_link} target='_blank' style={{color: "#333333", textDecoration: "underline"}}>Ver más información</Link></Grid>)}
                   </Grid>
               </Collapse>
           </TableCell>
